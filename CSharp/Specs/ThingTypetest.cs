@@ -1,0 +1,66 @@
+﻿#region
+
+using System;
+using NUnit.Framework;
+
+#endregion
+
+namespace ThingModel.Specs
+{
+    [TestFixture]
+    public class ThingTypeTest
+    {
+        private ThingType _type;
+        private PropertyType _propertyType;
+
+        [SetUp]
+        protected void SetUp()
+        {
+            _type = new ThingType("Plane");
+            _propertyType = PropertyType.Create<Property.Location>("location");
+            _type.DefineProperty(_propertyType);
+        }
+
+        [Test]
+        public void CheckName()
+        {
+            Assert.That(_type.Name, Is.EqualTo("Plane"));
+        }
+        
+        [Test]
+        public void WrongName()
+        {
+            Assert.Throws<Exception>(() => new ThingType(""));
+            Assert.Throws<Exception>(() => new ThingType(null));
+        }
+
+        [Test]
+        public void SetProperty()
+        {
+            Assert.That(_type.GetPropertyDefinition("location"), Is.EqualTo(_propertyType));
+        }
+
+        [Test]
+        public void CheckRequiredProperties()
+        {
+            var plane = new Thing("A380", _type);
+            Assert.That(_type.Check(plane), Is.False);
+
+            plane.SetProperty(new Property.Location("location", new Location.LatLng(49.010852, 2.547398)));
+
+            Assert.That(_type.Check(plane), Is.True);
+        }
+
+        [Test]
+        public void CheckNotRequiredProperties()
+        {
+            var plane = new Thing("A380", _type);
+            _propertyType.Required = false;
+            Assert.That(_type.Check(plane), Is.True);
+
+            // wrong type
+            plane.SetProperty(new Property.Number("location", 27));
+            Assert.That(_type.Check(plane), Is.False);
+        }
+    }
+}
