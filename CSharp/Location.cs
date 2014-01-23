@@ -1,18 +1,12 @@
-﻿#region
-
-using System;
-
-#endregion
-
-namespace ThingModel
+﻿namespace ThingModel
 {
     public class Location
     {
-        protected double X;
-        protected double Y;
-        protected double? Z;
+        public double X;
+        public double Y;
+        public double? Z;
         public string System;
-
+        
         protected Location(double x, double y, double? z)
         {
             X = x;
@@ -34,10 +28,6 @@ namespace ThingModel
                 : base(x, y, z)
             {
             }
-
-            public new double X;
-            public new double Y;
-            public new double? Z;
         }
 
         public class LatLng : Location
