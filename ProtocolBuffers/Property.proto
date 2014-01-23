@@ -1,0 +1,51 @@
+package ThingModel;
+
+message Property {
+
+	required int32 string_key = 1;
+
+	message Location {
+
+		required double x = 1 [default = 0.0];
+		required double y = 2 [default = 0.0];
+		optional double z = 3 [default = 0.0];
+
+		// WGS84 by default
+		optional int32 string_system = 4;
+	}
+
+	message String {
+		optional string value = 1;
+
+		/**
+		 *	A string can be cached using StringDeclaration
+		 *	It's just an option, and a developer
+		 *	is allowed to ignore this feature
+		 *	when he want to send a string property.
+		 */
+		optional string value_key = 2;	
+	}
+
+	message Double {
+		required double value = 1 [default = 0.0];
+	}
+
+	message Int {
+		required int32 Value = 1 [default = 0];
+	}
+
+	message Boolean {
+		required bool value = 1 [default = false];
+	}
+
+	message DateTime {
+		required int32 value = 1;
+	}
+
+	optional Location location = 2;
+	optional String string = 3;
+	optional Double double = 4;
+	optional Int int = 5;
+	optional Boolean boolean = 6;
+	optional DateTime datetime = 7;
+}

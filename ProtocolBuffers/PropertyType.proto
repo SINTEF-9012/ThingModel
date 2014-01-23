@@ -1,0 +1,19 @@
+package ThingModel;
+
+message PropertyType {
+	required int32 string_key = 1;
+
+	enum Type {
+		LOCATION = 0;
+		STRING = 1;
+		DOUBLE = 2;
+		INT = 3;
+		BOOLEAN = 4;
+		DATETIME = 5;
+	}
+
+	required Type type = 2 [default = STRING];
+
+	optional string name = 3;
+	optional string description = 4;
+}

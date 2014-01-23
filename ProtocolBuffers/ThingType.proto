@@ -1,0 +1,11 @@
+import "PropertyType.proto";
+
+package ThingModel;
+
+message ThingType {
+	required int32 string_name = 1;
+
+	optional string description = 2;
+
+	repeated PropertyType properties = 3;	
+}

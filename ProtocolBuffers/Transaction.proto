@@ -1,0 +1,19 @@
+import "StringDeclaration.proto";
+import "Thing.proto";
+import "ThingType.proto";
+
+package ThingModel;
+
+message Transaction {
+	repeated StringDeclaration string_declarations = 1;
+
+	repeated Thing things_publish_list = 2;
+	repeated int32 things_remove_list = 3 [packed = true];
+
+	// Can be declared once
+	// And we can't remove a ThingType
+	repeated ThingType thingtypes_declaration_list = 4;
+
+	// Identification of the sender
+	required int32 string_sender_id = 5;
+}

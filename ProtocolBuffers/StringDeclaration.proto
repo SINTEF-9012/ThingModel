@@ -1,0 +1,32 @@
+package ThingModel;
+
+/**
+ *	In order to reduce networks exchanges,
+ *	a string must be sent only one time
+ *	in the connection lifetime.
+ *
+ *	The value is the string and the key is a unique
+ *	number representing the string.
+ *
+ *	The key must not be a hash like a truncated
+ *	md5 or sha1. Collisions risks are important
+ *	with a 32bits key.
+ *
+ *	Instead, it's better to use a counter. 0 for
+ *	the first string decleration, 1 for the second…
+ *	And the Protocol Buffers encoding is more efficient
+ *	with small numbers.
+ *
+ *	Each connection should use two dictionaries
+ *	between these declarations. One dictionary
+ *	for the emission and another one for the reception.
+ *
+ *	A string declaration can replace a previous one.
+ *	It is not possible to remove a string declaration.
+ *	Duplicates, the same string with differents keys, are
+ *	allowed but developers must try to avoid that.
+ */
+message StringDeclaration {
+	required string value = 1;
+	required int32 key = 2;
+}

@@ -1,0 +1,13 @@
+import "Property.proto";
+
+package ThingModel;
+
+message Thing {
+	required int32 string_id = 1;
+	required int32 string_type_name = 2;
+
+	repeated Property properties = 3;
+
+	// Use int32 string ids
+	repeated int32 connections = 4 [packed = true];
+}
