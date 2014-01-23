@@ -43,7 +43,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IThingTypeObserver.cs" />
     <Compile Include="Location.cs" />
+    <Compile Include="IThingObserver.cs" />
     <Compile Include="Property.cs" />
     <Compile Include="PropertyType.cs" />
     <Compile Include="Specs\PropertyTest.cs" />

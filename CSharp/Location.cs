@@ -11,6 +11,7 @@ namespace ThingModel
         protected double X;
         protected double Y;
         protected double? Z;
+        public string System;
 
         protected Location(double x, double y, double? z)
         {
