@@ -1,4 +1,4 @@
-package ThingModel;
+package ThingModel.Proto;
 
 message Property {
 

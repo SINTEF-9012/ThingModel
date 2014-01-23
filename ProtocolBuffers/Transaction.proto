@@ -2,7 +2,7 @@ import "StringDeclaration.proto";
 import "Thing.proto";
 import "ThingType.proto";
 
-package ThingModel;
+package ThingModel.Proto;
 
 message Transaction {
 	repeated StringDeclaration string_declarations = 1;

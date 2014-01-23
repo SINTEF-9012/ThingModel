@@ -1,4 +1,4 @@
-package ThingModel;
+package ThingModel.Proto;
 
 message PropertyType {
 	required int32 string_key = 1;

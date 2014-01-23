@@ -1,6 +1,6 @@
 import "PropertyType.proto";
 
-package ThingModel;
+package ThingModel.Proto;
 
 message ThingType {
 	required int32 string_name = 1;
