@@ -192,5 +192,10 @@ namespace ThingModel
             return true;
 
         }
+
+        public IEnumerable<Property> GetProperties()
+        {
+            return Properties.Values/*.AsReadOnly()*/;
+        }
     }
 }
