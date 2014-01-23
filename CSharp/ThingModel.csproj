@@ -34,6 +34,9 @@
     <Reference Include="nunit.framework">
       <HintPath>packages\NUnit.2.6.3\lib\nunit.framework.dll</HintPath>
     </Reference>
+    <Reference Include="protobuf-net">
+      <HintPath>packages\protobuf-net.2.0.0.668\lib\net40\protobuf-net.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -43,11 +46,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="IThingTypeObserver.cs" />
+    <Compile Include="Client\IThingTypeObserver.cs" />
+    <Compile Include="Client\ToProtobuf.cs" />
     <Compile Include="Location.cs" />
-    <Compile Include="IThingObserver.cs" />
+    <Compile Include="Client\IThingObserver.cs" />
     <Compile Include="Property.cs" />
     <Compile Include="PropertyType.cs" />
+    <Compile Include="Proto\Property.cs" />
+    <Compile Include="Proto\PropertyType.cs" />
+    <Compile Include="Proto\StringDeclaration.cs" />
+    <Compile Include="Proto\Thing.cs" />
+    <Compile Include="Proto\ThingType.cs" />
+    <Compile Include="Proto\Transaction.cs" />
     <Compile Include="Specs\PropertyTest.cs" />
     <Compile Include="Specs\ThingTest.cs" />
     <Compile Include="Specs\ThingTypetest.cs" />
@@ -55,7 +65,7 @@
     <Compile Include="Thing.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ThingType.cs" />
-    <Compile Include="Wharehouse.cs" />
+    <Compile Include="Client\Wharehouse.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
