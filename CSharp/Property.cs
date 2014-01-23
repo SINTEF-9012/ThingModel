@@ -79,11 +79,11 @@ namespace ThingModel
             }
         }
 
-        public class Number : Property
+        public class Double : Property
         {
             public double Value;
 
-            public Number(string key, double value = 0.0) : base(key)
+            public Double(string key, double value = 0.0) : base(key)
             {
                 Value = value;
             }
@@ -95,10 +95,32 @@ namespace ThingModel
 
             public override bool Compare(Property prop)
             {
-                var other = prop as Number;
+                var other = prop as Double;
                 // ReSharper disable CompareOfFloatsByEqualityOperator
                 return other != null && Value == other.Value;
                 // ReSharper restore CompareOfFloatsByEqualityOperator
+            }
+        }
+
+        public class Int : Property
+        {
+            public int Value;
+
+            public Int(string key, int value = 0)
+                : base(key)
+            {
+                Value = value;
+            }
+
+            public new string ValueToString()
+            {
+                return Value.ToString(CultureInfo.InvariantCulture);
+            }
+
+            public override bool Compare(Property prop)
+            {
+                var other = prop as Int;
+                return other != null && Value == other.Value;
             }
         }
 

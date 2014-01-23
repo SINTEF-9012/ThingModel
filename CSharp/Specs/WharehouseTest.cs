@@ -19,11 +19,11 @@ namespace ThingModel.Specs
         {
             _type = new ThingType("duck");
             _type.DefineProperty(PropertyType.Create<Property.String>("name"));
-            _type.DefineProperty(PropertyType.Create<Property.Number>("age"));
+            _type.DefineProperty(PropertyType.Create<Property.Double>("age"));
 
             _thing = new Thing("871", _type);
             _thing.SetProperty(new Property.String("name", "Maurice"));
-            _thing.SetProperty(new Property.Number("age", 18));
+            _thing.SetProperty(new Property.Double("age", 18));
             _thing.SetProperty(new Property.Location("localization", new Location.Point(10,44)));
 
             _wharehouse = new Wharehouse();

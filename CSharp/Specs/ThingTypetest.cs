@@ -59,7 +59,7 @@ namespace ThingModel.Specs
             Assert.That(_type.Check(plane), Is.True);
 
             // wrong type
-            plane.SetProperty(new Property.Number("location", 27));
+            plane.SetProperty(new Property.Double("location", 27));
             Assert.That(_type.Check(plane), Is.False);
         }
     }

@@ -15,7 +15,7 @@ namespace ThingModel.Specs
         [SetUp]
         protected void SetUp()
         {
-            _property = new Property.Number("speed");
+            _property = new Property.Double("speed");
         }
 
         [Test]
@@ -32,7 +32,7 @@ namespace ThingModel.Specs
 
             Assert.That(new Property.String("name", "Alphonse").Value, Is.EqualTo("Alphonse"));
 
-            Assert.That(new Property.Number("answer", 42).Value, Is.InRange(41, 43));
+            Assert.That(new Property.Double("answer", 42).Value, Is.InRange(41, 43));
 
             Assert.That(new Property.DateTime("time").Value, Is.LessThan(DateTime.Now));
 
@@ -76,10 +76,10 @@ namespace ThingModel.Specs
         [Test]
         public void NumberChange()
         {
-            var a = new Property.Number("a", 1.0);
-            var b = new Property.Number("b", 1.0);
-            var c = new Property.Number("98", 98);
-            var d = new Property.Number("a");
+            var a = new Property.Double("a", 1.0);
+            var b = new Property.Double("b", 1.0);
+            var c = new Property.Double("98", 98);
+            var d = new Property.Double("a");
 
             Assert.That(a.Compare(a), Is.True);
             Assert.That(a.Compare(b), Is.True);
@@ -122,7 +122,7 @@ namespace ThingModel.Specs
         [Test]
         public void CompareDifferentThings()
         {
-            var a = new Property.Number("test");
+            var a = new Property.Double("test");
             var b = new Property.Boolean("test");
 
             Assert.That(a.Compare(b), Is.False);
@@ -131,8 +131,8 @@ namespace ThingModel.Specs
         [Test]
         public void CompareWithGenericType()
         {
-            var a = new Property.Number("test");
-            Property b = new Property.Number("test");
+            var a = new Property.Double("test");
+            Property b = new Property.Double("test");
 
             Assert.That(a.Compare(b), Is.True);
             Assert.That(b.Compare(a), Is.True);

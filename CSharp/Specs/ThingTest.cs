@@ -72,7 +72,7 @@ namespace ThingModel.Specs
         [Test]
         public void GetPropertyWithWrongType()
         {
-            Assert.That(_thing.GetProperty<Property.Number>("name"), Is.Null);
+            Assert.That(_thing.GetProperty<Property.Double>("name"), Is.Null);
         }
         
         [Test]
@@ -185,7 +185,7 @@ namespace ThingModel.Specs
         public void DeepCompairaison()
         {
             var aThingForTheRoad = new Thing("rabbit");
-            aThingForTheRoad.SetProperty(new Property.Number("speed", 12));
+            aThingForTheRoad.SetProperty(new Property.Double("speed", 12));
             _thing.Connect(aThingForTheRoad);
 
             var newThing = new Thing(_thing.ID, _type);
