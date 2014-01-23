@@ -22,53 +22,53 @@ namespace ThingModel.Proto
       get { return _string_key; }
       set { _string_key = value; }
     }
-    private ThingModel.Proto.Property.Location _location = null;
-    [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"location", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    private ThingModel.Proto.Property.Location _location_value = null;
+    [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"location_value", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue(null)]
-    public ThingModel.Proto.Property.Location location
+    public ThingModel.Proto.Property.Location location_value
     {
-      get { return _location; }
-      set { _location = value; }
+      get { return _location_value; }
+      set { _location_value = value; }
     }
-    private ThingModel.Proto.Property.String _string = null;
-    [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"string", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    private ThingModel.Proto.Property.String _string_value = null;
+    [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"string_value", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue(null)]
-    public ThingModel.Proto.Property.String @string
+    public ThingModel.Proto.Property.String string_value
     {
-      get { return _string; }
-      set { _string = value; }
+      get { return _string_value; }
+      set { _string_value = value; }
     }
-    private ThingModel.Proto.Property.Double _double = null;
-    [global::ProtoBuf.ProtoMember(4, IsRequired = false, Name=@"double", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    [global::System.ComponentModel.DefaultValue(null)]
-    public ThingModel.Proto.Property.Double @double
+    private double _double_value = default(double);
+    [global::ProtoBuf.ProtoMember(4, IsRequired = false, Name=@"double_value", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(double))]
+    public double double_value
     {
-      get { return _double; }
-      set { _double = value; }
+      get { return _double_value; }
+      set { _double_value = value; }
     }
-    private ThingModel.Proto.Property.Int _int = null;
-    [global::ProtoBuf.ProtoMember(5, IsRequired = false, Name=@"int", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    [global::System.ComponentModel.DefaultValue(null)]
-    public ThingModel.Proto.Property.Int @int
+    private int _int_value = default(int);
+    [global::ProtoBuf.ProtoMember(5, IsRequired = false, Name=@"int_value", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(int))]
+    public int int_value
     {
-      get { return _int; }
-      set { _int = value; }
+      get { return _int_value; }
+      set { _int_value = value; }
     }
-    private ThingModel.Proto.Property.Boolean _boolean = null;
-    [global::ProtoBuf.ProtoMember(6, IsRequired = false, Name=@"boolean", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    [global::System.ComponentModel.DefaultValue(null)]
-    public ThingModel.Proto.Property.Boolean boolean
+    private bool _boolean_value = default(bool);
+    [global::ProtoBuf.ProtoMember(6, IsRequired = false, Name=@"boolean_value", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(default(bool))]
+    public bool boolean_value
     {
-      get { return _boolean; }
-      set { _boolean = value; }
+      get { return _boolean_value; }
+      set { _boolean_value = value; }
     }
-    private ThingModel.Proto.Property.DateTime _datetime = null;
-    [global::ProtoBuf.ProtoMember(7, IsRequired = false, Name=@"datetime", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    [global::System.ComponentModel.DefaultValue(null)]
-    public ThingModel.Proto.Property.DateTime datetime
+    private long _datetime_value = default(long);
+    [global::ProtoBuf.ProtoMember(7, IsRequired = false, Name=@"datetime_value", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(long))]
+    public long datetime_value
     {
-      get { return _datetime; }
-      set { _datetime = value; }
+      get { return _datetime_value; }
+      set { _datetime_value = value; }
     }
   [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"Location")]
   public partial class Location : global::ProtoBuf.IExtensible
@@ -123,81 +123,13 @@ namespace ThingModel.Proto
       get { return _value; }
       set { _value = value; }
     }
-    private string _value_key = "";
-    [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"value_key", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    [global::System.ComponentModel.DefaultValue("")]
-    public string value_key
+    private int _string_value = default(int);
+    [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"string_value", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(int))]
+    public int string_value
     {
-      get { return _value_key; }
-      set { _value_key = value; }
-    }
-    private global::ProtoBuf.IExtension extensionObject;
-    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
-      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
-  }
-  
-  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"Double")]
-  public partial class Double : global::ProtoBuf.IExtensible
-  {
-    public Double() {}
-    
-    private double _value;
-    [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"value", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    public double value
-    {
-      get { return _value; }
-      set { _value = value; }
-    }
-    private global::ProtoBuf.IExtension extensionObject;
-    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
-      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
-  }
-  
-  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"Int")]
-  public partial class Int : global::ProtoBuf.IExtensible
-  {
-    public Int() {}
-    
-    private int _Value;
-    [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"Value", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    public int Value
-    {
-      get { return _Value; }
-      set { _Value = value; }
-    }
-    private global::ProtoBuf.IExtension extensionObject;
-    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
-      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
-  }
-  
-  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"Boolean")]
-  public partial class Boolean : global::ProtoBuf.IExtensible
-  {
-    public Boolean() {}
-    
-    private bool _value;
-    [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"value", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    public bool value
-    {
-      get { return _value; }
-      set { _value = value; }
-    }
-    private global::ProtoBuf.IExtension extensionObject;
-    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
-      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
-  }
-  
-  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"DateTime")]
-  public partial class DateTime : global::ProtoBuf.IExtensible
-  {
-    public DateTime() {}
-    
-    private int _value;
-    [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"value", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    public int value
-    {
-      get { return _value; }
-      set { _value = value; }
+      get { return _string_value; }
+      set { _string_value = value; }
     }
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)

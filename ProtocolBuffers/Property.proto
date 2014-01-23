@@ -23,29 +23,13 @@ message Property {
 		 *	is allowed to ignore this feature
 		 *	when he want to send a string property.
 		 */
-		optional string value_key = 2;	
+		optional int32 string_value = 2;	
 	}
 
-	message Double {
-		required double value = 1 [default = 0.0];
-	}
-
-	message Int {
-		required int32 Value = 1 [default = 0];
-	}
-
-	message Boolean {
-		required bool value = 1 [default = false];
-	}
-
-	message DateTime {
-		required int32 value = 1;
-	}
-
-	optional Location location = 2;
-	optional String string = 3;
-	optional Double double = 4;
-	optional Int int = 5;
-	optional Boolean boolean = 6;
-	optional DateTime datetime = 7;
+	optional Location location_value = 2;
+	optional String string_value = 3;
+	optional double double_value = 4;
+	optional int32 int_value = 5;
+	optional bool boolean_value = 6;
+	optional int64 datetime_value = 7;
 }
