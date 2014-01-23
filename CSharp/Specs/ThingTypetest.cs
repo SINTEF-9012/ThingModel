@@ -41,6 +41,21 @@ namespace ThingModel.Specs
         }
 
         [Test]
+        public void CheckGetProperties()
+        {
+
+            var visited = false;
+            foreach (var property in _type.GetProperties())
+            {
+                visited = true;
+                // Should not throw exceptions
+                _type.DefineProperty(property);
+            }
+
+            Assert.That(visited, Is.True);
+        }
+
+        [Test]
         public void CheckRequiredProperties()
         {
             var plane = new Thing("A380", _type);

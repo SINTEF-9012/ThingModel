@@ -22,7 +22,7 @@ namespace ThingModel.Specs
             _type.DefineProperty(PropertyType.Create<Property.String>("name"));
 
             _thing = new Thing("200787", _type);
-            
+
 
             _otherThing = new Thing("875402");
             _thing.Connect(_otherThing);
@@ -74,12 +74,27 @@ namespace ThingModel.Specs
         {
             Assert.That(_thing.GetProperty<Property.Double>("name"), Is.Null);
         }
-        
+
         [Test]
         public void GetNonexistentProperty()
         {
             Assert.That(_thing.GetProperty<Property.Boolean>("abcdef"), Is.Null);
             Assert.That(_thing.GetProperty<Property.String>("abcdef"), Is.Null);
+        }
+
+        [Test]
+        public void CheckGetProperties()
+        {
+            
+            var visited = false;
+            foreach (var property in _thing.GetProperties())
+            {
+                visited = true;
+                // Should not throw exceptions
+                _thing.SetProperty(property);
+            }
+
+            Assert.That(visited, Is.True);
         }
 
         [Test]
@@ -143,7 +158,7 @@ namespace ThingModel.Specs
             var newThing = new Thing(_thing.ID, _type);
 
             newThing.SetProperty(new Property.String("name", "Pierre"));
-            
+
             Assert.That(_thing.Compare(newThing), Is.False);
         }
 
@@ -160,7 +175,7 @@ namespace ThingModel.Specs
             // Different ID
             Assert.That(_thing.Compare(newThing), Is.False);
         }
-        
+
         [Test]
         public void CompareProperties()
         {
@@ -168,7 +183,7 @@ namespace ThingModel.Specs
             newThing.SetProperty(new Property.String("name", "Pierre"));
             newThing.SetProperty(new Property.String("surname", "Lapinou"));
             newThing.Connect(_otherThing);
-            
+
             Assert.That(_thing.Compare(newThing), Is.False);
             Assert.That(newThing.Compare(_thing), Is.False);
 
@@ -204,7 +219,7 @@ namespace ThingModel.Specs
             Assert.That(_thing.Compare(newThing, true, true), Is.False);
             Assert.That(newThing.Compare(_thing, true, true), Is.False);
         }
-        
+
         [Test]
         public void InfiniteLoopDeepCompairaison()
         {

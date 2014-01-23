@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace ThingModel
 {
-    class Wharehouse
+    public class Wharehouse
     {
         private readonly Dictionary<string, ThingType> _thingTypes = new Dictionary<string, ThingType>();
 

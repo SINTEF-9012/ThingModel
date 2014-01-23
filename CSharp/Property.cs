@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Text;
 
 namespace ThingModel
 {
@@ -17,24 +18,9 @@ namespace ThingModel
             _key = key;
         }
 
-        public string ValueToString()
-        {
-            return "undefined";
-        }
-
+        public abstract string ValueToString();
+        
         public abstract bool Compare(Property other);
-        /*{
-            if (other != null)
-            {
-                Type t = GetType();
-                if (t == other.GetType())
-                {
-                    return (bool) t.GetMethod("Compare", new [] {t}).Invoke(this, new object[]{other});
-                }
-            }
-
-            return false;
-        }*/
 
         public class Location : Property
         {
@@ -45,9 +31,15 @@ namespace ThingModel
                 Value = value;
             }
 
-            public new string ValueToString()
+            public override string ValueToString()
             {
-                return Value.ToString();
+                var sb = new StringBuilder();
+                sb.Append(Value.X);
+                sb.Append(" - ");
+                sb.Append(Value.Y);
+                sb.Append(" - ");
+                sb.Append(Value.Z);
+                return sb.ToString();
             }
 
             public override bool Compare(Property prop)
@@ -67,7 +59,7 @@ namespace ThingModel
                 Value = value;
             }
 
-            public new string ValueToString()
+            public override string ValueToString()
             {
                 return Value;
             }
@@ -88,7 +80,7 @@ namespace ThingModel
                 Value = value;
             }
 
-            public new string ValueToString()
+            public override string ValueToString()
             {
                 return Value.ToString(CultureInfo.InvariantCulture);
             }
@@ -112,7 +104,7 @@ namespace ThingModel
                 Value = value;
             }
 
-            public new string ValueToString()
+            public override string ValueToString()
             {
                 return Value.ToString(CultureInfo.InvariantCulture);
             }
@@ -133,9 +125,9 @@ namespace ThingModel
                 Value = value;
             }
 
-            public new string ValueToString()
+            public override string ValueToString()
             {
-                return Value.ToString();
+                return Value ? "true" : "false";
             }
 
             public override bool Compare(Property prop)
@@ -154,7 +146,7 @@ namespace ThingModel
                 Value = value;
             }
 
-            public new string ValueToString()
+            public override string ValueToString()
             {
                 return Value.ToString(CultureInfo.InvariantCulture);
             }

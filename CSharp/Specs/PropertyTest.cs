@@ -26,17 +26,35 @@ namespace ThingModel.Specs
         }
 
         [Test]
-        public void CodeCoverage()
+        public void CheckBoringGetterAndSetter()
         {
             Assert.That(new Property.Boolean("good", true).Value, Is.True);
 
             Assert.That(new Property.String("name", "Alphonse").Value, Is.EqualTo("Alphonse"));
 
             Assert.That(new Property.Double("answer", 42).Value, Is.InRange(41, 43));
+            Assert.That(new Property.Int("rounded answer", 42).Value, Is.InRange(41, 43));
 
             Assert.That(new Property.DateTime("time").Value, Is.LessThan(DateTime.Now));
 
             Assert.That(new Property.Location("localization", new Location.LatLng(42.0,19.6,100)).Value, Is.Not.Null);
+
+        }
+
+        [Test]
+        public void CheckToString()
+        {
+            Assert.That(new Property.Boolean("lapin", true).ValueToString().Length, Is.GreaterThan(0));
+
+            Assert.That(new Property.String("name", "Alphonse").ValueToString(), Is.StringContaining("Alphonse"));
+
+            Assert.That(new Property.Double("answer", 42).ValueToString(), Is.StringContaining("42"));
+            Assert.That(new Property.Int("rounded answer", 42).ValueToString(), Is.StringContaining("42"));
+
+            Assert.That(new Property.DateTime("time").ValueToString().Length, Is.GreaterThan(0));
+
+            Assert.That(new Property.Location("localization",
+                new Location.LatLng(42.0, 19.6, 100)).ValueToString(), Is.StringContaining("42"));
         }
 
         [Test]
@@ -45,7 +63,7 @@ namespace ThingModel.Specs
             var a = new Property.Location("the key is not important", new Location.Equatorial(1, 2, 3));
             var b = new Property.Location("not the same key", new Location.Equatorial(1, 2, 3));
             var c = new Property.Location("the key is not important", new Location.LatLng(1, 2, 3));
-            var d = new Property.Location("the key is not important", null);
+            var d = new Property.Location("the key is not important");
 
             Assert.That(a.Compare(b), Is.True);
 
@@ -74,12 +92,28 @@ namespace ThingModel.Specs
         }
 
         [Test]
-        public void NumberChange()
+        public void DoubleChange()
         {
             var a = new Property.Double("a", 1.0);
             var b = new Property.Double("b", 1.0);
             var c = new Property.Double("98", 98);
             var d = new Property.Double("a");
+
+            Assert.That(a.Compare(a), Is.True);
+            Assert.That(a.Compare(b), Is.True);
+            Assert.That(a.Compare(c), Is.False);
+            Assert.That(a.Compare(null), Is.False);
+            Assert.That(d.Compare(a), Is.False);
+            Assert.That(d.Compare(null), Is.False);
+        }
+
+        [Test]
+        public void IntChange()
+        {
+            var a = new Property.Int("a", 1);
+            var b = new Property.Int("b", 1);
+            var c = new Property.Int("98", 98);
+            var d = new Property.Int("a");
 
             Assert.That(a.Compare(a), Is.True);
             Assert.That(a.Compare(b), Is.True);

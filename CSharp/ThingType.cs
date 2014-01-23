@@ -64,7 +64,7 @@ namespace ThingModel
 
         public IEnumerable<PropertyType> GetProperties()
         {
-            return Properties.Values/*.AsReadOnly()*/;
+            return new List<PropertyType>(Properties.Values);/*.AsReadOnly()*/;
         }
     }
 }

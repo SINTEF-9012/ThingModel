@@ -46,6 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Client\FromProtobuf.cs" />
     <Compile Include="Client\IThingTypeObserver.cs" />
     <Compile Include="Client\ToProtobuf.cs" />
     <Compile Include="Location.cs" />
@@ -60,7 +61,7 @@
     <Compile Include="Proto\Transaction.cs" />
     <Compile Include="Specs\PropertyTest.cs" />
     <Compile Include="Specs\ThingTest.cs" />
-    <Compile Include="Specs\ThingTypetest.cs" />
+    <Compile Include="Specs\ThingTypeTest.cs" />
     <Compile Include="Specs\WharehouseTest.cs" />
     <Compile Include="Thing.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
