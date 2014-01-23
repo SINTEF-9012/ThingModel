@@ -10,22 +10,29 @@ namespace ThingModel.Client
 {
     public class ToProtobuf
     {
-        // String declarations dictionary, for the sender side
+        // String declarations dictionary, in the sender side
         protected readonly IDictionary<string, int> StringDeclarations = new Dictionary<string, int>();
 
         // Current transaction object
         // It will be filled step by step
         protected Transaction Transaction = new Transaction();
 
-        private readonly Dictionary<Type, Proto.PropertyType.Type> _prototypesBinding = new Dictionary<Type, Proto.PropertyType.Type>
+        // Simple binding between ThingModel property types and protocol buffer property types
+        // Tested as alternative to the dynamic keyword
+        private readonly Dictionary<Type, Proto.PropertyType.Type> _prototypesBinding = new Dictionary
+            <Type, Proto.PropertyType.Type>
             {
-                {typeof(Property.Location), Proto.PropertyType.Type.LOCATION},
-                {typeof(Property.String), Proto.PropertyType.Type.STRING},
-                {typeof(Property.Double), Proto.PropertyType.Type.DOUBLE},
-                {typeof(Property.Int), Proto.PropertyType.Type.INT},
-                {typeof(Property.Boolean), Proto.PropertyType.Type.BOOLEAN},
-                {typeof(Property.DateTime), Proto.PropertyType.Type.DATETIME},
-            }; 
+                {typeof (Property.Location), Proto.PropertyType.Type.LOCATION},
+                {typeof (Property.String), Proto.PropertyType.Type.STRING},
+                {typeof (Property.Double), Proto.PropertyType.Type.DOUBLE},
+                {typeof (Property.Int), Proto.PropertyType.Type.INT},
+                {typeof (Property.Boolean), Proto.PropertyType.Type.BOOLEAN},
+                {typeof (Property.DateTime), Proto.PropertyType.Type.DATETIME},
+            };
+
+        // When a string is in this collection, it should be sended
+        // as an int key with the StringToKey method
+        private readonly HashSet<string> _stringToDeclare = new HashSet<string>();
 
         protected int StringToKey(string value)
         {
@@ -66,16 +73,39 @@ namespace ThingModel.Client
 
         protected void ConvertPublishList(IEnumerable<Thing> publish)
         {
-            
+            foreach (var thing in publish)
+            {
+                var publication = new Proto.Thing
+                    {
+                        string_id = StringToKey(thing.ID),
+                        string_type_name = StringToKey(thing.Type.Name)
+                    };
+
+                foreach (var connectedThing in thing.ConnectedThings)
+                {
+                    publication.connections.Add(StringToKey(connectedThing.ID));
+                }
+
+                foreach (var property in thing.GetProperties())
+                {
+                    var proto = new Proto.Property
+                        {
+                            string_key = StringToKey(property.Key)
+                        };
+
+                    ConvertProperty((dynamic) property, proto);
+                }
+
+                Transaction.things_publish_list.Add(publication);
+            }
         }
 
         protected void ConvertDeleteList(IEnumerable<Thing> publish)
         {
             foreach (var thing in publish)
             {
-                Transaction.things_remove_list.Add(StringToKey(thing.ID));   
+                Transaction.things_remove_list.Add(StringToKey(thing.ID));
             }
-            
         }
 
         protected void ConvertDeclarationList(IEnumerable<ThingType> declarations)
@@ -98,11 +128,59 @@ namespace ThingModel.Client
                             required = propertyType.Required,
                             type = _prototypesBinding[propertyType.Type]
                         });
-
                 }
 
                 Transaction.thingtypes_declaration_list.Add(declaration);
             }
+        }
+
+        protected void ConvertProperty(Property.Location property, Proto.Property proto)
+        {
+            var value = property.Value;
+            proto.location_value = new Proto.Property.Location
+                {
+                    x = value.X,
+                    y = value.Y,
+                    z = value.Z == null ? 0.0 : (double) value.Z
+                };
+        }
+
+        protected void ConvertProperty(Property.String property, Proto.Property proto)
+        {
+            var value = property.Value;
+            proto.string_value = new Proto.Property.String();
+
+            if (_stringToDeclare.Contains(value))
+            {
+                proto.string_value.string_value = StringToKey(value);
+            }
+            else
+            {
+                proto.string_value.value = value;
+
+                // Use string to key the next time
+                _stringToDeclare.Add(value);
+            }
+        }
+
+        protected void ConvertProperty(Property.Double property, Proto.Property proto)
+        {
+            proto.double_value = property.Value;
+        }
+
+        protected void ConvertProperty(Property.Int property, Proto.Property proto)
+        {
+            proto.int_value = property.Value;
+        }
+
+        protected void ConvertProperty(Property.Boolean property, Proto.Property proto)
+        {
+            proto.boolean_value = property.Value;
+        }
+
+        protected void ConvertProperty(Property.DateTime property, Proto.Property proto)
+        {
+            proto.datetime_value = property.Value.Ticks;
         }
     }
 }
