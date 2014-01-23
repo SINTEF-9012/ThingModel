@@ -61,5 +61,10 @@ namespace ThingModel
             Properties.TryGetValue(key, out value);
             return value;
         }
+
+        public IEnumerable<PropertyType> GetProperties()
+        {
+            return Properties.Values/*.AsReadOnly()*/;
+        }
     }
 }
