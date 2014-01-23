@@ -171,5 +171,29 @@ namespace ThingModel.Specs
             Assert.That(a.Compare(b), Is.True);
             Assert.That(b.Compare(a), Is.True);
         }
+
+        [Test]
+        public void LocationGetterAndSetter()
+        {
+            var a = new Location.Equatorial
+                {
+                    RightAscension = 42,
+                    Declination = 42,
+                    HourAngle = 42
+                };
+            Assert.That(a.RightAscension, Is.EqualTo(42));
+            Assert.That(a.Declination, Is.EqualTo(42));
+            Assert.That(a.HourAngle, Is.EqualTo(42));
+
+            var b = new Location.LatLng
+            {
+                Latitude = 42,
+                Longitude = 42,
+                Altitude = 42
+            };
+            Assert.That(b.Latitude, Is.EqualTo(42));
+            Assert.That(b.Longitude, Is.EqualTo(42));
+            Assert.That(b.Altitude, Is.EqualTo(42));
+        }
     }
 }
