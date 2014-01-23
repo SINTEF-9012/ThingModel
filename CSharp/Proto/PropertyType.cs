@@ -29,8 +29,15 @@ namespace ThingModel.Proto
       get { return _type; }
       set { _type = value; }
     }
+    private bool _required;
+    [global::ProtoBuf.ProtoMember(3, IsRequired = true, Name=@"required", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    public bool required
+    {
+      get { return _required; }
+      set { _required = value; }
+    }
     private string _name = "";
-    [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"name", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::ProtoBuf.ProtoMember(4, IsRequired = false, Name=@"name", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue("")]
     public string name
     {
@@ -38,7 +45,7 @@ namespace ThingModel.Proto
       set { _name = value; }
     }
     private string _description = "";
-    [global::ProtoBuf.ProtoMember(4, IsRequired = false, Name=@"description", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::ProtoBuf.ProtoMember(5, IsRequired = false, Name=@"description", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue("")]
     public string description
     {
