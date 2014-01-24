@@ -116,6 +116,82 @@ namespace ThingModel.Specs
 
             Assert.That(_typeChangeObserver.DefineType, Is.True);
         }
+
+        [Test]
+        public void CheckThingUpdateCallback()
+        {
+            _wharehouse.RegisterThing(_thing);
+            Assert.That(_thingChangeObserver.UpdatedThing, Is.False);
+
+            _wharehouse.RegisterThing(_thing);
+            Assert.That(_thingChangeObserver.UpdatedThing, Is.True);
+        }
+
+        [Test]
+        public void UnregisterCallbacks()
+        {
+            _wharehouse.Unregister(_thingChangeObserver);
+            _wharehouse.Unregister(_typeChangeObserver);
+
+            _wharehouse.RegisterThing(_thing);
+            _wharehouse.RegisterType(_type);
+
+            Assert.That(_thingChangeObserver.NewThing, Is.False);
+            Assert.That(_typeChangeObserver.DefineType, Is.False);
+        }
+
+        [Test]
+        public void DeleteCallback()
+        {
+            // TODO
+        }
+
+        [Test]
+        public void RecursiveRegistration()
+        {
+            _wharehouse.RegisterThing(_thing);
+            _thingChangeObserver.Reset();
+
+            var newThing = new Thing("test");
+            newThing.Connect(_thing);
+
+            _thing.Connect(new Thing("blabla"));
+            _thing.Connect(new Thing("blabla2"));
+
+            _wharehouse.RegisterThing(newThing/*, true*/);
+
+            Assert.That(_thingChangeObserver.NewThing, Is.True);
+            Assert.That(_thingChangeObserver.UpdatedThing, Is.True);
+        }
+
+        [Test]
+        public void NoInfiniteLoopRegistration()
+        {
+            var newThing = new Thing("loop");
+            newThing.Connect(_thing);
+            _thing.Connect(newThing);
+
+            _wharehouse.RegisterThing(newThing);
+            _wharehouse.RegisterThing(_thing);
+
+            Assert.That(_thingChangeObserver.NewThing, Is.True);
+        }
+
+        [Test]
+        public void RegisterCollection()
+        {
+            var newThing = new Thing("loop");
+            newThing.Connect(_thing);
+            _thing.Connect(newThing);
+
+            _wharehouse.RegisterCollection(new[]
+                {
+                    newThing,
+                    _thing
+                });
+
+            Assert.That(_thingChangeObserver.NewThing, Is.True);
+        }
     }
 
 }

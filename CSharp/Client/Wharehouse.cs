@@ -60,7 +60,7 @@ namespace ThingModel
             }
             else
             {
-                NotifyThingUpdate(thing);   
+                NotifyThingUpdate(thing);
             }
             
         }
@@ -73,6 +73,8 @@ namespace ThingModel
             {
                 return;
             }
+
+            alreadyRegisteredThings.Add(thing);
             
             RegisterThing(thing, false, alsoRegisterTypes);
             
