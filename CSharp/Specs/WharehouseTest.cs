@@ -17,9 +17,9 @@ namespace ThingModel.Specs
         private class ThingChangeObserver : IThingObserver
         {
 
-            public bool NewThing = false;
-            public bool UpdatedThing = false;
-            public bool DeletedThing = false;
+            public bool NewThing;
+            public bool UpdatedThing;
+            public bool DeletedThing;
 
             public void Reset()
             {
@@ -49,7 +49,7 @@ namespace ThingModel.Specs
         private class TypeChangeObserver : IThingTypeObserver
         {
 
-            public bool DefineType = false;
+            public bool DefineType;
 
             public void Reset()
             {
@@ -101,7 +101,7 @@ namespace ThingModel.Specs
         [Test]
         public void RegisterThing()
         {
-            _wharehouse.RegisterThing(_thing, false, false);
+            _wharehouse.RegisterThing(_thing, false);
             Assert.That(_thingChangeObserver.NewThing, Is.True);
 
             _thingChangeObserver.Reset();
@@ -143,7 +143,10 @@ namespace ThingModel.Specs
         [Test]
         public void DeleteCallback()
         {
-            // TODO
+            _wharehouse.RegisterThing(_thing);
+            _wharehouse.RemoveThing(_thing);
+
+            Assert.That(_thingChangeObserver.DeletedThing, Is.True);
         }
 
         [Test]
@@ -191,6 +194,21 @@ namespace ThingModel.Specs
                 });
 
             Assert.That(_thingChangeObserver.NewThing, Is.True);
+        }
+
+        [Test]
+        public void DeleteWithConnections()
+        {
+            var otherThing = new Thing("lapin");
+            otherThing.Connect(_thing);
+
+            _wharehouse.RegisterThing(otherThing);
+            _thingChangeObserver.Reset();
+            _wharehouse.RemoveThing(_thing);
+
+            Assert.That(_thingChangeObserver.DeletedThing, Is.True);
+            Assert.That(_thingChangeObserver.UpdatedThing, Is.True);
+
         }
     }
 

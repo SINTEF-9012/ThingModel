@@ -94,6 +94,24 @@ namespace ThingModel
             }
         }
 
+        public void RemoveThing(Thing thing)
+        {
+            // Remove all the connections
+            foreach (var t in _things)
+            {
+                if (t.Value.IsConnectedTo(thing))
+                {
+                    t.Value.Disconnect(thing);
+                    NotifyThingUpdate(t.Value);
+                }
+            }
+
+            // Remove the thing
+            _things.Remove(thing.ID);
+
+            NotifyThingDeleted(thing);
+        }
+
         public void RegisterObserver(IThingObserver observer)
         {
             _thingObservers.Add(observer);
@@ -136,6 +154,21 @@ namespace ThingModel
             {
                 observer.New(thing);
             }
+        }
+
+        public void NotifyThingDeleted(Thing thing)
+        {
+            foreach (var observer in _thingObservers)
+            {
+                observer.Deleted(thing);
+            }
+        }
+
+        public Thing GetThing(string key)
+        {
+            Thing value;
+            _things.TryGetValue(key, out value);
+            return value;
         }
     }
 }

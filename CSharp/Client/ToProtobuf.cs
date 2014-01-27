@@ -15,7 +15,7 @@ namespace ThingModel.Client
 
         // Current transaction object
         // It will be filled step by step
-        protected Transaction Transaction = new Transaction();
+        protected Transaction Transaction;
 
         // Simple binding between ThingModel property types and protocol buffer property types
         // Tested as alternative to the dynamic keyword
@@ -58,17 +58,15 @@ namespace ThingModel.Client
         public Transaction Convert(IEnumerable<Thing> publish, IEnumerable<Thing> delete,
                                    IEnumerable<ThingType> declarations, string senderID)
         {
+            Transaction = new Transaction();
+
             Transaction.string_sender_id = StringToKey(senderID);
 
             ConvertPublishList(publish);
             ConvertDeleteList(delete);
             ConvertDeclarationList(declarations);
 
-            var tmpTransaction = Transaction;
-
-            Transaction = new Transaction();
-
-            return tmpTransaction;
+            return Transaction;
         }
 
         protected void ConvertPublishList(IEnumerable<Thing> publish)
