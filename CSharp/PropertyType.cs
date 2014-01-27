@@ -24,6 +24,16 @@ namespace ThingModel
             _type = type;
         }
 
+        public PropertyType(string key, Type type)
+        {
+            if (!typeof(Property).IsAssignableFrom(type))
+            {
+                throw new Exception("The type should be a subtype of Property");
+            }
+            Key = key;
+            _type = type;
+        }
+
         public static PropertyType Create<T>(string key,
             bool required = true) where T : Property
         {
