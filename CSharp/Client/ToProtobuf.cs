@@ -36,6 +36,11 @@ namespace ThingModel.Client
 
         protected int StringToKey(string value)
         {
+            if (String.IsNullOrEmpty(value))
+            {
+                return 0;
+            }
+
             int key;
             if (StringDeclarations.TryGetValue(value, out key))
             {

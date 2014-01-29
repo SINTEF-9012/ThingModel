@@ -21,6 +21,11 @@ namespace ThingModel.Client
 
         protected string KeyToString(int key)
         {
+            if (key == 0)
+            {
+                return "";
+            }
+
             string value;
             return StringDeclarations.TryGetValue(key, out value) ? value : "undefined";
         }
