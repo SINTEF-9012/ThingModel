@@ -22,8 +22,15 @@ namespace ThingModel.Proto
       get { return _string_key; }
       set { _string_key = value; }
     }
+    private ThingModel.Proto.Property.Type _type;
+    [global::ProtoBuf.ProtoMember(2, IsRequired = true, Name=@"type", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    public ThingModel.Proto.Property.Type type
+    {
+      get { return _type; }
+      set { _type = value; }
+    }
     private ThingModel.Proto.Property.Location _location_value = null;
-    [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"location_value", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"location_value", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue(null)]
     public ThingModel.Proto.Property.Location location_value
     {
@@ -31,7 +38,7 @@ namespace ThingModel.Proto
       set { _location_value = value; }
     }
     private ThingModel.Proto.Property.String _string_value = null;
-    [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"string_value", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::ProtoBuf.ProtoMember(4, IsRequired = false, Name=@"string_value", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue(null)]
     public ThingModel.Proto.Property.String string_value
     {
@@ -39,7 +46,7 @@ namespace ThingModel.Proto
       set { _string_value = value; }
     }
     private double _double_value = default(double);
-    [global::ProtoBuf.ProtoMember(4, IsRequired = false, Name=@"double_value", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::ProtoBuf.ProtoMember(5, IsRequired = false, Name=@"double_value", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(double))]
     public double double_value
     {
@@ -47,7 +54,7 @@ namespace ThingModel.Proto
       set { _double_value = value; }
     }
     private int _int_value = default(int);
-    [global::ProtoBuf.ProtoMember(5, IsRequired = false, Name=@"int_value", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::ProtoBuf.ProtoMember(6, IsRequired = false, Name=@"int_value", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(int))]
     public int int_value
     {
@@ -55,7 +62,7 @@ namespace ThingModel.Proto
       set { _int_value = value; }
     }
     private bool _boolean_value = default(bool);
-    [global::ProtoBuf.ProtoMember(6, IsRequired = false, Name=@"boolean_value", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::ProtoBuf.ProtoMember(7, IsRequired = false, Name=@"boolean_value", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue(default(bool))]
     public bool boolean_value
     {
@@ -63,7 +70,7 @@ namespace ThingModel.Proto
       set { _boolean_value = value; }
     }
     private long _datetime_value = default(long);
-    [global::ProtoBuf.ProtoMember(7, IsRequired = false, Name=@"datetime_value", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::ProtoBuf.ProtoMember(8, IsRequired = false, Name=@"datetime_value", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(long))]
     public long datetime_value
     {
@@ -123,9 +130,9 @@ namespace ThingModel.Proto
       get { return _value; }
       set { _value = value; }
     }
-    private int _string_value = default(int);
+    private int _string_value = (int)0;
     [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"string_value", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(int))]
+    [global::System.ComponentModel.DefaultValue((int)0)]
     public int string_value
     {
       get { return _string_value; }
@@ -135,6 +142,35 @@ namespace ThingModel.Proto
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
   }
+  
+    [global::ProtoBuf.ProtoContract(Name=@"Type")]
+    public enum Type
+    {
+            
+      [global::ProtoBuf.ProtoEnum(Name=@"LOCATION_POINT", Value=0)]
+      LOCATION_POINT = 0,
+            
+      [global::ProtoBuf.ProtoEnum(Name=@"LOCATION_LATLNG", Value=1)]
+      LOCATION_LATLNG = 1,
+            
+      [global::ProtoBuf.ProtoEnum(Name=@"LOCATION_EQUATORIAL", Value=2)]
+      LOCATION_EQUATORIAL = 2,
+            
+      [global::ProtoBuf.ProtoEnum(Name=@"STRING", Value=3)]
+      STRING = 3,
+            
+      [global::ProtoBuf.ProtoEnum(Name=@"DOUBLE", Value=4)]
+      DOUBLE = 4,
+            
+      [global::ProtoBuf.ProtoEnum(Name=@"INT", Value=5)]
+      INT = 5,
+            
+      [global::ProtoBuf.ProtoEnum(Name=@"BOOLEAN", Value=6)]
+      BOOLEAN = 6,
+            
+      [global::ProtoBuf.ProtoEnum(Name=@"DATETIME", Value=7)]
+      DATETIME = 7
+    }
   
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)

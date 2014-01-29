@@ -4,6 +4,19 @@ message Property {
 
 	required int32 string_key = 1;
 
+	enum Type {
+		LOCATION_POINT = 0;
+		LOCATION_LATLNG = 1;
+		LOCATION_EQUATORIAL = 2;
+		STRING = 3;
+		DOUBLE = 4;
+		INT = 5;
+		BOOLEAN = 6;
+		DATETIME = 7;
+	}
+
+	required Type type = 2 [default = STRING];
+
 	message Location {
 
 		required double x = 1 [default = 0.0];
@@ -23,13 +36,15 @@ message Property {
 		 *	is allowed to ignore this feature
 		 *	when he want to send a string property.
 		 */
-		optional int32 string_value = 2;	
+		optional int32 string_value = 2 [default = 0];	
 	}
 
-	optional Location location_value = 2;
-	optional String string_value = 3;
-	optional double double_value = 4;
-	optional int32 int_value = 5;
-	optional bool boolean_value = 6;
-	optional int64 datetime_value = 7;
+	optional Location location_value = 3;
+	optional String string_value = 4;
+	optional double double_value = 5;
+	optional int32 int_value = 6;
+	optional bool boolean_value = 7;
+	optional int64 datetime_value = 8;
+
+
 }
