@@ -76,7 +76,7 @@ namespace ThingModel.Client
                 var publication = new Proto.Thing
                     {
                         string_id = StringToKey(thing.ID),
-                        string_type_name = StringToKey(thing.Type.Name)
+                        string_type_name = thing.Type != null ? StringToKey(thing.Type.Name) : 0
                     };
 
                 foreach (var connectedThing in thing.ConnectedThings)
@@ -135,19 +135,36 @@ namespace ThingModel.Client
         protected void ConvertProperty(Property.Location property, Proto.Property proto)
         {
             var value = property.Value;
+
+            if (value is Location.LatLng)
+            {
+                proto.type = Proto.Property.Type.LOCATION_LATLNG;
+            }
+            else if (value is Location.Point)
+            {
+                proto.type = Proto.Property.Type.LOCATION_POINT;
+            }
+            else
+            {
+                proto.type = Proto.Property.Type.LOCATION_EQUATORIAL;    
+            }
+            
             proto.location_value = new Proto.Property.Location
                 {
                     x = value.X,
                     y = value.Y,
-                    z = value.Z == null ? 0.0 : (double) value.Z
+                    z = value.Z == null ? 0.0 : (double) value.Z,
+                    string_system = StringToKey(value.System),
                 };
         }
 
         protected void ConvertProperty(Property.String property, Proto.Property proto)
         {
             var value = property.Value;
-            proto.string_value = new Proto.Property.String();
 
+            proto.type = Proto.Property.Type.STRING;
+            proto.string_value = new Proto.Property.String();
+            
             if (_stringToDeclare.Contains(value))
             {
                 proto.string_value.string_value = StringToKey(value);
@@ -163,21 +180,25 @@ namespace ThingModel.Client
 
         protected void ConvertProperty(Property.Double property, Proto.Property proto)
         {
+            proto.type = Proto.Property.Type.DOUBLE;
             proto.double_value = property.Value;
         }
 
         protected void ConvertProperty(Property.Int property, Proto.Property proto)
         {
+            proto.type = Proto.Property.Type.INT;
             proto.int_value = property.Value;
         }
 
         protected void ConvertProperty(Property.Boolean property, Proto.Property proto)
         {
+            proto.type = Proto.Property.Type.BOOLEAN;
             proto.boolean_value = property.Value;
         }
 
         protected void ConvertProperty(Property.DateTime property, Proto.Property proto)
         {
+            proto.type = Proto.Property.Type.DATETIME;
             proto.datetime_value = property.Value.Ticks;
         }
     }
