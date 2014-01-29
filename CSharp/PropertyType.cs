@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 
 namespace ThingModel
 {
@@ -17,6 +16,8 @@ namespace ThingModel
 
         public bool Required;
 
+        // Performant constructor, but it's insecure
+        // You should use the static Create method instead
         private PropertyType(string key, Type type, bool required)
         {
             Key = key;
@@ -24,6 +25,8 @@ namespace ThingModel
             _type = type;
         }
 
+        // Slow constructor, but you can give directly a Type object
+        // The static Create method can be used instead
         public PropertyType(string key, Type type)
         {
             if (!typeof(Property).IsAssignableFrom(type))
@@ -34,12 +37,15 @@ namespace ThingModel
             _type = type;
         }
 
+        // Tool for create PropertyType objets using C# genericity
+        // It's performant and no so complex
         public static PropertyType Create<T>(string key,
             bool required = true) where T : Property
         {
             return new PropertyType(key, typeof(T), required);
         }
 
+        // Compare if the key and the type are equals
         public bool Check(Property property)
         {
             return (!Required && property == null) ||

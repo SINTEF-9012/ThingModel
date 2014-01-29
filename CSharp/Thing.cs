@@ -99,31 +99,41 @@ namespace ThingModel
         }
 
 
-
+        /**
+         * Compare if two things are equals
+         * 
+         * Can compare also connected things, without infinite recursions.
+         */
         public bool Compare(Thing other, bool compareId = true, bool deepComparaisonForConnectedThings = false)
         {
-            // Optimization
+            // Optimization, when two things are the same
             if (this == other)
             {
                 return true;
             }
 
+            // If the types are not the sames
+            // The type can be null so it's a bit ugly here
             if (other == null || (Type != null && other.Type != null && Type.Name != other.Type.Name) ||
                 (Type == null && other.Type != null) || (Type != null && other.Type == null))
             {
                 return false;
             }
 
+            // If we just need to compare the ids, it's very fast
             if (compareId && _id != other._id)
             {
                 return false;
             }
 
-            if (Connections.Keys.Any(key => !other.Connections.ContainsKey(key)))
+            // Check if the connection list are the same
+            if (Connections.Keys.Any(key => !other.Connections.ContainsKey(key)) ||
+                other.Connections.Keys.Any(key => !Connections.ContainsKey(key)))
             {
                 return false;
             }
 
+            // Check if the properties are the same
             foreach (var property in Properties)
             {
                 Property otherProp;
@@ -146,44 +156,43 @@ namespace ThingModel
                 }
             }
 
+            // And start the start recursion if needed
             if (deepComparaisonForConnectedThings)
             {
+                // The hashset is declared only once and here
                 return RecursiveCompare(other, new HashSet<string>());
             }
 
             return true;
         }
 
+        // Do a recursive comparaison, should be called 
         private bool RecursiveCompare(Thing other, HashSet<string> workIds) {
+            // If the thing was already checked, we don't need to check it again
             if (workIds.Contains(_id))
             {
+                // And it's alway true, because we are still looking for a difference
                 return true;
             }
 
+            // Made a simple comparison first
             if (!Compare(other))
             {
                 return false;
             }
 
+            // We are working on the current thing,
+            // this instruction prevent infinite recursion
             workIds.Add(_id);
 
+            // And start the infinite recursion for connected things
+            // Because we are after the simple comparison, the
+            // two connections list should be equivalents
             foreach (var connectedThing in Connections)
             {
-                Thing otherThing;
-                other.Connections.TryGetValue(connectedThing.Key, out otherThing);
+                var otherThing = other.Connections[connectedThing.Key];
 
-                if (otherThing == null || !connectedThing.Value.RecursiveCompare(otherThing, workIds))
-                {
-                    return false;
-                }
-            }
-
-            foreach (var connectedThing in other.Connections)
-            {
-                Thing ownThing;
-                Connections.TryGetValue(connectedThing.Key, out ownThing);
-
-                if (ownThing == null || !connectedThing.Value.RecursiveCompare(ownThing, workIds))
+                if (!connectedThing.Value.RecursiveCompare(otherThing, workIds))
                 {
                     return false;
                 }
@@ -195,7 +204,9 @@ namespace ThingModel
 
         public IEnumerable<Property> GetProperties()
         {
-            return new List<Property>(Properties.Values);/*.AsReadOnly()*/;
+            // Create a copy of this list, so the user can change the
+            // things properties during a loop on this list without exceptions
+            return new List<Property>(Properties.Values);
         }
     }
 }

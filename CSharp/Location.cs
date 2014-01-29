@@ -4,9 +4,21 @@
     {
         public double X;
         public double Y;
+        
+        /** This parameter is optionnal **/
         public double? Z;
+
+        /**
+         * Name of the location system.
+         * 
+         * Examples, GWS 84, ETRS89...
+         */
         public string System;
         
+        /**
+         * You cannot use this constructor directly.
+         *  Location.{Point|LatLng|Equatorial} should be used instead.
+         */
         protected Location(double x, double y, double? z)
         {
             X = x;
@@ -14,6 +26,15 @@
             Z = z;
         }
 
+        /**
+         * Return true if the location contains the same values.
+         * 
+         * A Location.Point and a Location.LatLng can be the same if the values
+         * are the same.
+         * 
+         * The comparaison doesn't manage issues with precision numbers. If
+         * a value is rounded, the location is not the same.
+         */
         public bool Compare(Location other)
         {
             // Double comparaison without Epsilon mouahahaha
@@ -22,6 +43,9 @@
             // ReSharper restore CompareOfFloatsByEqualityOperator
         }
 
+        /**
+         * Used for videogames and for default coordinates systems.
+         */
         public class Point : Location
         {
             public Point(double x = 0.0, double y = 0.0, double? z = null)
@@ -30,6 +54,11 @@
             }
         }
 
+        /**
+         * For location on planets.
+         * 
+         * Will be used often with Earth WGS-84 (GPS).
+         */
         public class LatLng : Location
         {
             public LatLng(double latitude = 0.0, double longitude = 0.0, double? altitude = null)
@@ -56,6 +85,9 @@
             }
         }
 
+        /**
+         * For location in space.
+         */
         public class Equatorial : Location
         {
             public Equatorial(double rightAscension = 0.0, double declination = 0.0, double hourAngle = 0.0)

@@ -1,11 +1,15 @@
-﻿using System;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Text;
 
 namespace ThingModel
 {
+    /**
+     * A property represent a value attached to a key
+     */
     public abstract class Property
     {
+        // The key is fixed, if you want to change the key,
+        // you have to create a new Property and delete the previous one
         private readonly string _key;
 
         public string Key
@@ -18,8 +22,10 @@ namespace ThingModel
             _key = key;
         }
 
+        // Used for simple debug and displays
         public abstract string ValueToString();
         
+        // After some tests, a generic version is complex and not very performant
         public abstract bool Compare(Property other);
 
         public class Location : Property
