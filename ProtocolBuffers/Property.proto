@@ -25,6 +25,9 @@ message Property {
 
 		// WGS84 by default
 		optional int32 string_system = 4;
+
+		// When the z attribute is not present
+		optional bool z_null = 5 [default = false];
 	}
 
 	message String {

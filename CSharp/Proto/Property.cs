@@ -112,6 +112,14 @@ namespace ThingModel.Proto
       get { return _string_system; }
       set { _string_system = value; }
     }
+    private bool _z_null = (bool)false;
+    [global::ProtoBuf.ProtoMember(5, IsRequired = false, Name=@"z_null", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue((bool)false)]
+    public bool z_null
+    {
+      get { return _z_null; }
+      set { _z_null = value; }
+    }
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
