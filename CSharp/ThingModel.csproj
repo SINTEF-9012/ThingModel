@@ -60,6 +60,7 @@
     <Compile Include="Proto\ThingType.cs" />
     <Compile Include="Proto\Transaction.cs" />
     <Compile Include="Specs\PropertyTest.cs" />
+    <Compile Include="Specs\ProtoConversions.cs" />
     <Compile Include="Specs\ThingTest.cs" />
     <Compile Include="Specs\ThingTypeTest.cs" />
     <Compile Include="Specs\WharehouseTest.cs" />

@@ -35,6 +35,18 @@ namespace ThingModel.Specs
         }
 
         [Test]
+        public void CheckSlowPorpertyTypeConstructor()
+        {
+            var prop = new PropertyType("location", typeof (Property.Location));
+            _type.DefineProperty(prop);
+
+            Assert.Throws<Exception>(delegate
+                {
+                    prop = new PropertyType("location", typeof (string));
+                });
+        }
+
+        [Test]
         public void SetProperty()
         {
             Assert.That(_type.GetPropertyDefinition("location"), Is.EqualTo(_propertyType));

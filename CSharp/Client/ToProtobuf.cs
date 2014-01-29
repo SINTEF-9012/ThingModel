@@ -62,40 +62,44 @@ namespace ThingModel.Client
 
             Transaction.string_sender_id = StringToKey(senderID);
 
-            ConvertPublishList(publish);
+            foreach (var thing in publish)
+            {
+                Convert(thing);
+            }
+
             ConvertDeleteList(delete);
             ConvertDeclarationList(declarations);
 
             return Transaction;
         }
 
-        protected void ConvertPublishList(IEnumerable<Thing> publish)
+        protected Proto.Thing Convert(Thing thing)
         {
-            foreach (var thing in publish)
+            var publication = new Proto.Thing
+                {
+                    string_id = StringToKey(thing.ID),
+                    string_type_name = thing.Type != null ? StringToKey(thing.Type.Name) : 0
+                };
+
+            foreach (var connectedThing in thing.ConnectedThings)
             {
-                var publication = new Proto.Thing
+                publication.connections.Add(StringToKey(connectedThing.ID));
+            }
+
+            foreach (var property in thing.GetProperties())
+            {
+                var proto = new Proto.Property
                     {
-                        string_id = StringToKey(thing.ID),
-                        string_type_name = thing.Type != null ? StringToKey(thing.Type.Name) : 0
+                        string_key = StringToKey(property.Key)
                     };
 
-                foreach (var connectedThing in thing.ConnectedThings)
-                {
-                    publication.connections.Add(StringToKey(connectedThing.ID));
-                }
-
-                foreach (var property in thing.GetProperties())
-                {
-                    var proto = new Proto.Property
-                        {
-                            string_key = StringToKey(property.Key)
-                        };
-
-                    ConvertProperty((dynamic) property, proto);
-                }
-
-                Transaction.things_publish_list.Add(publication);
+                ConvertProperty((dynamic) property, proto);
+                publication.properties.Add(proto);
             }
+
+            Transaction.things_publish_list.Add(publication);
+
+            return publication;
         }
 
         protected void ConvertDeleteList(IEnumerable<Thing> publish)
