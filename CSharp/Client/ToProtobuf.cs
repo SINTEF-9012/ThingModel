@@ -83,7 +83,8 @@ namespace ThingModel.Client
             var publication = new Proto.Thing
                 {
                     string_id = StringToKey(thing.ID),
-                    string_type_name = thing.Type != null ? StringToKey(thing.Type.Name) : 0
+                    string_type_name = thing.Type != null ? StringToKey(thing.Type.Name) : 0,
+                    connections_change = true
                 };
 
             foreach (var connectedThing in thing.ConnectedThings)

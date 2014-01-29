@@ -88,6 +88,11 @@ namespace ThingModel
             return Connections.ContainsKey(thing._id);
         }
 
+        public void Detach()
+        {
+            Connections.Clear();
+        }
+
         /**
          * Get a list of connected things.
          * The list is a copy so you can connect and disconnect

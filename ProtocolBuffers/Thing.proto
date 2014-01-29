@@ -10,4 +10,5 @@ message Thing {
 
 	// Use int32 string ids
 	repeated int32 connections = 4 [packed = true];
+	optional bool connections_change = 5 [default = false];
 }

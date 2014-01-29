@@ -44,6 +44,14 @@ namespace ThingModel.Proto
       get { return _connections; }
     }
   
+    private bool _connections_change = (bool)false;
+    [global::ProtoBuf.ProtoMember(5, IsRequired = false, Name=@"connections_change", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue((bool)false)]
+    public bool connections_change
+    {
+      get { return _connections_change; }
+      set { _connections_change = value; }
+    }
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }

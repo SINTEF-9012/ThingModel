@@ -48,7 +48,7 @@ namespace ThingModel.Client
             foreach (var thing in transaction.things_publish_list)
             {
                 var modelThing = ConvertThingPublication(thing);
-                if (thing.connections.Count > 0)
+                if (thing.connections_change)
                 {
                     thingsToConnect.Add(new Tuple<Thing, Proto.Thing>(modelThing, thing));
                 }
@@ -56,6 +56,8 @@ namespace ThingModel.Client
 
             foreach (var tuple in thingsToConnect)
             {
+                tuple.Item1.Detach();
+
                 foreach (var connection in tuple.Item2.connections)
                 {
                     tuple.Item1.Connect(Wharehouse.GetThing(KeyToString(connection)));

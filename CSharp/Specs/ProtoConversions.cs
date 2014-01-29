@@ -244,5 +244,28 @@ namespace ThingModel.Specs
             Assert.That(newThing.GetProperty<Property.Boolean>("space").Value, Is.True);
 
         }
+
+        [Test]
+        public void IncrementalUpdatesAndDisconnection()
+        {
+            var couple = new Thing("couple");
+            var a = new Thing("James");
+            var b = new Thing("Germaine");
+
+            couple.Connect(a);
+            couple.Connect(b);
+
+            _fromProtobuf.Convert(_toProtobuf.Convert(new[] { couple,a,b }, new Thing[0], new ThingType[0], null));
+
+            Assert.That(_wharehouse.GetThing("couple").ConnectedThings.Count, Is.EqualTo(2));
+
+            // Germaine doesn't want to live with James anymore
+            couple.Disconnect(b);
+            _fromProtobuf.Convert(_toProtobuf.Convert(new[] {couple}, new Thing[0], new ThingType[0], null));
+
+            Assert.That(_wharehouse.GetThing("couple").ConnectedThings.Count, Is.EqualTo(1));
+
+
+        }
     }
 }
