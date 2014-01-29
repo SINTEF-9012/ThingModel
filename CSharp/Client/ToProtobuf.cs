@@ -34,6 +34,9 @@ namespace ThingModel.Client
         // as an int key with the StringToKey method
         private readonly HashSet<string> _stringToDeclare = new HashSet<string>();
 
+        private readonly Dictionary<int, Proto.Thing> _thingsState = new Dictionary<int, Proto.Thing>();
+        private readonly Dictionary<Tuple<int, int>, Proto.Property> _propertiesState = new Dictionary<Tuple<int, int>, Proto.Property>();
+
         protected int StringToKey(string value)
         {
             if (String.IsNullOrEmpty(value))
@@ -80,16 +83,66 @@ namespace ThingModel.Client
 
         protected Proto.Thing Convert(Thing thing)
         {
+            var change = false;
+
             var publication = new Proto.Thing
                 {
                     string_id = StringToKey(thing.ID),
                     string_type_name = thing.Type != null ? StringToKey(thing.Type.Name) : 0,
-                    connections_change = true
+                    connections_change = false
                 };
+            
+            Proto.Thing previousThing;
+            _thingsState.TryGetValue(publication.string_id, out previousThing);
+
+            if (previousThing == null)
+            {
+                change = true;
+            }
 
             foreach (var connectedThing in thing.ConnectedThings)
             {
-                publication.connections.Add(StringToKey(connectedThing.ID));
+                var connectionKey = StringToKey(connectedThing.ID);
+                publication.connections.Add(connectionKey);
+
+                if (previousThing == null || !previousThing.connections.Contains(connectionKey))
+                {
+                    publication.connections_change = true;
+                }
+            }
+
+            if (previousThing != null && publication.connections_change == false)
+            {
+                if (previousThing.connections.Count != publication.connections.Count)
+                {
+                    publication.connections_change = true;
+                }
+                else
+                {
+                    foreach (var key in previousThing.connections)
+                    {
+                        if (!publication.connections.Contains(key))
+                        {
+                            publication.connections_change = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            
+            // If we don't have changes on the connection list,
+            // it's useless to send it
+            if (!publication.connections_change)
+            {
+                if (publication.connections.Count > 0)
+                {
+                    publication.connections.Clear();    
+                }
+                
+            }
+            else
+            {
+                change = true;
             }
 
             foreach (var property in thing.GetProperties())
@@ -100,10 +153,58 @@ namespace ThingModel.Client
                     };
 
                 ConvertProperty((dynamic) property, proto);
+
+                var key = new Tuple<int, int>(publication.string_id, proto.string_key);
+
+                if (previousThing != null)
+                {
+                    Proto.Property previousProto;
+                    if (_propertiesState.TryGetValue(key, out previousProto))
+                    {
+                        // ReSharper disable CompareOfFloatsByEqualityOperator
+                        // Boring but necessary ?
+                        if (previousProto.type == proto.type &&
+                            previousProto.boolean_value == proto.boolean_value &&
+                            previousProto.datetime_value == proto.datetime_value &&
+                            previousProto.double_value == proto.double_value &&
+                            previousProto.int_value == proto.int_value &&
+                            ((previousProto.location_value == null && proto.location_value == null) ||
+                             (previousProto.location_value != null && proto.location_value != null &&
+                              previousProto.location_value.x == proto.location_value.x &&
+                              previousProto.location_value.y == proto.location_value.y &&
+                              previousProto.location_value.z == proto.location_value.z &&
+                              previousProto.location_value.z_null == proto.location_value.z_null &&
+                              previousProto.location_value.string_system == proto.location_value.string_system)) &&
+                            ((previousProto.string_value == null && proto.string_value == null) ||
+                             (previousProto.string_value != null && proto.string_value != null &&
+                              previousProto.string_value.string_value == proto.string_value.string_value &&
+                              previousProto.string_value.value == proto.string_value.value)))
+                        {
+                            continue;
+                        }
+
+                        // ReSharper restore CompareOfFloatsByEqualityOperator
+                                    
+                    }
+
+                    
+                }
+
+                change = true;
+                
                 publication.properties.Add(proto);
+                _propertiesState.Add(key, proto);
             }
 
-            Transaction.things_publish_list.Add(publication);
+            if (change)
+            {
+                Transaction.things_publish_list.Add(publication);
+                if (previousThing == null)
+                {
+                    _thingsState.Add(publication.string_id, publication);
+                }
+            }
+            
 
             return publication;
         }
@@ -112,7 +213,9 @@ namespace ThingModel.Client
         {
             foreach (var thing in publish)
             {
-                Transaction.things_remove_list.Add(StringToKey(thing.ID));
+                var key = StringToKey(thing.ID);
+                Transaction.things_remove_list.Add(key);
+                _thingsState.Remove(key);
             }
         }
 

@@ -27,7 +27,7 @@ namespace ThingModel.Specs
             var message = new Thing("first");
             message.SetProperty(new Property.String("content", "Hello World"));
 
-            var transaction = _toProtobuf.Convert(new Thing[] {message}, new Thing[0], new ThingType[0], "tests");
+            var transaction = _toProtobuf.Convert(new [] {message}, new Thing[0], new ThingType[0], "tests");
 
             var senderId = _fromProtobuf.Convert(transaction);
             Assert.That(senderId, Is.EqualTo("tests"));
@@ -266,6 +266,22 @@ namespace ThingModel.Specs
             Assert.That(_wharehouse.GetThing("couple").ConnectedThings.Count, Is.EqualTo(1));
 
 
+        }
+
+        [Test]
+        public void DontSendAnUnchangedObject()
+        {
+            var thing = new Thing("café");
+            thing.SetProperty(new Property.Double("temperature", 40.0));
+            thing.SetProperty(new Property.Location("location", new Location.Equatorial(48,454,2)));
+
+            var transaction = _toProtobuf.Convert(new[] { thing }, new Thing[0], new ThingType[0], null);
+
+            Assert.That(transaction.things_publish_list.Count, Is.EqualTo(1));
+
+            transaction = _toProtobuf.Convert(new[] { thing }, new Thing[0], new ThingType[0], null);
+
+            Assert.That(transaction.things_publish_list.Count, Is.EqualTo(0));
         }
     }
 }
