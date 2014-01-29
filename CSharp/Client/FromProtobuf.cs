@@ -110,7 +110,13 @@ namespace ThingModel.Client
                 type = Wharehouse.GetThingType(KeyToString(thing.string_type_name));
             }
 
-            var modelThing = new Thing(KeyToString(thing.string_id), type);
+            var id = KeyToString(thing.string_id);
+            var modelThing = Wharehouse.GetThing(id);
+               
+            if (modelThing == null || modelThing.Type != type)
+            {
+                modelThing = new Thing(KeyToString(thing.string_id), type);
+            }
 
             foreach (var property in thing.properties)
             {

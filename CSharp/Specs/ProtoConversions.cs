@@ -201,5 +201,48 @@ namespace ThingModel.Specs
 
             Assert.That(_wharehouse.GetThing("family").ConnectedThings.Count, Is.EqualTo(2));
         }
+
+        [Test]
+        public void IndependentInstances()
+        {
+            var location = new Location.LatLng(25, 2);
+
+            var thing = new Thing("8712C");
+            thing.SetProperty(new Property.Location("position", location));
+
+            _fromProtobuf.Convert(_toProtobuf.Convert(new[] { thing }, new Thing[0], new ThingType[0], null));
+
+            var newLocation = _wharehouse.GetThing("8712C").GetProperty<Property.Location>("position").Value;
+            
+            Assert.That(location.Compare(newLocation), Is.True);
+
+            newLocation.Y = 27;
+
+            Assert.That(location.Compare(newLocation), Is.False);
+
+        }
+
+        [Test]
+        public void IncrementalPropertiesUpdates()
+        {
+            var thing = new Thing("rocket");
+            thing.SetProperty(new Property.Double("speed", 1500.0));
+            thing.SetProperty(new Property.String("name", "Ariane"));
+
+            _fromProtobuf.Convert(_toProtobuf.Convert(new[] { thing }, new Thing[0], new ThingType[0], null));
+
+            thing = new Thing("rocket");
+            thing.SetProperty(new Property.Double("speed", 1200.0));
+            thing.SetProperty(new Property.Boolean("space", true));
+
+            _fromProtobuf.Convert(_toProtobuf.Convert(new[] { thing }, new Thing[0], new ThingType[0], null));
+
+            var newThing = _wharehouse.GetThing("rocket");
+
+            Assert.That(newThing.GetProperty<Property.String>("name").Value, Is.EqualTo("Ariane"));
+            Assert.That(newThing.GetProperty<Property.Double>("speed").Value, Is.EqualTo(1200.0));
+            Assert.That(newThing.GetProperty<Property.Boolean>("space").Value, Is.True);
+
+        }
     }
 }
