@@ -132,8 +132,14 @@ namespace ThingModel
             }
 
             // Check if the connection list are the same
-            if (Connections.Keys.Any(key => !other.Connections.ContainsKey(key)) ||
+            if (Connections.Count != other.Connections.Count ||
+                Connections.Keys.Any(key => !other.Connections.ContainsKey(key)) ||
                 other.Connections.Keys.Any(key => !Connections.ContainsKey(key)))
+            {
+                return false;
+            }
+
+            if (Properties.Count != other.Properties.Count)
             {
                 return false;
             }
