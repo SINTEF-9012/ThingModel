@@ -37,7 +37,25 @@ namespace ThingModel.Client
             transaction.string_declarations.ForEach(ConvertStringDeclaration);
             transaction.things_remove_list.ForEach(ConvertDelete);
             transaction.thingtypes_declaration_list.ForEach(ConvertThingTypeDeclaration);
-            transaction.things_publish_list.ForEach(ConvertThingPublication);
+
+            var thingsToConnect = new List<Tuple<Thing, Proto.Thing>>();
+
+            foreach (var thing in transaction.things_publish_list)
+            {
+                var modelThing = ConvertThingPublication(thing);
+                if (thing.connections.Count > 0)
+                {
+                    thingsToConnect.Add(new Tuple<Thing, Proto.Thing>(modelThing, thing));
+                }
+            }
+
+            foreach (var tuple in thingsToConnect)
+            {
+                foreach (var connection in tuple.Item2.connections)
+                {
+                    tuple.Item1.Connect(Wharehouse.GetThing(KeyToString(connection)));
+                }
+            }
 
             var senderId = KeyToString(transaction.string_sender_id);
 
@@ -161,6 +179,7 @@ namespace ThingModel.Client
                 
             }
 
+            Wharehouse.RegisterThing(modelThing, false);
             return modelThing;
         }
     }
