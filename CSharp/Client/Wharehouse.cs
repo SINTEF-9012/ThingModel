@@ -170,5 +170,12 @@ namespace ThingModel
             _things.TryGetValue(key, out value);
             return value;
         }
+
+        public ThingType GetThingType(string key)
+        {
+            ThingType value;
+            _thingTypes.TryGetValue(key, out value);
+            return value;
+        }
     }
 }

@@ -153,9 +153,14 @@ namespace ThingModel.Client
                 {
                     x = value.X,
                     y = value.Y,
-                    z = value.Z == null ? 0.0 : (double) value.Z,
                     string_system = StringToKey(value.System),
+                    z_null = value.Z == null
                 };
+
+            if (value.Z != null)
+            {
+                proto.location_value.z = (double) value.Z;
+            }
         }
 
         protected void ConvertProperty(Property.String property, Proto.Property proto)
