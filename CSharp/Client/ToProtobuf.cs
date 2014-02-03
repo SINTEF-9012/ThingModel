@@ -112,49 +112,35 @@ namespace ThingModel.Client
                 change = true;
             }
 
-            foreach (var connectedThing in thing.ConnectedThings)
+            if ((previousThing == null && thing.ConnectedThings.Count > 0)
+                || (previousThing != null && previousThing.connections.Count != thing.ConnectedThings.Count))
             {
-                var connectionKey = StringToKey(connectedThing.ID);
-                publication.connections.Add(connectionKey);
-
-                if (previousThing == null || !previousThing.connections.Contains(connectionKey))
-                {
-                    publication.connections_change = true;
-                }
+                publication.connections_change = true;
             }
-
-            if (previousThing != null && publication.connections_change == false)
+            else
             {
-                if (previousThing.connections.Count != publication.connections.Count)
+                foreach (var connectedThing in thing.ConnectedThings)
                 {
-                    publication.connections_change = true;
-                }
-                else
-                {
-                    foreach (var key in previousThing.connections)
+                    var connectionKey = StringToKey(connectedThing.ID);
+
+                    if (previousThing == null || !previousThing.connections.Contains(connectionKey))
                     {
-                        if (!publication.connections.Contains(key))
-                        {
-                            publication.connections_change = true;
-                            break;
-                        }
+                        publication.connections_change = true;
                     }
                 }
             }
             
             // If we don't have changes on the connection list,
             // it's useless to send it
-            if (!publication.connections_change)
-            {
-                if (publication.connections.Count > 0)
-                {
-                    publication.connections.Clear();    
-                }
-                
-            }
-            else
+            if (publication.connections_change)
             {
                 change = true;
+                foreach (var connectedThing in thing.ConnectedThings)
+                {
+                    var connectionKey = StringToKey(connectedThing.ID);
+                    publication.connections.Add(connectionKey);
+                }
+                
             }
 
             foreach (var property in thing.GetProperties())
@@ -211,12 +197,8 @@ namespace ThingModel.Client
             if (change)
             {
                 Transaction.things_publish_list.Add(publication);
-                if (previousThing == null)
-                {
-                    _thingsState.Add(publication.string_id, publication);
-                }
+                _thingsState[publication.string_id] = publication;
             }
-            
 
             return publication;
         }

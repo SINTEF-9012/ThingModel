@@ -76,7 +76,12 @@ namespace ThingModel.Client
 
                 foreach (var connection in tuple.Item2.connections)
                 {
-                    tuple.Item1.Connect(Wharehouse.GetThing(KeyToString(connection)));
+                    var t = Wharehouse.GetThing(KeyToString(connection));
+                    if (t != null)
+                    {
+                        tuple.Item1.Connect(t);    
+                    }
+                    
                 }
             }
 
