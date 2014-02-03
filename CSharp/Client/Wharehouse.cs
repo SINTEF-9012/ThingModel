@@ -1,13 +1,14 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 
 namespace ThingModel
 {
     public class Wharehouse
     {
-        private readonly Dictionary<string, ThingType> _thingTypes = new Dictionary<string, ThingType>();
+        private readonly ConcurrentDictionary<string, ThingType> _thingTypes = new ConcurrentDictionary<string, ThingType>();
 
-        private readonly Dictionary<string, Thing> _things = new Dictionary<string, Thing>();
+        private readonly ConcurrentDictionary<string, Thing> _things = new ConcurrentDictionary<string, Thing>();
 
         private readonly HashSet<IThingObserver> _thingObservers = new HashSet<IThingObserver>();
  
@@ -26,6 +27,7 @@ namespace ThingModel
 
                 NotifyThingTypeDefine(type);
             }
+            
         }
 
         public void RegisterThing(Thing thing, bool alsoRegisterConnections = true, bool alsoRegisterTypes = false)
@@ -35,8 +37,7 @@ namespace ThingModel
                 throw new Exception("Null are not allowed in the wharehouse.");
             }
 
-
-            var creation = !_things.ContainsKey(thing.ID);
+           var creation = !_things.ContainsKey(thing.ID);
             _things[thing.ID] = thing;
 
             if (alsoRegisterTypes)
@@ -112,9 +113,11 @@ namespace ThingModel
             }
 
             // Remove the thing
-            _things.Remove(thing.ID);
-
-            NotifyThingDeleted(thing);
+            Thing uselessThing;
+            if (_things.TryRemove(thing.ID, out uselessThing))
+            {
+                NotifyThingDeleted(thing);
+            }
         }
 
         public void RegisterObserver(IThingObserver observer)
