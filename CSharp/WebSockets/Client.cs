@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading;
-using ProtoBuf;
 using ThingModel.Client;
 using WebSocketSharp;
 
@@ -18,7 +15,7 @@ namespace ThingModel.WebSockets
         private bool _close = true;
         private int _delayReconnection = 1;
         
-        private ProtoObserver _thingObserver;
+        private ProtoModelObserver _thingModelObserver;
 
         public Client(string senderID, string path, Wharehouse wharehouse)
         {
@@ -26,8 +23,8 @@ namespace ThingModel.WebSockets
 
             _wharehouse = wharehouse;
 
-            _thingObserver = new ProtoObserver();
-            _wharehouse.RegisterObserver(_thingObserver);
+            _thingModelObserver = new ProtoModelObserver();
+            _wharehouse.RegisterObserver(_thingModelObserver);
 
             _fromProtobuf = new FromProtobuf(wharehouse);
             _toProtobuf = new ToProtobuf();
@@ -42,9 +39,9 @@ namespace ThingModel.WebSockets
 
         public void Send()
         {
-            var transaction = _thingObserver.GetTransaction(_toProtobuf, SenderID);
+            var transaction = _thingModelObserver.GetTransaction(_toProtobuf, SenderID);
             _ws.Send(_toProtobuf.Convert(transaction));
-            _thingObserver.Reset();
+            _thingModelObserver.Reset();
         }
 
         private void WsOnClose(object sender, CloseEventArgs closeEventArgs)
@@ -78,7 +75,7 @@ namespace ThingModel.WebSockets
             {
                 var senderName = _fromProtobuf.Convert(args.RawData);
                 Console.WriteLine(SenderID + " | Binary message from : " + senderName);
-                _thingObserver.Reset();
+                _thingModelObserver.Reset();
             }
             else
             {

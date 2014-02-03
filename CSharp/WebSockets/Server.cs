@@ -16,14 +16,14 @@ namespace ThingModel.WebSockets
             protected ToProtobuf ToProtobuf;
             protected FromProtobuf FromProtobuf;
             protected Wharehouse Wharehouse;
-            protected ProtoObserver ProtoObserver;
+            protected ProtoModelObserver ProtoModelObserver;
 
             public ServerService(Wharehouse wharehouse)
             {
                 Wharehouse = wharehouse;
 
-                ProtoObserver = new ProtoObserver();
-                Wharehouse.RegisterObserver(ProtoObserver);
+                ProtoModelObserver = new ProtoModelObserver();
+                Wharehouse.RegisterObserver(ProtoModelObserver);
 
                 ToProtobuf = new ToProtobuf();
                 FromProtobuf = new FromProtobuf(wharehouse);
@@ -39,12 +39,12 @@ namespace ThingModel.WebSockets
             { 
                 if (e.Type == Opcode.BINARY)
                 {
-                    ProtoObserver.Reset();
+                    ProtoModelObserver.Reset();
 
                     var senderID = FromProtobuf.Convert(e.RawData);
                     Console.WriteLine("Server | Message from : " + senderID);
                     
-                    var analyzedTransaction = ProtoObserver.GetTransaction(ToProtobuf, senderID);
+                    var analyzedTransaction = ProtoModelObserver.GetTransaction(ToProtobuf, senderID);
                     
                     
 

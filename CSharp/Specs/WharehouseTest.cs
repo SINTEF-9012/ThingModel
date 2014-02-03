@@ -15,18 +15,20 @@ namespace ThingModel.Specs
         private Thing _thing;
         private Wharehouse _wharehouse;
 
-        private class ThingChangeObserver : IThingObserver
+        private class ThingModelChangeObserver : IThingModelObserver
         {
 
             public bool NewThing;
             public bool UpdatedThing;
             public bool DeletedThing;
+            public bool DefineType;
 
             public void Reset()
             {
                 NewThing = false;
                 UpdatedThing = false;
                 DeletedThing = false;
+                DefineType = false;
             }
 
             public void New(Thing thing)
@@ -44,27 +46,13 @@ namespace ThingModel.Specs
                 UpdatedThing = true;
             }
 
-
-        }
-
-        private class TypeChangeObserver : IThingTypeObserver
-        {
-
-            public bool DefineType;
-
-            public void Reset()
-            {
-                DefineType = false;
-            }
-
             public void Define(ThingType thing)
             {
                 DefineType = true;
             }
         }
 
-        private ThingChangeObserver _thingChangeObserver;
-        private TypeChangeObserver _typeChangeObserver;
+        private ThingModelChangeObserver _thingModelChangeObserver;
 
         [SetUp]
         protected void SetUp()
@@ -80,22 +68,20 @@ namespace ThingModel.Specs
 
             _wharehouse = new Wharehouse();
 
-            _thingChangeObserver = new ThingChangeObserver();
-            _typeChangeObserver = new TypeChangeObserver();
+            _thingModelChangeObserver = new ThingModelChangeObserver();
 
-            _wharehouse.RegisterObserver(_thingChangeObserver);
-            _wharehouse.RegisterObserver(_typeChangeObserver);
+            _wharehouse.RegisterObserver(_thingModelChangeObserver);
         }
 
         [Test]
         public void RegisterType()
         {
             _wharehouse.RegisterType(_type);
-            Assert.That(_typeChangeObserver.DefineType, Is.True);
+            Assert.That(_thingModelChangeObserver.DefineType, Is.True);
 
-            _typeChangeObserver.Reset();
+            _thingModelChangeObserver.Reset();
             Assert.Throws<Exception>(() => _wharehouse.RegisterType(null));
-            Assert.That(_typeChangeObserver.DefineType, Is.False);
+            Assert.That(_thingModelChangeObserver.DefineType, Is.False);
 
         }
 
@@ -103,11 +89,11 @@ namespace ThingModel.Specs
         public void RegisterThing()
         {
             _wharehouse.RegisterThing(_thing, false);
-            Assert.That(_thingChangeObserver.NewThing, Is.True);
+            Assert.That(_thingModelChangeObserver.NewThing, Is.True);
 
-            _thingChangeObserver.Reset();
+            _thingModelChangeObserver.Reset();
             Assert.Throws<Exception>(() => _wharehouse.RegisterThing(null));
-            Assert.That(_thingChangeObserver.NewThing, Is.False);
+            Assert.That(_thingModelChangeObserver.NewThing, Is.False);
         }
 
         [Test]
@@ -115,30 +101,29 @@ namespace ThingModel.Specs
         {
             _wharehouse.RegisterThing(_thing, false, true);
 
-            Assert.That(_typeChangeObserver.DefineType, Is.True);
+            Assert.That(_thingModelChangeObserver.DefineType, Is.True);
         }
 
         [Test]
         public void CheckThingUpdateCallback()
         {
             _wharehouse.RegisterThing(_thing);
-            Assert.That(_thingChangeObserver.UpdatedThing, Is.False);
+            Assert.That(_thingModelChangeObserver.UpdatedThing, Is.False);
 
             _wharehouse.RegisterThing(_thing);
-            Assert.That(_thingChangeObserver.UpdatedThing, Is.True);
+            Assert.That(_thingModelChangeObserver.UpdatedThing, Is.True);
         }
 
         [Test]
         public void UnregisterCallbacks()
         {
-            _wharehouse.Unregister(_thingChangeObserver);
-            _wharehouse.Unregister(_typeChangeObserver);
+            _wharehouse.UnregisterObserver(_thingModelChangeObserver);
 
             _wharehouse.RegisterThing(_thing);
             _wharehouse.RegisterType(_type);
 
-            Assert.That(_thingChangeObserver.NewThing, Is.False);
-            Assert.That(_typeChangeObserver.DefineType, Is.False);
+            Assert.That(_thingModelChangeObserver.NewThing, Is.False);
+            Assert.That(_thingModelChangeObserver.DefineType, Is.False);
         }
 
         [Test]
@@ -147,18 +132,18 @@ namespace ThingModel.Specs
             _wharehouse.RegisterThing(_thing);
             _wharehouse.RemoveThing(_thing);
 
-            Assert.That(_thingChangeObserver.DeletedThing, Is.True);
+            Assert.That(_thingModelChangeObserver.DeletedThing, Is.True);
 
-            _thingChangeObserver.Reset();
+            _thingModelChangeObserver.Reset();
             _wharehouse.RemoveThing(null);
-            Assert.That(_thingChangeObserver.DeletedThing, Is.False);
+            Assert.That(_thingModelChangeObserver.DeletedThing, Is.False);
         }
 
         [Test]
         public void RecursiveRegistration()
         {
             _wharehouse.RegisterThing(_thing);
-            _thingChangeObserver.Reset();
+            _thingModelChangeObserver.Reset();
 
             var newThing = new Thing("test");
             newThing.Connect(_thing);
@@ -168,8 +153,8 @@ namespace ThingModel.Specs
 
             _wharehouse.RegisterThing(newThing/*, true*/);
 
-            Assert.That(_thingChangeObserver.NewThing, Is.True);
-            Assert.That(_thingChangeObserver.UpdatedThing, Is.True);
+            Assert.That(_thingModelChangeObserver.NewThing, Is.True);
+            Assert.That(_thingModelChangeObserver.UpdatedThing, Is.True);
         }
 
         [Test]
@@ -182,7 +167,7 @@ namespace ThingModel.Specs
             _wharehouse.RegisterThing(newThing);
             _wharehouse.RegisterThing(_thing);
 
-            Assert.That(_thingChangeObserver.NewThing, Is.True);
+            Assert.That(_thingModelChangeObserver.NewThing, Is.True);
         }
 
         [Test]
@@ -198,7 +183,7 @@ namespace ThingModel.Specs
                     _thing
                 });
 
-            Assert.That(_thingChangeObserver.NewThing, Is.True);
+            Assert.That(_thingModelChangeObserver.NewThing, Is.True);
         }
 
         [Test]
@@ -208,11 +193,11 @@ namespace ThingModel.Specs
             otherThing.Connect(_thing);
 
             _wharehouse.RegisterThing(otherThing);
-            _thingChangeObserver.Reset();
+            _thingModelChangeObserver.Reset();
             _wharehouse.RemoveThing(_thing);
 
-            Assert.That(_thingChangeObserver.DeletedThing, Is.True);
-            Assert.That(_thingChangeObserver.UpdatedThing, Is.True);
+            Assert.That(_thingModelChangeObserver.DeletedThing, Is.True);
+            Assert.That(_thingModelChangeObserver.UpdatedThing, Is.True);
 
         }
 

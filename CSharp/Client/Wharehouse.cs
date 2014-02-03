@@ -10,9 +10,7 @@ namespace ThingModel
 
         private readonly ConcurrentDictionary<string, Thing> _things = new ConcurrentDictionary<string, Thing>();
 
-        private readonly HashSet<IThingObserver> _thingObservers = new HashSet<IThingObserver>();
- 
-        private readonly HashSet<IThingTypeObserver> _thingTypeObservers = new HashSet<IThingTypeObserver>();
+        private readonly HashSet<IThingModelObserver> _observers = new HashSet<IThingModelObserver>();
  
         public void RegisterType(ThingType type, bool force = true)
         {
@@ -120,29 +118,19 @@ namespace ThingModel
             }
         }
 
-        public void RegisterObserver(IThingObserver observer)
+        public void RegisterObserver(IThingModelObserver modelObserver)
         {
-            _thingObservers.Add(observer);
+            _observers.Add(modelObserver);
         }
 
-        public void RegisterObserver(IThingTypeObserver observer)
+        public void UnregisterObserver(IThingModelObserver modelObserver)
         {
-            _thingTypeObservers.Add(observer);
+            _observers.Remove(modelObserver);
         }
-
-        public void Unregister(IThingObserver observer)
-        {
-            _thingObservers.Remove(observer);
-        }
-
-        public void Unregister(IThingTypeObserver observer)
-        {
-            _thingTypeObservers.Remove(observer);
-        }
-
+        
         public void NotifyThingTypeDefine(ThingType type)
         {
-            foreach (var observer in _thingTypeObservers)
+            foreach (var observer in _observers)
             {
                 observer.Define(type);
             }
@@ -150,7 +138,7 @@ namespace ThingModel
 
         public void NotifyThingUpdate(Thing thing)
         {
-            foreach (var observer in _thingObservers)
+            foreach (var observer in _observers)
             {
                 observer.Updated(thing);
             }
@@ -158,7 +146,7 @@ namespace ThingModel
 
         public void NotifyThingCreation(Thing thing)
         {
-            foreach (var observer in _thingObservers)
+            foreach (var observer in _observers)
             {
                 observer.New(thing);
             }
@@ -166,7 +154,7 @@ namespace ThingModel
 
         public void NotifyThingDeleted(Thing thing)
         {
-            foreach (var observer in _thingObservers)
+            foreach (var observer in _observers)
             {
                 observer.Deleted(thing);
             }

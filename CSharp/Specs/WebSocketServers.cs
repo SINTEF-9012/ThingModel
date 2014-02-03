@@ -16,11 +16,12 @@ namespace ThingModel.Specs
         private Wharehouse _wharehouseA;
         private Wharehouse _wharehouseB;
 
-        private class WharehouseWait : IThingObserver
+        private class WharehouseWait : IThingModelObserver
         {
             private readonly AutoResetEvent _newEvent = new AutoResetEvent(false);
             private readonly AutoResetEvent _deleteEvent = new AutoResetEvent(false);
             private readonly AutoResetEvent _updatedEvent = new AutoResetEvent(false);
+            private readonly AutoResetEvent _defineEvent = new AutoResetEvent(false);
 
             public void New(Thing thing)
             {
@@ -37,27 +38,31 @@ namespace ThingModel.Specs
                 _updatedEvent.Set();
             }
 
-            public bool WaitNew(int millisecondsTimeout = 500)
+            public void Define(ThingType thing)
+            {
+                _defineEvent.Set();
+            }
+
+            public bool WaitNew(int millisecondsTimeout = 800)
             {
                 return _newEvent.WaitOne(millisecondsTimeout);
             }
 
-            public bool WaitDeleted(int millisecondsTimeout = 500)
+            public bool WaitDeleted(int millisecondsTimeout = 800)
             {
                 return _deleteEvent.WaitOne(millisecondsTimeout);
             }
 
-            public bool WaitUpdated(int millisecondsTimeout = 500)
+            public bool WaitUpdated(int millisecondsTimeout = 800)
             {
                 return _updatedEvent.WaitOne(millisecondsTimeout);
             }
 
-            public void Reset()
+            public bool WaitDefine(int millisecondsTimeout = 800)
             {
-                _newEvent.Reset();
-                _deleteEvent.Reset();
-                _updatedEvent.Reset();
+                return _defineEvent.WaitOne(millisecondsTimeout);
             }
+           
         }
 
         private WharehouseWait _wharehouseWaitA;
@@ -148,8 +153,60 @@ namespace ThingModel.Specs
             Assert.That(_wharehouseB.GetThing("lapin"), Is.Null);
             _clientB.Send();
 
-            Assert.That( _wharehouseWaitA.WaitDeleted(), Is.True);
+            Assert.That( _wharehouseWaitA.WaitDeleted(1200), Is.True);
             Assert.That(_wharehouseA.GetThing("lapin"), Is.Null);
+        }
+
+        [Test]
+        public void TestUpdate()
+        {
+            var lapin = new Thing("lapin");
+            lapin.SetProperty(new Property.String("name", "roger"));
+            _wharehouseA.RegisterThing(lapin);
+            _clientA.Send();
+            _wharehouseWaitB.WaitNew();
+
+            var lapinB = _wharehouseB.GetThing("lapin");
+            lapinB.SetProperty(new Property.String("name", "groaw"));
+            _clientB.Send();
+
+            Assert.That(_wharehouseWaitA.WaitUpdated(), Is.True);
+
+            Assert.That(_wharehouseA.GetThing("lapin")
+                .GetProperty<Property.String>("name").Value, Is.EqualTo("groaw"));
+        }
+
+        [Test]
+        public void TestTypeDefinition()
+        {
+            var type = new ThingType("rabbit");
+            type.Description = "Just a rabbit";
+
+            var name = PropertyType.Create<Property.String>("name");
+            name.Required = true;
+            name.Name = "Name";
+            name.Description = "Rabbit's name";
+            type.DefineProperty(name);
+
+            var position = PropertyType.Create<Property.Location>("position");
+            position.Required = false;
+            position.Description = "Localization of the rabbit";
+            type.DefineProperty(position);
+
+            var thing = new Thing("lapin", type);
+            _wharehouseA.RegisterThing(thing, true, true);
+            _clientA.Send();
+
+            Assert.That(_wharehouseWaitB.WaitDefine(), Is.True);
+
+            var transportedType = _wharehouseB.GetThingType("rabbit");
+            Assert.That(transportedType, Is.Not.Null);
+
+            Assert.That(type.Description, Is.EqualTo(transportedType.Description));
+
+            Assert.That(transportedType.GetPropertyDefinition("position").Description, Is.EqualTo(position.Description));
+
+            Assert.That(_wharehouseB.GetThing("lapin").Type.Name, Is.EqualTo(type.Name));
         }
     }
 }

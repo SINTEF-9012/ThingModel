@@ -4,15 +4,17 @@ using ThingModel.Proto;
 
 namespace ThingModel.WebSockets
 {
-    public class ProtoObserver : IThingObserver
+    public class ProtoModelObserver : IThingModelObserver
     {
         public readonly HashSet<Thing> Updates = new HashSet<Thing>();
         public readonly HashSet<Thing> Deletions = new HashSet<Thing>();
+        public readonly HashSet<ThingType> Definitions = new HashSet<ThingType>(); 
 
         public void Reset()
         {
             Updates.Clear();
             Deletions.Clear();
+            Definitions.Clear();
         }
 
         public void New(Thing thing)
@@ -30,9 +32,14 @@ namespace ThingModel.WebSockets
             Updates.Add(thing);
         }
 
+        public void Define(ThingType thing)
+        {
+            Definitions.Add(thing);
+        }
+
         public Transaction GetTransaction(ToProtobuf toProtobuf, string senderID)
         {
-            return toProtobuf.Convert(Updates, Deletions, new ThingType[0], senderID);
+            return toProtobuf.Convert(new List<Thing>(Updates), new List<Thing>(Deletions), new List<ThingType>(Definitions), senderID);
         }
     }
 }
