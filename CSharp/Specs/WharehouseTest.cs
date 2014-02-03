@@ -217,37 +217,46 @@ namespace ThingModel.Specs
         {
             Assert.DoesNotThrow(delegate
                 {
+                    var a = new ManualResetEvent(false);
+                    var b = new ManualResetEvent(false);
+                    var c = new ManualResetEvent(false);
+
                     var cptCreationA = 0;
                     var creationA = new Thread(delegate(object sender)
                     {
-                        for (var i = 0; i < 10000; ++i)
+                        for (var i = 0; i < 1000; ++i)
                         {
                             _wharehouse.RegisterThing(new Thing("banana_" + ++cptCreationA));
                         }
+                        a.Set();
                     });
 
                     var cptCreationB = 0;
                     var creationB = new Thread(delegate(object sender)
                     {
-                        for (var i = 0; i < 10000; ++i)
+                        for (var i = 0; i < 1000; ++i)
                         {
                             _wharehouse.RegisterThing(new Thing("lapin_" + ++cptCreationB));
                         }
+                        b.Set();
                     });
 
                     var cptDeletions = 0;
                     var deletions = new Thread(delegate(object sender)
                     {
-                        for (var i = 0; i < 10000; ++i)
+                        for (var i = 0; i < 1000; ++i)
                         {
                             _wharehouse.RemoveThing(_wharehouse.GetThing("lapin_" + ++cptDeletions));
                         }
+                        c.Set();
                     });
 
 
                     creationA.Start();
                     creationB.Start();
                     deletions.Start();
+
+                    Assert.That(WaitHandle.WaitAll(new WaitHandle[] {a, b, c}, 5000), Is.True);
                 });
 
         }
