@@ -148,6 +148,10 @@ namespace ThingModel.Specs
             _wharehouse.RemoveThing(_thing);
 
             Assert.That(_thingChangeObserver.DeletedThing, Is.True);
+
+            _thingChangeObserver.Reset();
+            _wharehouse.RemoveThing(null);
+            Assert.That(_thingChangeObserver.DeletedThing, Is.False);
         }
 
         [Test]
