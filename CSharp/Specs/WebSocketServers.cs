@@ -60,7 +60,8 @@ namespace ThingModel.Specs
             }
         }
 
-        private WharehouseWait _wharehouseWait;
+        private WharehouseWait _wharehouseWaitA;
+        private WharehouseWait _wharehouseWaitB;
 
         [SetUp]
         protected void SetUp()
@@ -76,11 +77,14 @@ namespace ThingModel.Specs
             _clientA = new WebSockets.Client("UnitTestA", path, _wharehouseA);
             _clientB = new WebSockets.Client("UnitTestB", path, _wharehouseB);
 
-            _wharehouseWait = new WharehouseWait();
-            _wharehouseB.RegisterObserver(_wharehouseWait);
+            _wharehouseWaitA = new WharehouseWait();
+            _wharehouseA.RegisterObserver(_wharehouseWaitA);
 
-            //_server.Debug();
-            //_clientA.Debug();
+            _wharehouseWaitB = new WharehouseWait();
+            _wharehouseB.RegisterObserver(_wharehouseWaitB);
+
+            _server.Debug();
+            _clientA.Debug();
         }
 
         [TearDown]
@@ -98,13 +102,25 @@ namespace ThingModel.Specs
         }
 
         [Test]
+        public void TestReconnection()
+        {
+            Assert.That(_clientA.IsConnected(), Is.True);
+            _server.Close();
+            Assert.That(_clientA.IsConnected(), Is.False);
+            _server = new Server("ws://localhost:4251/");
+
+            Thread.Sleep(2000);
+            Assert.That(_clientA.IsConnected(), Is.True);
+        }
+
+        [Test]
         public void TestNew()
         {
             var thing = new Thing("lapin");
             _wharehouseA.RegisterThing(thing);
             _clientA.Send();
 
-            Assert.That(_wharehouseWait.WaitNew(), Is.True);
+            Assert.That(_wharehouseWaitB.WaitNew(), Is.True);
 
             Assert.That(_wharehouseB.GetThing("lapin"), Is.Not.Null);
         }
@@ -117,8 +133,23 @@ namespace ThingModel.Specs
             _clientA.Send();
             _clientB.Connect();
 
-            Assert.That(_wharehouseWait.WaitNew(), Is.True);
+            Assert.That(_wharehouseWaitB.WaitNew(), Is.True);
             Assert.That(_wharehouseB.GetThing("boat"), Is.Not.Null);
+        }
+
+        [Test]
+        public void TestDelete()
+        {
+            _wharehouseA.RegisterThing(new Thing("lapin"));
+            _clientA.Send();
+
+            _wharehouseWaitB.WaitNew();
+            _wharehouseB.RemoveThing(_wharehouseB.GetThing("lapin"));
+            Assert.That(_wharehouseB.GetThing("lapin"), Is.Null);
+            _clientB.Send();
+
+            Assert.That( _wharehouseWaitA.WaitDeleted(), Is.True);
+            Assert.That(_wharehouseA.GetThing("lapin"), Is.Null);
         }
     }
 }

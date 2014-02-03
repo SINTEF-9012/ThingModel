@@ -39,12 +39,15 @@ namespace ThingModel.WebSockets
             { 
                 if (e.Type == Opcode.BINARY)
                 {
+                    ProtoObserver.Reset();
 
                     var senderID = FromProtobuf.Convert(e.RawData);
                     Console.WriteLine("Server | Message from : " + senderID);
                     
                     var analyzedTransaction = ProtoObserver.GetTransaction(ToProtobuf, senderID);
                     
+                    
+
                     // Broadcast to other clients
                     foreach (var session in Sessions.Sessions)
                     {
@@ -72,8 +75,9 @@ namespace ThingModel.WebSockets
 
         public Server(string path)
         {
+            var house = new Wharehouse();
             _ws = new WebSocketServer(path);
-            _ws.AddWebSocketService("/", () => new ServerService(new Wharehouse()));
+            _ws.AddWebSocketService("/", () => new ServerService(house));
             _ws.Start();
         }
 
