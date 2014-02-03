@@ -44,6 +44,9 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="websocket-sharp">
+      <HintPath>packages\WebSocketSharp.1.0.3-rc2\lib\websocket-sharp.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Client\FromProtobuf.cs" />
@@ -63,11 +66,15 @@
     <Compile Include="Specs\ProtoConversions.cs" />
     <Compile Include="Specs\ThingTest.cs" />
     <Compile Include="Specs\ThingTypeTest.cs" />
+    <Compile Include="Specs\WebSocketServers.cs" />
     <Compile Include="Specs\WharehouseTest.cs" />
     <Compile Include="Thing.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ThingType.cs" />
     <Compile Include="Client\Wharehouse.cs" />
+    <Compile Include="WebSockets\Client.cs" />
+    <Compile Include="WebSockets\ProtoObserver.cs" />
+    <Compile Include="WebSockets\Server.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
