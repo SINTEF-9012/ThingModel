@@ -16,6 +16,7 @@ namespace ThingModel.WebSockets
         private ToProtobuf _toProtobuf;
         private FromProtobuf _fromProtobuf;
         private bool _close = true;
+        private int _delayReconnection = 1;
         
         private ProtoObserver _thingObserver;
 
@@ -50,16 +51,22 @@ namespace ThingModel.WebSockets
         {
             if (!_close)
             {
-                Console.WriteLine("Connection lost, try to connect again in 5 seconds");
+                Console.WriteLine("Connection lost, try to connect again in "+_delayReconnection+" seconds");
                 // ReSharper disable ObjectCreationAsStatement
                 new Timer(state =>
                 {
-                    if (_ws.IsAlive)
+                    if (!_ws.IsAlive)
                     {
                         _ws.Connect();
                     }
+
+                    // Increase the connection delay until 16 secondes
+                    if (_delayReconnection < 16)
+                    {
+                        _delayReconnection *= 2;   
+                    }
                 },
-                null, 5000, Timeout.Infinite);
+                null, _delayReconnection*1, Timeout.Infinite);
                 // ReSharper restore ObjectCreationAsStatement
             }
             
@@ -71,6 +78,7 @@ namespace ThingModel.WebSockets
             {
                 var senderName = _fromProtobuf.Convert(args.RawData);
                 Console.WriteLine(SenderID + " | Binary message from : " + senderName);
+                _thingObserver.Reset();
             }
             else
             {
