@@ -156,7 +156,7 @@ namespace ThingModel
                 }
             }
 
-            foreach (var property in other.Properties)
+            /*foreach (var property in other.Properties)
             {
                 Property ownProp;
                 Properties.TryGetValue(property.Key, out ownProp);
@@ -165,7 +165,7 @@ namespace ThingModel
                 {
                     return false;
                 }
-            }
+            }*/
 
             // And start the start recursion if needed
             if (deepComparaisonForConnectedThings)

@@ -194,6 +194,12 @@ namespace ThingModel.Specs
             _thing.SetProperty(new Property.String("surname", "Roger"));
             Assert.That(_thing.Compare(newThing), Is.False);
             Assert.That(newThing.Compare(_thing), Is.False);
+
+            _thing.SetProperty(new Property.String("surname", "Lapinou"));
+            _thing.SetProperty(new Property.String("color", "white"));
+            newThing.SetProperty(new Property.String("meal", "nothing"));
+            Assert.That(_thing.Compare(newThing), Is.False);
+            Assert.That(newThing.Compare(_thing), Is.False);
         }
 
         [Test]
