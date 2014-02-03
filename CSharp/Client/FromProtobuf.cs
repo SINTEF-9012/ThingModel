@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using ProtoBuf;
 using ThingModel.Proto;
 
 namespace ThingModel.Client
@@ -37,6 +39,19 @@ namespace ThingModel.Client
             Wharehouse = wharehouse;
         }
 
+        private readonly MemoryStream _memoryInput = new MemoryStream();
+
+        public string Convert(byte[] data)
+        {
+            _memoryInput.Write(data, 0, data.Length);
+            _memoryInput.Position = 0;
+            var transaction = Serializer.Deserialize<Transaction>(_memoryInput);
+            
+            _memoryInput.SetLength(0);
+
+            return Convert(transaction);
+        }
+
         public string Convert(Transaction transaction)
         {
             transaction.string_declarations.ForEach(ConvertStringDeclaration);
@@ -44,10 +59,11 @@ namespace ThingModel.Client
             transaction.thingtypes_declaration_list.ForEach(ConvertThingTypeDeclaration);
 
             var thingsToConnect = new List<Tuple<Thing, Proto.Thing>>();
-
+            
             foreach (var thing in transaction.things_publish_list)
             {
                 var modelThing = ConvertThingPublication(thing);
+                
                 if (thing.connections_change)
                 {
                     thingsToConnect.Add(new Tuple<Thing, Proto.Thing>(modelThing, thing));
@@ -71,7 +87,7 @@ namespace ThingModel.Client
 
         protected void ConvertStringDeclaration(StringDeclaration declaration)
         {
-            StringDeclarations.Add(declaration.key, declaration.value);
+            StringDeclarations[declaration.key] = declaration.value;
         }
 
         public void ConvertDelete(int thingKey)
@@ -113,6 +129,7 @@ namespace ThingModel.Client
             }
 
             var id = KeyToString(thing.string_id);
+            
             var modelThing = Wharehouse.GetThing(id);
                
             if (modelThing == null || modelThing.Type != type)

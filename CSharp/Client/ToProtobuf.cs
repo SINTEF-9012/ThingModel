@@ -2,6 +2,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
+using ProtoBuf;
 using ThingModel.Proto;
 
 #endregion
@@ -79,6 +81,16 @@ namespace ThingModel.Client
             ConvertDeclarationList(declarations);
 
             return Transaction;
+        }
+
+
+        private readonly MemoryStream _memoryInput = new MemoryStream();
+
+        public byte[] Convert(Transaction transaction)
+        {
+            _memoryInput.SetLength(0);
+            Serializer.Serialize(_memoryInput, transaction);
+            return _memoryInput.ToArray();
         }
 
         protected Proto.Thing Convert(Thing thing)
@@ -193,7 +205,7 @@ namespace ThingModel.Client
                 change = true;
                 
                 publication.properties.Add(proto);
-                _propertiesState.Add(key, proto);
+                _propertiesState[key] = proto;
             }
 
             if (change)

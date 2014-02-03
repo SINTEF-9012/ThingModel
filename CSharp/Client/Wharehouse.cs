@@ -96,6 +96,11 @@ namespace ThingModel
 
         public void RemoveThing(Thing thing)
         {
+            if (thing == null)
+            {
+                return;
+            }
+
             // Remove all the connections
             foreach (var t in _things)
             {
@@ -176,6 +181,9 @@ namespace ThingModel
             ThingType value;
             _thingTypes.TryGetValue(key, out value);
             return value;
+        }
+
+        public IList<Thing> Things { get { return new List<Thing>(_things.Values); }
         }
     }
 }

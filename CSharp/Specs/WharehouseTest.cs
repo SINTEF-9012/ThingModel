@@ -1,6 +1,7 @@
 ﻿#region
 
 using System;
+using System.Threading;
 using NUnit.Framework;
 
 #endregion
@@ -208,6 +209,46 @@ namespace ThingModel.Specs
 
             Assert.That(_thingChangeObserver.DeletedThing, Is.True);
             Assert.That(_thingChangeObserver.UpdatedThing, Is.True);
+
+        }
+
+        [Test]
+        public void MultiThreadCarnage()
+        {
+            Assert.DoesNotThrow(delegate
+                {
+                    var cptCreationA = 0;
+                    var creationA = new Thread(delegate(object sender)
+                    {
+                        for (var i = 0; i < 10000; ++i)
+                        {
+                            _wharehouse.RegisterThing(new Thing("banana_" + ++cptCreationA));
+                        }
+                    });
+
+                    var cptCreationB = 0;
+                    var creationB = new Thread(delegate(object sender)
+                    {
+                        for (var i = 0; i < 10000; ++i)
+                        {
+                            _wharehouse.RegisterThing(new Thing("lapin_" + ++cptCreationB));
+                        }
+                    });
+
+                    var cptDeletions = 0;
+                    var deletions = new Thread(delegate(object sender)
+                    {
+                        for (var i = 0; i < 10000; ++i)
+                        {
+                            _wharehouse.RemoveThing(_wharehouse.GetThing("lapin_" + ++cptDeletions));
+                        }
+                    });
+
+
+                    creationA.Start();
+                    creationB.Start();
+                    deletions.Start();
+                });
 
         }
     }
