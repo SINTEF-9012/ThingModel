@@ -238,7 +238,7 @@ namespace ThingModel.Client
                 var declaration = new Proto.ThingType
                     {
                         string_name = StringToKey(thingType.Name),
-                        description = thingType.Description
+                        string_description = StringToKey(thingType.Description)
                     };
 
                 foreach (var propertyType in thingType.GetProperties())
@@ -246,8 +246,8 @@ namespace ThingModel.Client
                     declaration.properties.Add(new Proto.PropertyType
                         {
                             string_key = StringToKey(propertyType.Key),
-                            name = propertyType.Name,
-                            description = propertyType.Description,
+                            string_name = StringToKey(propertyType.Name),
+                            string_description = StringToKey(propertyType.Description),
                             required = propertyType.Required,
                             type = _prototypesBinding[propertyType.Type]
                         });

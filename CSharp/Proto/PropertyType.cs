@@ -36,21 +36,21 @@ namespace ThingModel.Proto
       get { return _required; }
       set { _required = value; }
     }
-    private string _name = "";
-    [global::ProtoBuf.ProtoMember(4, IsRequired = false, Name=@"name", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    [global::System.ComponentModel.DefaultValue("")]
-    public string name
+    private int _string_name = default(int);
+    [global::ProtoBuf.ProtoMember(4, IsRequired = false, Name=@"string_name", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(int))]
+    public int string_name
     {
-      get { return _name; }
-      set { _name = value; }
+      get { return _string_name; }
+      set { _string_name = value; }
     }
-    private string _description = "";
-    [global::ProtoBuf.ProtoMember(5, IsRequired = false, Name=@"description", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    [global::System.ComponentModel.DefaultValue("")]
-    public string description
+    private int _string_description = default(int);
+    [global::ProtoBuf.ProtoMember(5, IsRequired = false, Name=@"string_description", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(int))]
+    public int string_description
     {
-      get { return _description; }
-      set { _description = value; }
+      get { return _string_description; }
+      set { _string_description = value; }
     }
     [global::ProtoBuf.ProtoContract(Name=@"Type")]
     public enum Type

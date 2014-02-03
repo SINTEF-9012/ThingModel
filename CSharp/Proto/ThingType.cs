@@ -23,13 +23,13 @@ namespace ThingModel.Proto
       get { return _string_name; }
       set { _string_name = value; }
     }
-    private string _description = "";
-    [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"description", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    [global::System.ComponentModel.DefaultValue("")]
-    public string description
+    private int _string_description = default(int);
+    [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"string_description", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(int))]
+    public int string_description
     {
-      get { return _description; }
-      set { _description = value; }
+      get { return _string_description; }
+      set { _string_description = value; }
     }
     private readonly global::System.Collections.Generic.List<ThingModel.Proto.PropertyType> _properties = new global::System.Collections.Generic.List<ThingModel.Proto.PropertyType>();
     [global::ProtoBuf.ProtoMember(3, Name=@"properties", DataFormat = global::ProtoBuf.DataFormat.Default)]

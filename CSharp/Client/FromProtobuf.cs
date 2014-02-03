@@ -99,15 +99,15 @@ namespace ThingModel.Client
         public void ConvertThingTypeDeclaration(Proto.ThingType thingType)
         {
             var modelType = new ThingType(KeyToString(thingType.string_name));
-            modelType.Description = thingType.description;
+            modelType.Description = KeyToString(thingType.string_description);
 
             foreach (var propertyType in thingType.properties)
             {
                 var type = _prototypesBinding[propertyType.type];
                 var modelProperty = new PropertyType(KeyToString(propertyType.string_key),
                                                         type);
-                modelProperty.Description = propertyType.description;
-                modelProperty.Name = propertyType.name;
+                modelProperty.Description = KeyToString(propertyType.string_description);
+                modelProperty.Name = KeyToString(propertyType.string_name);
                 modelProperty.Required = propertyType.required;
 
                 modelType.DefineProperty(modelProperty);

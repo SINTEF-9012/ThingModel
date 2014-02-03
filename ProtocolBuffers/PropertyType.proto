@@ -15,6 +15,6 @@ message PropertyType {
 	required Type type = 2 [default = STRING];
 	required bool required = 3 [default = true];
 
-	optional string name = 4;
-	optional string description = 5;
+	optional int32 string_name = 4;
+	optional int32 string_description = 5;
 }
