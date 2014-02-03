@@ -77,10 +77,6 @@ namespace ThingModel.WebSockets
                 Console.WriteLine(SenderID + " | Binary message from : " + senderName);
                 _thingModelObserver.Reset();
             }
-            else
-            {
-                Console.WriteLine(SenderID + " | String message (ignored) : " + args.Data);
-            }
         }
 
 

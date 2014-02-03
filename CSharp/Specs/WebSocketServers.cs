@@ -2,6 +2,7 @@
 using System.Threading;
 using NUnit.Framework;
 using ThingModel.WebSockets;
+using WebSocketSharp.Server;
 
 namespace ThingModel.Specs
 {
@@ -43,22 +44,22 @@ namespace ThingModel.Specs
                 _defineEvent.Set();
             }
 
-            public bool WaitNew(int millisecondsTimeout = 800)
+            public bool WaitNew(int millisecondsTimeout = 2500)
             {
                 return _newEvent.WaitOne(millisecondsTimeout);
             }
 
-            public bool WaitDeleted(int millisecondsTimeout = 800)
+            public bool WaitDeleted(int millisecondsTimeout = 2500)
             {
                 return _deleteEvent.WaitOne(millisecondsTimeout);
             }
 
-            public bool WaitUpdated(int millisecondsTimeout = 800)
+            public bool WaitUpdated(int millisecondsTimeout = 2500)
             {
                 return _updatedEvent.WaitOne(millisecondsTimeout);
             }
 
-            public bool WaitDefine(int millisecondsTimeout = 800)
+            public bool WaitDefine(int millisecondsTimeout = 2500)
             {
                 return _defineEvent.WaitOne(millisecondsTimeout);
             }
@@ -68,19 +69,19 @@ namespace ThingModel.Specs
         private WharehouseWait _wharehouseWaitA;
         private WharehouseWait _wharehouseWaitB;
 
+        private const string Path = "ws://localhost:4251/";
+
         [SetUp]
         protected void SetUp()
         {
             _wharehouseA = new Wharehouse();
             _wharehouseB = new Wharehouse();
 
-            const string path = "ws://localhost:4251/";
-
-            _server = new Server(path);
+            _server = new Server(Path);
             
 
-            _clientA = new WebSockets.Client("UnitTestA", path, _wharehouseA);
-            _clientB = new WebSockets.Client("UnitTestB", path, _wharehouseB);
+            _clientA = new WebSockets.Client("UnitTestA", Path, _wharehouseA);
+            _clientB = new WebSockets.Client("UnitTestB", Path, _wharehouseB);
 
             _wharehouseWaitA = new WharehouseWait();
             _wharehouseA.RegisterObserver(_wharehouseWaitA);
@@ -98,6 +99,8 @@ namespace ThingModel.Specs
             _clientA.Close();
             _clientB.Close();
             _server.Close();
+
+            Thread.Sleep(100);
         }
 
         [Test]
@@ -112,7 +115,7 @@ namespace ThingModel.Specs
             Assert.That(_clientA.IsConnected(), Is.True);
             _server.Close();
             Assert.That(_clientA.IsConnected(), Is.False);
-            _server = new Server("ws://localhost:4251/");
+            _server = new Server(Path);
 
             Thread.Sleep(2000);
             Assert.That(_clientA.IsConnected(), Is.True);
@@ -153,7 +156,7 @@ namespace ThingModel.Specs
             Assert.That(_wharehouseB.GetThing("lapin"), Is.Null);
             _clientB.Send();
 
-            Assert.That( _wharehouseWaitA.WaitDeleted(1200), Is.True);
+            Assert.That( _wharehouseWaitA.WaitDeleted(), Is.True);
             Assert.That(_wharehouseA.GetThing("lapin"), Is.Null);
         }
 
@@ -207,6 +210,75 @@ namespace ThingModel.Specs
             Assert.That(transportedType.GetPropertyDefinition("position").Description, Is.EqualTo(position.Description));
 
             Assert.That(_wharehouseB.GetThing("lapin").Type.Name, Is.EqualTo(type.Name));
+        }
+
+        [Test]
+        public void TestNoChanges()
+        {
+            var pc = new Thing("computer");
+            pc.SetProperty(new Property.String("name", "Interstella"));
+            pc.SetProperty(new Property.Double("weight", 12));
+            _wharehouseA.RegisterThing(pc);
+            _clientA.Send();
+
+            Assert.That(_wharehouseWaitB.WaitNew(), Is.True);
+            
+            _wharehouseA.RegisterThing(_wharehouseA.GetThing("computer"));
+            _clientA.Send();
+
+            Assert.That(_wharehouseWaitB.WaitUpdated(), Is.True);
+
+            _wharehouseA.RegisterThing(_wharehouseA.GetThing("computer"));
+            _clientA.Send();
+
+            Assert.That(_wharehouseWaitB.WaitUpdated(500), Is.False);
+        }
+
+        [Test]
+        public void TestThingsConnections()
+        {
+            var family = new Thing("family");
+            var parentA = new Thing("Patrick");
+            var parentB = new Thing("Bob");
+
+            family.Connect(parentA);
+
+            _wharehouseA.RegisterThing(family);
+            _clientA.Send();
+
+            Assert.That(_wharehouseWaitB.WaitNew(), Is.True);
+            Assert.That(_wharehouseB.GetThing("family").IsConnectedTo(_wharehouseB.GetThing("Patrick")), Is.True);
+
+            family.Connect(parentB);
+            _wharehouseA.RegisterThing(parentB);
+            _wharehouseA.NotifyThingUpdate(family);
+            _clientA.Send();
+
+
+            Assert.That(_wharehouseWaitB.WaitUpdated(), Is.True);
+            Assert.That(_wharehouseB.GetThing("family").IsConnectedTo(_wharehouseB.GetThing("Bob")), Is.True);
+
+            family.Disconnect(parentB);
+
+            _wharehouseA.NotifyThingUpdate(family);
+
+            _clientA.Send();
+
+            Assert.That(_wharehouseWaitB.WaitUpdated(), Is.True);
+            Assert.That(_wharehouseB.GetThing("family").IsConnectedTo(_wharehouseB.GetThing("Bob")), Is.False);
+
+            _wharehouseA.NotifyThingUpdate(family);
+            _clientA.Send();
+            Assert.That(_wharehouseWaitB.WaitUpdated(500), Is.False);
+
+            family.Disconnect(parentA);
+            family.Connect(parentB);
+            _wharehouseA.NotifyThingUpdate(family);
+
+            _clientA.Send();
+
+            Assert.That(_wharehouseWaitB.WaitUpdated(), Is.True);
+            Assert.That(_wharehouseB.GetThing("family").IsConnectedTo(_wharehouseB.GetThing("Bob")), Is.True);
         }
     }
 }
