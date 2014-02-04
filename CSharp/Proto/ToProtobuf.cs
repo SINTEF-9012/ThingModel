@@ -4,11 +4,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using ProtoBuf;
-using ThingModel.Proto;
 
 #endregion
 
-namespace ThingModel.Client
+namespace ThingModel.Proto
 {
     public class ToProtobuf
     {
@@ -21,23 +20,23 @@ namespace ThingModel.Client
 
         // Simple binding between ThingModel property types and protocol buffer property types
         // Tested as alternative to the dynamic keyword
-        private readonly Dictionary<Type, Proto.PropertyType.Type> _prototypesBinding = new Dictionary
-            <Type, Proto.PropertyType.Type>
+        private readonly Dictionary<Type, PropertyType.Type> _prototypesBinding = new Dictionary
+            <Type, PropertyType.Type>
             {
-                {typeof (Property.Location), Proto.PropertyType.Type.LOCATION},
-                {typeof (Property.String), Proto.PropertyType.Type.STRING},
-                {typeof (Property.Double), Proto.PropertyType.Type.DOUBLE},
-                {typeof (Property.Int), Proto.PropertyType.Type.INT},
-                {typeof (Property.Boolean), Proto.PropertyType.Type.BOOLEAN},
-                {typeof (Property.DateTime), Proto.PropertyType.Type.DATETIME},
+                {typeof (ThingModel.Property.Location), PropertyType.Type.LOCATION},
+                {typeof (ThingModel.Property.String), PropertyType.Type.STRING},
+                {typeof (ThingModel.Property.Double), PropertyType.Type.DOUBLE},
+                {typeof (ThingModel.Property.Int), PropertyType.Type.INT},
+                {typeof (ThingModel.Property.Boolean), PropertyType.Type.BOOLEAN},
+                {typeof (ThingModel.Property.DateTime), PropertyType.Type.DATETIME},
             };
 
         // When a string is in this collection, it should be sended
         // as an int key with the StringToKey method
         private readonly HashSet<string> _stringToDeclare = new HashSet<string>();
 
-        private readonly Dictionary<int, Proto.Thing> _thingsState = new Dictionary<int, Proto.Thing>();
-        private readonly Dictionary<Tuple<int, int>, Proto.Property> _propertiesState = new Dictionary<Tuple<int, int>, Proto.Property>();
+        private readonly Dictionary<int, Thing> _thingsState = new Dictionary<int, Thing>();
+        private readonly Dictionary<Tuple<int, int>, Property> _propertiesState = new Dictionary<Tuple<int, int>, Property>();
 
         protected int StringToKey(string value)
         {
@@ -65,8 +64,8 @@ namespace ThingModel.Client
             return key;
         }
 
-        public Transaction Convert(IEnumerable<Thing> publish, IEnumerable<Thing> delete,
-                                   IEnumerable<ThingType> declarations, string senderID)
+        public Transaction Convert(IEnumerable<ThingModel.Thing> publish, IEnumerable<ThingModel.Thing> delete,
+                                   IEnumerable<ThingModel.ThingType> declarations, string senderID)
         {
             Transaction = new Transaction();
 
@@ -93,18 +92,18 @@ namespace ThingModel.Client
             return _memoryInput.ToArray();
         }
 
-        protected Proto.Thing Convert(Thing thing)
+        protected Thing Convert(ThingModel.Thing thing)
         {
             var change = false;
 
-            var publication = new Proto.Thing
+            var publication = new Thing
                 {
                     string_id = StringToKey(thing.ID),
                     string_type_name = thing.Type != null ? StringToKey(thing.Type.Name) : 0,
                     connections_change = false
                 };
             
-            Proto.Thing previousThing;
+            Thing previousThing;
             _thingsState.TryGetValue(publication.string_id, out previousThing);
 
             if (previousThing == null)
@@ -145,7 +144,7 @@ namespace ThingModel.Client
 
             foreach (var property in thing.GetProperties())
             {
-                var proto = new Proto.Property
+                var proto = new Property
                     {
                         string_key = StringToKey(property.Key)
                     };
@@ -156,7 +155,7 @@ namespace ThingModel.Client
 
                 if (previousThing != null)
                 {
-                    Proto.Property previousProto;
+                    Property previousProto;
                     if (_propertiesState.TryGetValue(key, out previousProto))
                     {
                         // ReSharper disable CompareOfFloatsByEqualityOperator
@@ -204,7 +203,7 @@ namespace ThingModel.Client
             return publication;
         }
 
-        protected void ConvertDeleteList(IEnumerable<Thing> publish)
+        protected void ConvertDeleteList(IEnumerable<ThingModel.Thing> publish)
         {
             foreach (var thing in publish)
             {
@@ -214,11 +213,11 @@ namespace ThingModel.Client
             }
         }
 
-        protected void ConvertDeclarationList(IEnumerable<ThingType> declarations)
+        protected void ConvertDeclarationList(IEnumerable<ThingModel.ThingType> declarations)
         {
             foreach (var thingType in declarations)
             {
-                var declaration = new Proto.ThingType
+                var declaration = new ThingType
                     {
                         string_name = StringToKey(thingType.Name),
                         string_description = StringToKey(thingType.Description)
@@ -226,7 +225,7 @@ namespace ThingModel.Client
 
                 foreach (var propertyType in thingType.GetProperties())
                 {
-                    declaration.properties.Add(new Proto.PropertyType
+                    declaration.properties.Add(new PropertyType
                         {
                             string_key = StringToKey(propertyType.Key),
                             string_name = StringToKey(propertyType.Name),
@@ -240,24 +239,24 @@ namespace ThingModel.Client
             }
         }
 
-        protected void ConvertProperty(Property.Location property, Proto.Property proto)
+        protected void ConvertProperty(ThingModel.Property.Location property, Property proto)
         {
             var value = property.Value;
 
             if (value is Location.LatLng)
             {
-                proto.type = Proto.Property.Type.LOCATION_LATLNG;
+                proto.type = Property.Type.LOCATION_LATLNG;
             }
             else if (value is Location.Point)
             {
-                proto.type = Proto.Property.Type.LOCATION_POINT;
+                proto.type = Property.Type.LOCATION_POINT;
             }
             else
             {
-                proto.type = Proto.Property.Type.LOCATION_EQUATORIAL;    
+                proto.type = Property.Type.LOCATION_EQUATORIAL;    
             }
             
-            proto.location_value = new Proto.Property.Location
+            proto.location_value = new Property.Location
                 {
                     x = value.X,
                     y = value.Y,
@@ -271,12 +270,12 @@ namespace ThingModel.Client
             }
         }
 
-        protected void ConvertProperty(Property.String property, Proto.Property proto)
+        protected void ConvertProperty(ThingModel.Property.String property, Property proto)
         {
             var value = property.Value;
 
-            proto.type = Proto.Property.Type.STRING;
-            proto.string_value = new Proto.Property.String();
+            proto.type = Property.Type.STRING;
+            proto.string_value = new Property.String();
             
             if (_stringToDeclare.Contains(value))
             {
@@ -291,27 +290,27 @@ namespace ThingModel.Client
             }
         }
 
-        protected void ConvertProperty(Property.Double property, Proto.Property proto)
+        protected void ConvertProperty(ThingModel.Property.Double property, Property proto)
         {
-            proto.type = Proto.Property.Type.DOUBLE;
+            proto.type = Property.Type.DOUBLE;
             proto.double_value = property.Value;
         }
 
-        protected void ConvertProperty(Property.Int property, Proto.Property proto)
+        protected void ConvertProperty(ThingModel.Property.Int property, Property proto)
         {
-            proto.type = Proto.Property.Type.INT;
+            proto.type = Property.Type.INT;
             proto.int_value = property.Value;
         }
 
-        protected void ConvertProperty(Property.Boolean property, Proto.Property proto)
+        protected void ConvertProperty(ThingModel.Property.Boolean property, Property proto)
         {
-            proto.type = Proto.Property.Type.BOOLEAN;
+            proto.type = Property.Type.BOOLEAN;
             proto.boolean_value = property.Value;
         }
 
-        protected void ConvertProperty(Property.DateTime property, Proto.Property proto)
+        protected void ConvertProperty(ThingModel.Property.DateTime property, Property proto)
         {
-            proto.type = Proto.Property.Type.DATETIME;
+            proto.type = Property.Type.DATETIME;
             proto.datetime_value = property.Value.Ticks;
         }
     }

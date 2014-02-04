@@ -1,5 +1,4 @@
 ﻿using System;
-using ThingModel.Client;
 using ThingModel.Proto;
 using WebSocketSharp;
 using WebSocketSharp.Server;

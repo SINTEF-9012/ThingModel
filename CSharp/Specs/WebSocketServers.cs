@@ -1,8 +1,6 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using NUnit.Framework;
 using ThingModel.WebSockets;
-using WebSocketSharp.Server;
 
 namespace ThingModel.Specs
 {
@@ -11,8 +9,8 @@ namespace ThingModel.Specs
     {
         private Server _server;
 
-        private WebSockets.Client _clientA;
-        private WebSockets.Client _clientB;
+        private Client _clientA;
+        private Client _clientB;
         
         private Wharehouse _wharehouseA;
         private Wharehouse _wharehouseB;
@@ -80,8 +78,8 @@ namespace ThingModel.Specs
             _server = new Server(Path);
             
 
-            _clientA = new WebSockets.Client("UnitTestA", Path, _wharehouseA);
-            _clientB = new WebSockets.Client("UnitTestB", Path, _wharehouseB);
+            _clientA = new Client("UnitTestA", Path, _wharehouseA);
+            _clientB = new Client("UnitTestB", Path, _wharehouseB);
 
             _wharehouseWaitA = new WharehouseWait();
             _wharehouseA.RegisterObserver(_wharehouseWaitA);

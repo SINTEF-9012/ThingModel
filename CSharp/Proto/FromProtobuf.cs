@@ -2,21 +2,20 @@
 using System.Collections.Generic;
 using System.IO;
 using ProtoBuf;
-using ThingModel.Proto;
 
-namespace ThingModel.Client
+namespace ThingModel.Proto
 {
     public class FromProtobuf
     {
-        private readonly Dictionary<Proto.PropertyType.Type, Type> _prototypesBinding = new Dictionary
-            <Proto.PropertyType.Type, Type>
+        private readonly Dictionary<PropertyType.Type, Type> _prototypesBinding = new Dictionary
+            <PropertyType.Type, Type>
             {
-                {Proto.PropertyType.Type.LOCATION, typeof (Property.Location)},
-                {Proto.PropertyType.Type.STRING, typeof (Property.String)},
-                {Proto.PropertyType.Type.DOUBLE, typeof (Property.Double)},
-                {Proto.PropertyType.Type.INT, typeof (Property.Int)},
-                {Proto.PropertyType.Type.BOOLEAN, typeof (Property.Boolean)},
-                {Proto.PropertyType.Type.DATETIME, typeof (Property.DateTime)},
+                {PropertyType.Type.LOCATION, typeof (ThingModel.Property.Location)},
+                {PropertyType.Type.STRING, typeof (ThingModel.Property.String)},
+                {PropertyType.Type.DOUBLE, typeof (ThingModel.Property.Double)},
+                {PropertyType.Type.INT, typeof (ThingModel.Property.Int)},
+                {PropertyType.Type.BOOLEAN, typeof (ThingModel.Property.Boolean)},
+                {PropertyType.Type.DATETIME, typeof (ThingModel.Property.DateTime)},
             };
 
         protected readonly IDictionary<int,string> StringDeclarations = new Dictionary<int, string>();
@@ -58,7 +57,7 @@ namespace ThingModel.Client
             transaction.things_remove_list.ForEach(ConvertDelete);
             transaction.thingtypes_declaration_list.ForEach(ConvertThingTypeDeclaration);
 
-            var thingsToConnect = new List<Tuple<Thing, Proto.Thing>>();
+            var thingsToConnect = new List<Tuple<ThingModel.Thing, Thing>>();
             
             foreach (var thing in transaction.things_publish_list)
             {
@@ -66,7 +65,7 @@ namespace ThingModel.Client
                 
                 if (thing.connections_change)
                 {
-                    thingsToConnect.Add(new Tuple<Thing, Proto.Thing>(modelThing, thing));
+                    thingsToConnect.Add(new Tuple<ThingModel.Thing, Thing>(modelThing, thing));
                 }
             }
 
@@ -101,15 +100,15 @@ namespace ThingModel.Client
             Wharehouse.RemoveThing(Wharehouse.GetThing(id));
         }
 
-        public void ConvertThingTypeDeclaration(Proto.ThingType thingType)
+        public void ConvertThingTypeDeclaration(ThingType thingType)
         {
-            var modelType = new ThingType(KeyToString(thingType.string_name));
+            var modelType = new ThingModel.ThingType(KeyToString(thingType.string_name));
             modelType.Description = KeyToString(thingType.string_description);
 
             foreach (var propertyType in thingType.properties)
             {
                 var type = _prototypesBinding[propertyType.type];
-                var modelProperty = new PropertyType(KeyToString(propertyType.string_key),
+                var modelProperty = new ThingModel.PropertyType(KeyToString(propertyType.string_key),
                                                         type);
                 modelProperty.Description = KeyToString(propertyType.string_description);
                 modelProperty.Name = KeyToString(propertyType.string_name);
@@ -120,9 +119,9 @@ namespace ThingModel.Client
             Wharehouse.RegisterType(modelType);
         }
 
-        public Thing ConvertThingPublication(Proto.Thing thing, bool check)
+        public ThingModel.Thing ConvertThingPublication(Thing thing, bool check)
         {
-            ThingType type = null;
+            ThingModel.ThingType type = null;
             if (thing.string_type_name != 0)
             {
                 // Here the type can be null if the string type name is not registered
@@ -139,30 +138,30 @@ namespace ThingModel.Client
                
             if (modelThing == null || modelThing.Type != type)
             {
-                modelThing = new Thing(KeyToString(thing.string_id), type);
+                modelThing = new ThingModel.Thing(KeyToString(thing.string_id), type);
             }
 
             foreach (var property in thing.properties)
             {
-                Property modelProperty = null;
+                ThingModel.Property modelProperty = null;
                 string key = KeyToString(property.string_key);
                 Location location = null;
 
                 switch (property.type)
                 {
-                    case Proto.Property.Type.LOCATION_POINT:
+                    case Property.Type.LOCATION_POINT:
                         location = new Location.Point();
 
                         // C# imposes a break statements when a case is not empty
                         // So in 2014 I am using a goto instruction
                         // for the first time in my life
-                        goto case Proto.Property.Type.LOCATION_EQUATORIAL;
+                        goto case Property.Type.LOCATION_EQUATORIAL;
                         
-                    case Proto.Property.Type.LOCATION_LATLNG:
+                    case Property.Type.LOCATION_LATLNG:
                         location = new Location.LatLng();
-                        goto case Proto.Property.Type.LOCATION_EQUATORIAL;
+                        goto case Property.Type.LOCATION_EQUATORIAL;
 
-                    case Proto.Property.Type.LOCATION_EQUATORIAL:
+                    case Property.Type.LOCATION_EQUATORIAL:
                         if (location == null)
                         {
                             location = new Location.Equatorial();
@@ -181,32 +180,32 @@ namespace ThingModel.Client
                             
                         }
 
-                        modelProperty = new Property.Location(key, location);
+                        modelProperty = new ThingModel.Property.Location(key, location);
                         break;
 
-                    case Proto.Property.Type.STRING:
+                    case Property.Type.STRING:
                         string value = property.string_value.value;
                         if (String.IsNullOrEmpty(value) && property.string_value.string_value != 0)
                         {
                             value = KeyToString(property.string_value.string_value);
                         }
-                        modelProperty = new Property.String(key, value);
+                        modelProperty = new ThingModel.Property.String(key, value);
                         break;
 
-                    case Proto.Property.Type.DOUBLE:
-                        modelProperty = new Property.Double(key, property.double_value);
+                    case Property.Type.DOUBLE:
+                        modelProperty = new ThingModel.Property.Double(key, property.double_value);
                         break;
 
-                    case Proto.Property.Type.INT:
-                        modelProperty = new Property.Int(key, property.int_value);
+                    case Property.Type.INT:
+                        modelProperty = new ThingModel.Property.Int(key, property.int_value);
                         break;
 
-                    case Proto.Property.Type.BOOLEAN:
-                        modelProperty = new Property.Boolean(key, property.boolean_value);
+                    case Property.Type.BOOLEAN:
+                        modelProperty = new ThingModel.Property.Boolean(key, property.boolean_value);
                         break;
 
-                    case Proto.Property.Type.DATETIME:
-                        modelProperty = new Property.DateTime(key, new DateTime(property.datetime_value));
+                    case Property.Type.DATETIME:
+                        modelProperty = new ThingModel.Property.DateTime(key, new DateTime(property.datetime_value));
                         break;
                 }
                 

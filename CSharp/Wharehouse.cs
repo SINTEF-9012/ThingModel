@@ -174,7 +174,6 @@ namespace ThingModel
             return value;
         }
 
-        public IList<Thing> Things { get { return new List<Thing>(_things.Values); }
-        }
+        public IList<Thing> Things { get { return new List<Thing>(_things.Values); } }
     }
 }
