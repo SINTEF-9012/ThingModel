@@ -227,12 +227,13 @@ namespace ThingModel.Specs
             _wharehouseA.RegisterThing(_wharehouseA.GetThing("computer"));
             _clientA.Send();
 
-            Assert.That(_wharehouseWaitB.WaitUpdated(), Is.True);
+            Assert.That(_wharehouseWaitB.WaitUpdated(500), Is.False);
 
-            _wharehouseA.RegisterThing(_wharehouseA.GetThing("computer"));
+            pc.SetProperty(new Property.String("name", "Interstella2"));
+            _wharehouseA.NotifyThingUpdate(pc);
             _clientA.Send();
 
-            Assert.That(_wharehouseWaitB.WaitUpdated(500), Is.False);
+            Assert.That(_wharehouseWaitB.WaitUpdated(), Is.True);
         }
 
         [Test]

@@ -174,9 +174,10 @@ namespace ThingModel.Client
                               previousProto.location_value.z_null == proto.location_value.z_null &&
                               previousProto.location_value.string_system == proto.location_value.string_system)) &&
                             ((previousProto.string_value == null && proto.string_value == null) ||
-                             (previousProto.string_value != null && proto.string_value != null &&
+                             (previousProto.string_value != null && proto.string_value != null && ((
                               previousProto.string_value.string_value == proto.string_value.string_value &&
-                              previousProto.string_value.value == proto.string_value.value)))
+                              previousProto.string_value.value == proto.string_value.value) ||
+                              (previousProto.string_value.value == property.ValueToString())))))
                         {
                             continue;
                         }
