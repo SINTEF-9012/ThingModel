@@ -41,7 +41,7 @@ namespace ThingModel.WebSockets
                 {
                     ProtoModelObserver.Reset();
 
-                    var senderID = FromProtobuf.Convert(e.RawData);
+                    var senderID = FromProtobuf.Convert(e.RawData, true);
                     Console.WriteLine("Server | Message from : " + senderID);
                     
                     var analyzedTransaction = ProtoModelObserver.GetTransaction(ToProtobuf, senderID);

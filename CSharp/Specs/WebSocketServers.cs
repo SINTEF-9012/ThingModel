@@ -156,7 +156,7 @@ namespace ThingModel.Specs
             Assert.That(_wharehouseB.GetThing("lapin"), Is.Null);
             _clientB.Send();
 
-            Assert.That( _wharehouseWaitA.WaitDeleted(), Is.True);
+            Assert.That( _wharehouseWaitA.WaitDeleted(5000), Is.True);
             Assert.That(_wharehouseA.GetThing("lapin"), Is.Null);
         }
 
@@ -197,6 +197,7 @@ namespace ThingModel.Specs
             type.DefineProperty(position);
 
             var thing = new Thing("lapin", type);
+            thing.SetProperty(new Property.String("name", "Roger"));
             _wharehouseA.RegisterThing(thing, true, true);
             _clientA.Send();
 
@@ -279,6 +280,36 @@ namespace ThingModel.Specs
 
             Assert.That(_wharehouseWaitB.WaitUpdated(), Is.True);
             Assert.That(_wharehouseB.GetThing("family").IsConnectedTo(_wharehouseB.GetThing("Bob")), Is.True);
+        }
+
+        [Test]
+        public void TestInvalidObject()
+        {
+            // Missing property
+            var type = new ThingType("rabbit");
+            type.DefineProperty(PropertyType.Create<Property.String>("name"));
+
+            var thing = new Thing("a", type);
+            _wharehouseA.RegisterThing(thing,true,true);
+            _clientA.Send();
+
+            // Not sent
+            Assert.That(_wharehouseWaitB.WaitNew(500), Is.False);
+
+            // Wrong property
+            thing.SetProperty(new Property.Double("name", 42));
+            _wharehouseA.NotifyThingUpdate(thing);
+            _clientA.Send();
+
+            // Still wrong
+            Assert.That(_wharehouseWaitB.WaitNew(500), Is.False);
+
+            thing.SetProperty(new Property.String("name", "Roger"));
+            _wharehouseA.NotifyThingUpdate(thing);
+            _clientA.Send();
+
+            // Now, it's OK
+            Assert.That(_wharehouseWaitB.WaitNew(), Is.True);
         }
     }
 }

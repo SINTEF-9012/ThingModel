@@ -41,7 +41,7 @@ namespace ThingModel.Client
 
         private readonly MemoryStream _memoryInput = new MemoryStream();
 
-        public string Convert(byte[] data)
+        public string Convert(byte[] data, bool check = false)
         {
             _memoryInput.Write(data, 0, data.Length);
             _memoryInput.Position = 0;
@@ -49,10 +49,10 @@ namespace ThingModel.Client
             
             _memoryInput.SetLength(0);
 
-            return Convert(transaction);
+            return Convert(transaction, check);
         }
 
-        public string Convert(Transaction transaction)
+        public string Convert(Transaction transaction, bool check = false)
         {
             transaction.string_declarations.ForEach(ConvertStringDeclaration);
             transaction.things_remove_list.ForEach(ConvertDelete);
@@ -62,7 +62,7 @@ namespace ThingModel.Client
             
             foreach (var thing in transaction.things_publish_list)
             {
-                var modelThing = ConvertThingPublication(thing);
+                var modelThing = ConvertThingPublication(thing, check);
                 
                 if (thing.connections_change)
                 {
@@ -120,7 +120,7 @@ namespace ThingModel.Client
             Wharehouse.RegisterType(modelType);
         }
 
-        public Thing ConvertThingPublication(Proto.Thing thing)
+        public Thing ConvertThingPublication(Proto.Thing thing, bool check)
         {
             ThingType type = null;
             if (thing.string_type_name != 0)
@@ -209,12 +209,20 @@ namespace ThingModel.Client
                         modelProperty = new Property.DateTime(key, new DateTime(property.datetime_value));
                         break;
                 }
-
-                modelThing.SetProperty(modelProperty);   
+                
+                modelThing.SetProperty(modelProperty);
                 
             }
 
-            Wharehouse.RegisterThing(modelThing, false);
+            if (check && type != null && !type.Check(modelThing))
+            {
+                Console.WriteLine("Object «" + id + "» not valid, ignored");
+            }
+            else
+            {
+                Wharehouse.RegisterThing(modelThing, false);    
+            }
+            
             return modelThing;
         }
     }
