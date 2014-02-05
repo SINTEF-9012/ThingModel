@@ -42,7 +42,7 @@ module ThingModel {
 		 */
 		private _connections : {[key: string] : Thing };
 
-		public constructor(id : string, type : ThingType = null) {
+		constructor(id : string, type : ThingType = null) {
 			if (!id) {
 				throw "The thing ID should not be null or empty";
 			}
@@ -55,11 +55,11 @@ module ThingModel {
 		}
 
 		public SetProperty(property : Property) : void {
-			this._properties[property.key] = property;
+			this._properties[property.Key] = property;
 		}
 
 		public HasProperty(key : string) : boolean {
-			return this.
+			return _.has(this._properties, key);
 		}
 
 		public GetProperty<T extends Property>(key : string) : Property {
@@ -81,9 +81,16 @@ module ThingModel {
 			this._connections = {};
 		}
 
-		public IsConnectedTo(thing : Thing) : boolean {
-			return thing._id in this._connections;
+		public IsConnectedTo(thing: Thing): boolean {
+			return _.has(this._connections, thing._id);
 		}
 
+		public get ConnectedThings(): Thing[] {
+			return _.values(this._connections);
+		}
+
+		public get Properties(): Property[] {
+			return _.values(this._properties);
+		}
 	}
 }
