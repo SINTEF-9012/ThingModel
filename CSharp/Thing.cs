@@ -23,7 +23,7 @@ namespace ThingModel
         public ThingType Type { get { return _type; } }
 
         /**
-         * A thing have a liste of properties.
+         * A thing contains a list of properties.
          * A property is defined by a key and a value.
          */
         protected IDictionary<string, Property> Properties { get; private set; }

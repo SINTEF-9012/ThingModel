@@ -1,7 +1,7 @@
 ﻿
 using System;
 using NUnit.Framework;
-using ThingModel.Client;
+using ThingModel.Proto;
 
 namespace ThingModel.Specs
 {

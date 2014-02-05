@@ -49,10 +49,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Client\FromProtobuf.cs" />
-    <Compile Include="Client\ToProtobuf.cs" />
+    <Compile Include="Proto\FromProtobuf.cs" />
+    <Compile Include="Proto\ToProtobuf.cs" />
     <Compile Include="Location.cs" />
-    <Compile Include="Client\IThingModelObserver.cs" />
+    <Compile Include="IThingModelObserver.cs" />
     <Compile Include="Property.cs" />
     <Compile Include="PropertyType.cs" />
     <Compile Include="Proto\Property.cs" />
@@ -70,7 +70,7 @@
     <Compile Include="Thing.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ThingType.cs" />
-    <Compile Include="Client\Wharehouse.cs" />
+    <Compile Include="Wharehouse.cs" />
     <Compile Include="WebSockets\Client.cs" />
     <Compile Include="WebSockets\ProtoModelObserver.cs" />
     <Compile Include="WebSockets\Server.cs" />
