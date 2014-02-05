@@ -62,9 +62,14 @@ module ThingModel {
 			return _.has(this._properties, key);
 		}
 
-		public GetProperty<T extends Property>(key : string) : T {
-			// TODO check if same object
-			return this._properties[key];
+		public GetProperty<T extends Property>(key: string, type?: Type): T {
+
+			var prop = this._properties[key];
+			if (type && prop.Type != type) {
+				return null;
+			}
+
+			return prop;
 		}
 
 		public Connect(thing : Thing) : void {
