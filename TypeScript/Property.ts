@@ -10,6 +10,10 @@ module ThingModel {
 			return this._key;
 		}
 
+		public get Type(): Type {
+			return Type.Unknown;
+		}
+
 		constructor(key: string, value: any) {
 			this._key = key;
 			this.Value = value;
@@ -50,6 +54,10 @@ module ThingModel {
 			public set Value(value: ThingModel.Location) {
 				this.Value = value;
 			}
+
+			public get Type(): Type {
+				return Type.Location;
+			}
 		}
 
 		export class String extends Property {
@@ -65,6 +73,10 @@ module ThingModel {
 			public set Value(value: string) {
 				this.Value = value;
 			}
+
+			public get Type(): Type {
+				return Type.String;
+			}
 		}
 
 		export class Double extends Property {
@@ -78,6 +90,10 @@ module ThingModel {
 	
 			public set Value(value: number) {
 				this.Value = value;
+			}
+
+			public get Type(): Type {
+				return Type.Double;
 			}
 		}
 
@@ -93,6 +109,10 @@ module ThingModel {
 			public set Value(value: number) {
 				this.Value = Math.round(value);
 			}
+
+			public get Type(): Type {
+				return Type.Int;
+			}
 		}
 
 		export class Boolean extends Property {
@@ -106,6 +126,10 @@ module ThingModel {
 	
 			public set Value(value: boolean) {
 				this.Value = value;
+			}
+
+			public get Type(): Type {
+				return Type.Boolean;
 			}
 		}
 
@@ -121,6 +145,10 @@ module ThingModel {
 	
 			public set Value(value: Date) {
 				this.Value = value;
+			}
+
+			public get Type(): Type {
+				return Type.DateTime;
 			}
 		}
 

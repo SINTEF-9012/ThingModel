@@ -22,8 +22,10 @@
   <ItemGroup>
     <TypeScriptCompile Include="Location.ts" />
     <TypeScriptCompile Include="Property.ts" />
+    <TypeScriptCompile Include="PropertyType.ts" />
     <TypeScriptCompile Include="Thing.ts" />
     <TypeScriptCompile Include="ThingType.ts" />
+    <TypeScriptCompile Include="Type.ts" />
   </ItemGroup>
   <ItemGroup>
     <None Include="web.Debug.config">
