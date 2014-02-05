@@ -33,14 +33,16 @@ module ThingModel {
 		 *
 		 *	A property is defined by his key and his value.
 		 */
-		private _properties : {[key: string] : Property };
+		private _properties: { [key: string]: Property };
+		private _propertiesCount: number;
 
 		/**
 		 *	A thing can have a list of connected things.
 		 *
 		 *	But a thing cannot be connected directly to itself.
 		 */
-		private _connections : {[key: string] : Thing };
+		private _connections: { [key: string]: Thing };
+		private _connectionsCount: number;
 
 		constructor(id : string, type : ThingType = null) {
 			if (!id) {
@@ -51,10 +53,15 @@ module ThingModel {
 			this._type = type;
 
 			this._properties = {};
+			this._propertiesCount = 0;
 			this._connections = {};
+			this._connectionsCount = 0;
 		}
 
-		public SetProperty(property : Property) : void {
+		public SetProperty(property: Property): void {
+			if (!this.HasProperty(property.Key)) {
+				++this._propertiesCount;
+			}
 			this._properties[property.Key] = property;
 		}
 
@@ -76,15 +83,22 @@ module ThingModel {
 			if (thing === this || thing._id === this._id) {
 				throw "You can't connect a thing directly to itself";
 			}
+			if (!this.IsConnectedTo(thing)) {
+				++this._connectionsCount;
+			}
 			this._connections[thing._id] = thing;
 		}
 
-		public Disconnect(thing : Thing) : void {
-			delete this._connections[thing._id];
+		public Disconnect(thing: Thing): void {
+			if (this.IsConnectedTo(thing)) {
+				--this._connectionsCount;	
+				delete this._connections[thing._id];
+			}
 		}
 
 		public DisconnectAll() : void {
 			this._connections = {};
+			this._connectionsCount = 0;
 		}
 
 		public IsConnectedTo(thing: Thing): boolean {
@@ -97,6 +111,57 @@ module ThingModel {
 
 		public get Properties(): Property[] {
 			return _.values(this._properties);
+		}
+
+		public Compare(other: Thing, compareId: boolean = true,
+			deepComparisonForConnectedThing: boolean = false): boolean {
+			// Optimization, when two things are the same instance
+			if (this === other) {
+				return true;
+			}
+
+			// If the types are not the same
+			if (!other || (this._type != null && other._type != null &&
+				this._type.Name != other._type.Name) ||
+				(this._type == null && other._type != null) ||
+				(this._type != null && other._type == null)) {
+				return false;
+			}
+
+			// If we need to compare the ids, and they are not the same
+			if (compareId && this._id != other._id) {
+				return false;
+			}
+
+			// Check if the connections are the sames
+			if (this._connectionsCount !== other._connectionsCount || 
+				_.any(this._connections, (connectedThing:Thing)=> {
+					return !_.has(other._connections, connectedThing._id);
+				})) {
+				return false;
+			}
+
+			// Check if the properties are the sames
+			if (this._propertiesCount !== other._propertiesCount ||
+				_.any(this._properties, (property: Property) => {
+					var otherProp = other._properties[property.Key];
+
+					return otherProp == null || !otherProp.Compare(property);
+				})) {
+				return false;
+			}
+
+			if (deepComparisonForConnectedThing) {
+				return this.RecursiveCompare(other, {});
+			}
+
+			return true;
+		}
+
+		private RecursiveCompare(other: Thing, alreadyVisitedObjets: { [id: string]: boolean }): boolean {
+
+			// TODO tomorrow
+			return false;
 		}
 	}
 }

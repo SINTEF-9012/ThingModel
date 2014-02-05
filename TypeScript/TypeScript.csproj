@@ -20,12 +20,14 @@
     <Content Include="web.config" />
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="IWharehouseObserver.ts" />
     <TypeScriptCompile Include="Location.ts" />
     <TypeScriptCompile Include="Property.ts" />
     <TypeScriptCompile Include="PropertyType.ts" />
     <TypeScriptCompile Include="Thing.ts" />
     <TypeScriptCompile Include="ThingType.ts" />
     <TypeScriptCompile Include="Type.ts" />
+    <TypeScriptCompile Include="Wharehouse.ts" />
   </ItemGroup>
   <ItemGroup>
     <None Include="web.Debug.config">
