@@ -47,7 +47,9 @@ namespace ThingModel
          */
         public bool Check(Thing thing)
         {
-            return thing.Type == this && Properties.All(propertyType => propertyType.Value.Check(thing.GetProperty<Property>(propertyType.Key)));
+            return (thing.Type == this ||
+				(thing.Type != null && thing.Type.Name == Name)) &&
+				Properties.All(propertyType => propertyType.Value.Check(thing.GetProperty<Property>(propertyType.Key)));
         }
 
         public void DefineProperty(PropertyType property)
