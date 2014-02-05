@@ -21,6 +21,7 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="Location.ts" />
+    <TypeScriptCompile Include="Property.ts" />
     <TypeScriptCompile Include="Thing.ts" />
     <TypeScriptCompile Include="ThingType.ts" />
   </ItemGroup>

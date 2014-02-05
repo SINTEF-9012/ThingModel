@@ -14,7 +14,9 @@ module ThingModel {
 		/**
 		 *	Return true if the locations are the same.
 		 */
-		Compare(other: Location) : boolean;
+		Compare(other: Location): boolean;
+
+		toString() : string;
 	}
 
 	export module Location {
@@ -43,6 +45,19 @@ module ThingModel {
 					other.Y === this.Y &&
 					other.Z == this.Z &&
 					other.System == this.System;
+			}
+
+			public toString() {
+				var s = this.X + " - " + this.Y;
+
+				if (this.Z != null) {
+					s += " - " + this.Z;
+				}
+
+				if (this.System != null) {
+					s += " -- " + this.System;
+				}
+				return s;
 			}
 		}
 		
