@@ -133,8 +133,7 @@ namespace ThingModel
 
             // Check if the connection list are the same
             if (Connections.Count != other.Connections.Count ||
-                Connections.Keys.Any(key => !other.Connections.ContainsKey(key)) ||
-                other.Connections.Keys.Any(key => !Connections.ContainsKey(key)))
+                Connections.Keys.Any(key => !other.Connections.ContainsKey(key)))
             {
                 return false;
             }
@@ -155,17 +154,6 @@ namespace ThingModel
                     return false;
                 }
             }
-
-            /*foreach (var property in other.Properties)
-            {
-                Property ownProp;
-                Properties.TryGetValue(property.Key, out ownProp);
-
-                if (ownProp == null || !property.Value.Compare(ownProp))
-                {
-                    return false;
-                }
-            }*/
 
             // And start the start recursion if needed
             if (deepComparaisonForConnectedThings)
