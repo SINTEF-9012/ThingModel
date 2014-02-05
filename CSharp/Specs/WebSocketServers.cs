@@ -15,7 +15,7 @@ namespace ThingModel.Specs
         private Wharehouse _wharehouseA;
         private Wharehouse _wharehouseB;
 
-        private class WharehouseWait : IThingModelObserver
+        private class WharehouseWait : IWharehouseObserver
         {
             private readonly AutoResetEvent _newEvent = new AutoResetEvent(false);
             private readonly AutoResetEvent _deleteEvent = new AutoResetEvent(false);

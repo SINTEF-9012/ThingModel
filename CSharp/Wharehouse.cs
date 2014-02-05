@@ -10,7 +10,7 @@ namespace ThingModel
 
         private readonly ConcurrentDictionary<string, Thing> _things = new ConcurrentDictionary<string, Thing>();
 
-        private readonly HashSet<IThingModelObserver> _observers = new HashSet<IThingModelObserver>();
+        private readonly HashSet<IWharehouseObserver> _observers = new HashSet<IWharehouseObserver>();
  
         public void RegisterType(ThingType type, bool force = true)
         {
@@ -118,12 +118,12 @@ namespace ThingModel
             }
         }
 
-        public void RegisterObserver(IThingModelObserver modelObserver)
+        public void RegisterObserver(IWharehouseObserver modelObserver)
         {
             _observers.Add(modelObserver);
         }
 
-        public void UnregisterObserver(IThingModelObserver modelObserver)
+        public void UnregisterObserver(IWharehouseObserver modelObserver)
         {
             _observers.Remove(modelObserver);
         }

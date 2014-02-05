@@ -53,7 +53,7 @@
     <Compile Include="Proto\ProtoModelObserver.cs" />
     <Compile Include="Proto\ToProtobuf.cs" />
     <Compile Include="Location.cs" />
-    <Compile Include="IThingModelObserver.cs" />
+    <Compile Include="IWharehouseObserver.cs" />
     <Compile Include="Property.cs" />
     <Compile Include="PropertyType.cs" />
     <Compile Include="Proto\Property.cs" />

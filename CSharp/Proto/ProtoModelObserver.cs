@@ -2,7 +2,7 @@
 
 namespace ThingModel.Proto
 {
-    public class ProtoModelObserver : IThingModelObserver
+    public class ProtoModelObserver : IWharehouseObserver
     {
         public readonly HashSet<ThingModel.Thing> Updates = new HashSet<ThingModel.Thing>();
         public readonly HashSet<ThingModel.Thing> Deletions = new HashSet<ThingModel.Thing>();
