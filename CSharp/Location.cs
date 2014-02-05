@@ -39,7 +39,7 @@
         {
             // Double comparaison without Epsilon mouahahaha
             // ReSharper disable CompareOfFloatsByEqualityOperator
-            return other != null && X == other.X && Y == other.Y && Z == other.Z;
+            return other != null && X == other.X && Y == other.Y && Z == other.Z && System = other.System;
             // ReSharper restore CompareOfFloatsByEqualityOperator
         }
 
