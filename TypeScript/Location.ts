@@ -39,8 +39,7 @@ module ThingModel {
 
 			// Check if the values are the same and if the representation is the same
 			public Compare(other: Location) {
-				return other !== null &&
-					other instanceof Point &&
+				return other != null &&
 					other.X === this.X &&
 					other.Y === this.Y &&
 					other.Z == this.Z &&
@@ -72,23 +71,23 @@ module ThingModel {
 			}
 
 			public get Latitude() {
-				return this.X;
+				return this.Y;
 			}
 
 			public set Latitude(latitude: number) {
-				this.X = latitude;
+				this.Y = latitude;
 			}
 
 			public get Longitude() {
-				return this.Y;
+				return this.X;
 			}
 
 			public set Longitude(longitude: number) {
-				this.Y = longitude;
+				this.X = longitude;
 			}
 
 			public get Altitude() {
-				return this.Y;
+				return this.Z;
 			}
 
 			public set Altitude(altitude: number) {
