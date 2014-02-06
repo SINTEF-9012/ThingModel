@@ -65,13 +65,13 @@ namespace ThingModel.Specs
             var c = new Property.Location("the key is not important", new Location.LatLng(1, 2, 3));
             var d = new Property.Location("the key is not important");
 
-            Assert.That(a.Compare(b), Is.True);
+            Assert.That(a.CompareValue(b), Is.True);
 
             
-            Assert.That(a.Compare(c), Is.False);
-            Assert.That(a.Compare(null), Is.False);
-            Assert.That(d.Compare(a), Is.False);
-            Assert.That(d.Compare(d), Is.True);
+            Assert.That(a.CompareValue(c), Is.False);
+            Assert.That(a.CompareValue(null), Is.False);
+            Assert.That(d.CompareValue(a), Is.False);
+            Assert.That(d.CompareValue(d), Is.True);
 
         }
 
@@ -83,12 +83,12 @@ namespace ThingModel.Specs
             var c = new Property.String(":-)", "salut");
             var d = new Property.String(":-)");
 
-            Assert.That(a.Compare(a), Is.True);
-            Assert.That(a.Compare(b), Is.True);
-            Assert.That(a.Compare(c), Is.False);
-            Assert.That(a.Compare(d), Is.False);
-            Assert.That(d.Compare(d), Is.True);
-            Assert.That(d.Compare(null), Is.False);
+            Assert.That(a.CompareValue(a), Is.True);
+            Assert.That(a.CompareValue(b), Is.True);
+            Assert.That(a.CompareValue(c), Is.False);
+            Assert.That(a.CompareValue(d), Is.False);
+            Assert.That(d.CompareValue(d), Is.True);
+            Assert.That(d.CompareValue(null), Is.False);
         }
 
         [Test]
@@ -99,12 +99,12 @@ namespace ThingModel.Specs
             var c = new Property.Double("98", 98);
             var d = new Property.Double("a");
 
-            Assert.That(a.Compare(a), Is.True);
-            Assert.That(a.Compare(b), Is.True);
-            Assert.That(a.Compare(c), Is.False);
-            Assert.That(a.Compare(null), Is.False);
-            Assert.That(d.Compare(a), Is.False);
-            Assert.That(d.Compare(null), Is.False);
+            Assert.That(a.CompareValue(a), Is.True);
+            Assert.That(a.CompareValue(b), Is.True);
+            Assert.That(a.CompareValue(c), Is.False);
+            Assert.That(a.CompareValue(null), Is.False);
+            Assert.That(d.CompareValue(a), Is.False);
+            Assert.That(d.CompareValue(null), Is.False);
         }
 
         [Test]
@@ -115,12 +115,12 @@ namespace ThingModel.Specs
             var c = new Property.Int("98", 98);
             var d = new Property.Int("a");
 
-            Assert.That(a.Compare(a), Is.True);
-            Assert.That(a.Compare(b), Is.True);
-            Assert.That(a.Compare(c), Is.False);
-            Assert.That(a.Compare(null), Is.False);
-            Assert.That(d.Compare(a), Is.False);
-            Assert.That(d.Compare(null), Is.False);
+            Assert.That(a.CompareValue(a), Is.True);
+            Assert.That(a.CompareValue(b), Is.True);
+            Assert.That(a.CompareValue(c), Is.False);
+            Assert.That(a.CompareValue(null), Is.False);
+            Assert.That(d.CompareValue(a), Is.False);
+            Assert.That(d.CompareValue(null), Is.False);
         }
 
         [Test]
@@ -130,11 +130,11 @@ namespace ThingModel.Specs
             var b = new Property.Boolean("b", true);
             var c = new Property.Boolean("98");
 
-            Assert.That(a.Compare(a), Is.True);
-            Assert.That(a.Compare(b), Is.True);
-            Assert.That(a.Compare(c), Is.False);
-            Assert.That(a.Compare(null), Is.False);
-            Assert.That(c.Compare(null), Is.False);
+            Assert.That(a.CompareValue(a), Is.True);
+            Assert.That(a.CompareValue(b), Is.True);
+            Assert.That(a.CompareValue(c), Is.False);
+            Assert.That(a.CompareValue(null), Is.False);
+            Assert.That(c.CompareValue(null), Is.False);
         }
 
         [Test]
@@ -145,12 +145,12 @@ namespace ThingModel.Specs
             var c = new Property.DateTime("98", DateTime.Now);
             var d = new Property.DateTime("a");
 
-            Assert.That(a.Compare(a), Is.True);
-            Assert.That(a.Compare(b), Is.True);
-            Assert.That(a.Compare(c), Is.False);
-            Assert.That(a.Compare(null), Is.False);
-            Assert.That(d.Compare(a), Is.False);
-            Assert.That(d.Compare(null), Is.False);
+            Assert.That(a.CompareValue(a), Is.True);
+            Assert.That(a.CompareValue(b), Is.True);
+            Assert.That(a.CompareValue(c), Is.False);
+            Assert.That(a.CompareValue(null), Is.False);
+            Assert.That(d.CompareValue(a), Is.False);
+            Assert.That(d.CompareValue(null), Is.False);
         }
 
         [Test]
@@ -159,7 +159,7 @@ namespace ThingModel.Specs
             var a = new Property.Double("test");
             var b = new Property.Boolean("test");
 
-            Assert.That(a.Compare(b), Is.False);
+            Assert.That(a.CompareValue(b), Is.False);
         }
 
         [Test]
@@ -168,8 +168,8 @@ namespace ThingModel.Specs
             var a = new Property.Double("test");
             Property b = new Property.Double("test");
 
-            Assert.That(a.Compare(b), Is.True);
-            Assert.That(b.Compare(a), Is.True);
+            Assert.That(a.CompareValue(b), Is.True);
+            Assert.That(b.CompareValue(a), Is.True);
         }
 
         [Test]

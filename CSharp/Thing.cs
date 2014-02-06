@@ -149,7 +149,7 @@ namespace ThingModel
                 Property otherProp;
                 other.Properties.TryGetValue(property.Key, out otherProp);
 
-                if (otherProp == null || !property.Value.Compare(otherProp))
+                if (otherProp == null || !property.Value.CompareValue(otherProp))
                 {
                     return false;
                 }

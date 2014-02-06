@@ -31,7 +31,7 @@ namespace ThingModel
         public abstract string ValueToString();
         
         // After some tests, a generic version is complex and not very performant
-        public abstract bool Compare(Property other);
+        public abstract bool CompareValue(Property other);
 
         public class Location : Property
         {
@@ -53,7 +53,7 @@ namespace ThingModel
                 return sb.ToString();
             }
 
-            public override bool Compare(Property prop)
+            public override bool CompareValue(Property prop)
             {
                 var other = prop as Location;
                 return other != null && ((Value == null && other.Value == null) || (Value!= null && other.Value != null && Value.GetType() == other.Value.GetType() && Value.Compare(other.Value)));
@@ -75,7 +75,7 @@ namespace ThingModel
                 return Value;
             }
 
-            public override bool Compare(Property prop)
+            public override bool CompareValue(Property prop)
             {
                 var other = prop as String;
                 return other != null && ((Value == null && other.Value == null) || (Value != null && Value.Equals(other.Value)));
@@ -96,7 +96,7 @@ namespace ThingModel
                 return Value.ToString(CultureInfo.InvariantCulture);
             }
 
-            public override bool Compare(Property prop)
+            public override bool CompareValue(Property prop)
             {
                 var other = prop as Double;
                 // ReSharper disable CompareOfFloatsByEqualityOperator
@@ -120,7 +120,7 @@ namespace ThingModel
                 return Value.ToString(CultureInfo.InvariantCulture);
             }
 
-            public override bool Compare(Property prop)
+            public override bool CompareValue(Property prop)
             {
                 var other = prop as Int;
                 return other != null && Value == other.Value;
@@ -141,7 +141,7 @@ namespace ThingModel
                 return Value ? "true" : "false";
             }
 
-            public override bool Compare(Property prop)
+            public override bool CompareValue(Property prop)
             {
                 var other = prop as Boolean;
                 return other != null && Value == other.Value;
@@ -162,7 +162,7 @@ namespace ThingModel
                 return Value.ToString(CultureInfo.InvariantCulture);
             }
 
-            public override bool Compare(Property prop)
+            public override bool CompareValue(Property prop)
             {
                 var other = prop as DateTime;
                 return other != null && Value == other.Value;

@@ -148,7 +148,7 @@ module ThingModel {
 				_.any(this._properties, (property: Property) => {
 					var otherProp = other._properties[property.Key];
 
-					return otherProp == null || !otherProp.Compare(property);
+					return otherProp == null || !otherProp.CompareValue(property);
 				})) {
 				return false;
 			}

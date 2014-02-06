@@ -26,7 +26,7 @@ module ThingModel {
 			return this.Value != null ? this.Value.ToString() : "";
 		}
 
-		Compare(other: Property): boolean {
+		CompareValue(other: Property): boolean {
 			if (other == null || (this.Value != null && other.Value == null)) {
 				return false;
 			}
