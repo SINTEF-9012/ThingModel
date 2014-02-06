@@ -1,4 +1,6 @@
 package ThingModel.Proto;
+option java_package = "org.thingmodel.proto";
+option java_outer_classname = "ProtoStringDeclaration";
 
 /**
  *	In order to reduce networks exchanges,

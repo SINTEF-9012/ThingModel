@@ -1,4 +1,6 @@
 package ThingModel.Proto;
+option java_package = "org.thingmodel.proto";
+option java_outer_classname = "ProtoPropertyType";
 
 message PropertyType {
 	required int32 string_key = 1;

@@ -4,6 +4,9 @@ import "ThingType.proto";
 
 package ThingModel.Proto;
 
+option java_package = "org.thingmodel.proto";
+option java_outer_classname = "ProtoTransaction";
+
 message Transaction {
 	repeated StringDeclaration string_declarations = 1;
 
