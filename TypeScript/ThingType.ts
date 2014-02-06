@@ -12,6 +12,9 @@ module ThingModel {
 		private _properties: { [key: string]: PropertyType };
 
 		constructor(name: string) {
+			if (!name) {
+				throw "The name should not be null or empty";
+			}
 			this._name = name;
 			this._properties = {};
 		}

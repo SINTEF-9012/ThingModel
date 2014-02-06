@@ -184,9 +184,7 @@ namespace ThingModel
             // this instruction prevent infinite recursion
             workIds.Add(_id);
 
-            // And start the infinite recursion for connected things
-            // Because we are after the simple comparison, the
-            // two connections list should be equivalents
+            // And start the recursion for connected things
             foreach (var connectedThing in Connections)
             {
                 var otherThing = other.Connections[connectedThing.Key];

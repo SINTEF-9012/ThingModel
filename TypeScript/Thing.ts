@@ -135,7 +135,7 @@ module ThingModel {
 				return false;
 			}
 
-			// Check if the connections are the sames
+			// Check if the connections are the same
 			if (this._connectionsCount !== other._connectionsCount || 
 				_.any(this._connections, (connectedThing:Thing)=> {
 					return !_.has(other._connections, connectedThing._id);
