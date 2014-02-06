@@ -89,11 +89,13 @@ module ThingModel {
 			this._connections[thing._id] = thing;
 		}
 
-		public Disconnect(thing: Thing): void {
+		public Disconnect(thing: Thing): boolean {
 			if (this.IsConnectedTo(thing)) {
 				--this._connectionsCount;	
 				delete this._connections[thing._id];
+				return true;
 			}
+			return false;
 		}
 
 		public DisconnectAll() : void {
