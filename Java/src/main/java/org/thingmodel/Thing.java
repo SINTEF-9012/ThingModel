@@ -2,6 +2,7 @@ package org.thingmodel;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 public class Thing {
@@ -107,9 +108,85 @@ public class Thing {
 	public List<Property> getProperties() {
 		return new ArrayList<>(Properties.values());
 	}
+
+    // No default parameters lol
+    public boolean Compare(Thing other) {
+        return Compare(other, true, false);
+    }
+
+	public boolean Compare(Thing other, boolean compareId,
+			boolean deepComparisonForConnectThings) {
+		// Optimization, when two things are the same instance
+        if (this == other) {
+            return true;
+        }
+
+        // If the types are not the same
+        if (other == null || (_type != null && other._type != null &&
+                !_type.getName().equals(other._type.getName())) ||
+                (_type == null && other._type != null) ||
+                (_type != null && other._type == null)) {
+            return false;
+        }
+
+        // If we need to compare the ids, and they are not the same
+        if (compareId && !_id.equals(other._id)) {
+            return false;
+        }
+
+        // Check if the connections are the same
+        if (Connections.size() != other.Connections.size() ||
+            !Connections.keySet().containsAll(other.Connections.keySet())) {
+            return false;
+        }
+
+        // Check if the properties are the same
+        if (Properties.size() != other.Properties.size()) {
+            return false;
+        }
+
+        for(Property property: Properties.values()) {
+            Property otherProp = other.Properties.get(property.getKey());
+
+            if (otherProp == null || !otherProp.Compare(property)) {
+            	return false;
+            }
+        }
+        
+        if (deepComparisonForConnectThings) {
+        	return RecursiveCompare(other, new HashSet<String>());
+        }
+
+		return true;
+	}
 	
-	public boolean Compare(Thing other, boolean compareId, boolean deepComparisonForConnectThings) {
-		// TODO
-		return false;
+	private boolean RecursiveCompare(Thing other,
+			HashSet<String> alreadyVisitedThings) {
+		
+		// If the thing was already checked
+		// We don't need to check it again
+		
+		if (alreadyVisitedThings.contains(other._id)) {
+			// It's true because we are still looking for a difference
+			return true;
+		}
+		
+		// Made a simple comparison first
+		if (!this.Compare(other)) {
+			return false;
+		}
+		
+		// Register the thing now, prevent infinite recursions
+		alreadyVisitedThings.add(_id);
+		
+		// And start the recursion for connected things
+		for (Thing connectedThing : Connections.values()) {
+			Thing otherThing = other.Connections.get(connectedThing);
+			
+			if (!connectedThing.RecursiveCompare(otherThing, alreadyVisitedThings)) {
+				return false;
+			}
+		}
+		return true;
 	}
 }
