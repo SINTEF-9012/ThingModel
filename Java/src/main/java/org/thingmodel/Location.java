@@ -27,24 +27,60 @@ public abstract class Location {
 		Z = z;
 	}
 	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((System == null) ? 0 : System.hashCode());
+		long temp;
+		temp = Double.doubleToLongBits(X);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(Y);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		result = prime * result + ((Z == null) ? 0 : Z.hashCode());
+		return result;
+	}
+
 	/**
 	 * Return true if the location contain the same values.
 	 * 
 	 * A location.Point and a Location.LatLng are not the same
 	 * even if the values are identical.
 	 * 
-	 * The comparison doesn't manage issues with numbers precision.
-	 * If a value is rounded, the location is not the same.
 	 */
-	public boolean Compare(Location other) {
-		return other != null &&
-			X == other.X &&
-			Y == other.Y &&
-			(Z == other.Z || (Z != null && Z.equals(other.Z))) &&
-			(System == other.System || (System != null && System.equals(other.System)));
-			
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof Location))
+			return false;
+		Location other = (Location) obj;
+		if (System == null) {
+			if (other.System != null)
+				return false;
+		} else if (!System.equals(other.System))
+			return false;
+		if (Double.doubleToLongBits(X) != Double.doubleToLongBits(other.X))
+			return false;
+		if (Double.doubleToLongBits(Y) != Double.doubleToLongBits(other.Y))
+			return false;
+		if (Z == null) {
+			if (other.Z != null)
+				return false;
+		} else if (!Z.equals(other.Z))
+			return false;
+		return true;
 	}
-	
+
+	@Override
+	public String toString() {
+		return "Location [X=" + X + ", Y=" + Y + ", "
+				+ (Z != null ? "Z=" + Z + ", " : "")
+				+ (System != null ? "System=" + System : "") + "]";
+	}
+
 	/**
 	 *	Simple location value.
 	 *	Often used in videogames.
