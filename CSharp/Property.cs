@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using System.Text;
 
 namespace ThingModel
@@ -19,6 +20,10 @@ namespace ThingModel
 
         protected Property(string key)
         {
+	        if (string.IsNullOrEmpty(key))
+	        {
+		        throw new Exception("The Property key should not be null or empty");
+	        }
             _key = key;
         }
 

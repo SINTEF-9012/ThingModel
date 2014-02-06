@@ -15,6 +15,9 @@ module ThingModel {
 		}
 
 		constructor(key: string, value: any) {
+			if (!key) {
+				throw "The Property key should not be null or empty";
+			}
 			this._key = key;
 			this.Value = value;
 		}
