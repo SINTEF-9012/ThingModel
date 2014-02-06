@@ -187,6 +187,7 @@ public class Thing {
 				return false;
 			}
 		}
+		
 		return true;
 	}
 }

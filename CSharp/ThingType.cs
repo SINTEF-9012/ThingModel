@@ -43,7 +43,7 @@ namespace ThingModel
 
         /**
          * Check if the given thing have all the required properties,
-         * and if there values are correct.
+         * and if their values are correct.
          */
         public bool Check(Thing thing)
         {
