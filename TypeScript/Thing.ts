@@ -116,7 +116,7 @@ module ThingModel {
 		}
 
 		public Compare(other: Thing, compareId: boolean = true,
-			deepComparisonForConnectedThing: boolean = false): boolean {
+			deepComparisonForConnectedThings: boolean = false): boolean {
 			// Optimization, when two things are the same instance
 			if (this === other) {
 				return true;
@@ -153,7 +153,7 @@ module ThingModel {
 				return false;
 			}
 
-			if (deepComparisonForConnectedThing) {
+			if (deepComparisonForConnectedThings) {
 				return this.RecursiveCompare(other, {});
 			}
 
