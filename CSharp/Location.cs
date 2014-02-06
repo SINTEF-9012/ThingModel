@@ -1,6 +1,6 @@
 ﻿namespace ThingModel
 {
-    public class Location
+    public abstract class Location
     {
         public double X;
         public double Y;
@@ -11,7 +11,7 @@
         /**
          * Name of the location system.
          * 
-         * Examples, GWS 84, ETRS89...
+         * Examples, WGS84, ETRS89...
          */
         public string System;
         
@@ -27,10 +27,10 @@
         }
 
         /**
-         * Return true if the location contains the same values.
+         * Return true if the location contain the same values.
          * 
-         * A Location.Point and a Location.LatLng can be the same if the values
-         * are the same.
+         * A Location.Point and a Location.LatLng are the same
+		 * if the values are the same.
          * 
          * The comparaison doesn't manage issues with precision numbers. If
          * a value is rounded, the location is not the same.
@@ -39,7 +39,11 @@
         {
             // Double comparaison without Epsilon mouahahaha
             // ReSharper disable CompareOfFloatsByEqualityOperator
-            return other != null && X == other.X && Y == other.Y && Z == other.Z && System == other.System;
+            return other != null &&
+				X == other.X &&
+				Y == other.Y &&
+				Z == other.Z &&
+				System == other.System;
             // ReSharper restore CompareOfFloatsByEqualityOperator
         }
 
