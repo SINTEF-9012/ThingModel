@@ -4,7 +4,13 @@ namespace ThingModel
 {
     public class PropertyType
     {
-        public string Key;
+	    private string _key;
+
+	    public string Key
+	    {
+		    get { return _key; }
+	    }
+
         public string Name;
         public string Description;
 
@@ -20,7 +26,7 @@ namespace ThingModel
         // You should use the static Create method instead
         private PropertyType(string key, Type type, bool required)
         {
-            Key = key;
+            _key = key;
             Required = required;
             _type = type;
         }
@@ -33,7 +39,7 @@ namespace ThingModel
             {
                 throw new Exception("The type should be a subtype of Property");
             }
-            Key = key;
+            _key = key;
             _type = type;
         }
 

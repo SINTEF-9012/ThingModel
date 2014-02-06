@@ -1,6 +1,11 @@
  module ThingModel {
 	 export class PropertyType {
-		 public Key: string;
+		 private _key: string;
+
+		 public get Key() {
+			 return this._key;
+		 }
+
 		 public Name: string;
 		 public Description: string;
 
@@ -13,7 +18,7 @@
 		 }
 
 		constructor(key: string, type: Type, required: boolean = true) {
-			this.Key = key;
+			this._key = key;
 			this._type = type;
 			this.Required = required;
 		}

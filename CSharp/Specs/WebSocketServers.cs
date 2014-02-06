@@ -155,6 +155,7 @@ namespace ThingModel.Specs
             _clientB.Send();
 
             Assert.That( _wharehouseWaitA.WaitDeleted(5000), Is.True);
+			Thread.Sleep(100);
             Assert.That(_wharehouseA.GetThing("lapin"), Is.Null);
         }
 
