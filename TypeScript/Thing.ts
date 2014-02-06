@@ -158,10 +158,34 @@ module ThingModel {
 			return true;
 		}
 
-		private RecursiveCompare(other: Thing, alreadyVisitedObjets: { [id: string]: boolean }): boolean {
+		private RecursiveCompare(other: Thing,
+			alreadyVisitedObjets: { [id: string]: boolean }): boolean {
 
-			// TODO tomorrow
-			return false;
+			// If the thing was already checked,
+			// we don't need to check it again
+			if (_.has(alreadyVisitedObjets, this._id)) {
+
+				// It's true because we are still looking for a difference
+				return true;
+			}
+
+			// Made a simple comparison first
+			if (!this.Compare(other)) {
+				return false;
+			}
+
+			// Register the thing now, prevent infinite recursions
+			alreadyVisitedObjets[this._id] = true;
+
+			_.each(this._connections, (connectedThing : Thing)=> {
+				var otherThing = other._connections[connectedThing._id];
+
+				if (!connectedThing.RecursiveCompare(otherThing, alreadyVisitedObjets)) {
+					return false;
+				}
+			});
+
+			return true;
 		}
 	}
 }
