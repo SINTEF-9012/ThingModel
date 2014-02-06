@@ -17,7 +17,10 @@
 			 return this._type;
 		 }
 
-		constructor(key: string, type: Type, required: boolean = true) {
+		 constructor(key: string, type: Type, required: boolean = true) {
+			if (!key) {
+				throw "The PropertyType key should not be null or empty";
+			}
 			this._key = key;
 			this._type = type;
 			this.Required = required;

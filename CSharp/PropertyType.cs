@@ -4,7 +4,7 @@ namespace ThingModel
 {
     public class PropertyType
     {
-	    private string _key;
+	    private readonly string _key;
 
 	    public string Key
 	    {
@@ -26,6 +26,10 @@ namespace ThingModel
         // You should use the static Create method instead
         private PropertyType(string key, Type type, bool required)
         {
+	        if (String.IsNullOrEmpty(key))
+	        {
+		        throw new Exception("The PropertyType key should not be null or empty");
+	        }
             _key = key;
             Required = required;
             _type = type;
@@ -33,14 +37,12 @@ namespace ThingModel
 
         // Slow constructor, but you can give directly a Type object
         // The static Create method can be used instead
-        public PropertyType(string key, Type type)
+        public PropertyType(string key, Type type) : this(key, type, true)
         {
             if (!typeof(Property).IsAssignableFrom(type))
             {
                 throw new Exception("The type should be a subtype of Property");
             }
-            _key = key;
-            _type = type;
         }
 
         // Tool for create PropertyType objets using C# genericity
