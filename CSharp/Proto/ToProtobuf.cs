@@ -1,7 +1,6 @@
 ﻿#region
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using ProtoBuf;
@@ -21,7 +20,7 @@ namespace ThingModel.Proto
 
         // Simple binding between ThingModel property types and protocol buffer property types
         // Tested as alternative to the dynamic keyword
-        private readonly Dictionary<Type, PropertyType.Type> _prototypesBinding = new Dictionary
+        private static readonly Dictionary<Type, PropertyType.Type> PrototypesBinding = new Dictionary
             <Type, PropertyType.Type>
             {
                 {typeof (ThingModel.Property.Location), PropertyType.Type.LOCATION},
@@ -239,7 +238,7 @@ namespace ThingModel.Proto
                             string_name = StringToKey(propertyType.Name),
                             string_description = StringToKey(propertyType.Description),
                             required = propertyType.Required,
-                            type = _prototypesBinding[propertyType.Type]
+                            type = PrototypesBinding[propertyType.Type]
                         });
                 }
 
@@ -341,7 +340,7 @@ namespace ThingModel.Proto
 		    }
 	    }
 
-	    public void ApplyThingSuppressions(IEnumerable<ThingModel.Thing> things)
+	    public void ApplyThingsSuppressions(IEnumerable<ThingModel.Thing> things)
 	    {
 		    foreach (var thing in things)
 		    {

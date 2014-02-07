@@ -98,7 +98,7 @@ namespace ThingModel.Specs
             _clientB.Close();
             _server.Close();
 
-            Thread.Sleep(100);
+            Thread.Sleep(200);
         }
 
         [Test]
@@ -154,7 +154,7 @@ namespace ThingModel.Specs
             Assert.That(_wharehouseB.GetThing("lapin"), Is.Null);
             _clientB.Send();
 
-            Assert.That( _wharehouseWaitA.WaitDeleted(5000), Is.True);
+            Assert.That( _wharehouseWaitA.WaitDeleted(), Is.True);
             Assert.That(_wharehouseA.GetThing("lapin"), Is.Null);
             
 			_wharehouseA.RegisterThing(new Thing("lapin"));

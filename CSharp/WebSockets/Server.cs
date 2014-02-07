@@ -45,7 +45,7 @@ namespace ThingModel.WebSockets
                     Console.WriteLine("Server | Message from : " + senderID);
                     
 //                    var analyzedTransaction = ProtoModelObserver.GetTransaction(ToProtobuf, senderID);
-                    ToProtobuf.ApplyThingSuppressions(ProtoModelObserver.Deletions);
+                    ToProtobuf.ApplyThingsSuppressions(ProtoModelObserver.Deletions);
 
                     // Broadcast to other clients
                     foreach (var session in Sessions.Sessions)

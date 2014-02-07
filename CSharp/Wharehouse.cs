@@ -132,11 +132,6 @@ namespace ThingModel
 				}
 	        }
 
-	        foreach (var t in thingsToDisconnect)
-	        {
-				t.Disconnect(thing);
-				NotifyThingUpdate(t);
-	        }
 
             // Remove the thing
 	        bool removed;
@@ -150,6 +145,12 @@ namespace ThingModel
             {
                 NotifyThingDeleted(thing);
             }
+	        
+			foreach (var t in thingsToDisconnect)
+	        {
+				t.Disconnect(thing);
+				NotifyThingUpdate(t);
+	        }
         }
 
         public void RegisterObserver(IWharehouseObserver modelObserver)
