@@ -160,17 +160,17 @@ namespace ThingModel
             }
         }
 
-        public Thing GetThing(string key)
+        public Thing GetThing(string id)
         {
             Thing value;
-            _things.TryGetValue(key, out value);
+            _things.TryGetValue(id, out value);
             return value;
         }
 
-        public ThingType GetThingType(string key)
+        public ThingType GetThingType(string name)
         {
             ThingType value;
-            _thingTypes.TryGetValue(key, out value);
+            _thingTypes.TryGetValue(name, out value);
             return value;
         }
 

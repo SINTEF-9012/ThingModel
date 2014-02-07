@@ -125,12 +125,12 @@ module ThingModel {
 			});
 		}
 
-		public GetThing(key: string): Thing {
-			return this._things[key];
+		public GetThing(id: string): Thing {
+			return this._things[id];
 		}
 
-		public GetThingType(key: string): ThingType {
-			return this._thingTypes[key];
+		public GetThingType(name: string): ThingType {
+			return this._thingTypes[name];
 		}
 
 		public get Things() : Thing[] {
