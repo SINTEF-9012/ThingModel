@@ -155,7 +155,6 @@ namespace ThingModel.Specs
             _clientB.Send();
 
             Assert.That( _wharehouseWaitA.WaitDeleted(5000), Is.True);
-			Thread.Sleep(100);
             Assert.That(_wharehouseA.GetThing("lapin"), Is.Null);
             
 			_wharehouseA.RegisterThing(new Thing("lapin"));
@@ -254,7 +253,6 @@ namespace ThingModel.Specs
             _clientA.Send();
 
             Assert.That(_wharehouseWaitB.WaitNew(), Is.True);
-            Thread.Sleep(100);
             Assert.That(_wharehouseB.GetThing("family").IsConnectedTo(_wharehouseB.GetThing("Patrick")), Is.True);
 
             family.Connect(parentB);
@@ -264,7 +262,6 @@ namespace ThingModel.Specs
 
 
             Assert.That(_wharehouseWaitB.WaitUpdated(), Is.True);
-            Thread.Sleep(100);
             Assert.That(_wharehouseB.GetThing("family").IsConnectedTo(_wharehouseB.GetThing("Bob")), Is.True);
 
             family.Disconnect(parentB);
@@ -274,7 +271,6 @@ namespace ThingModel.Specs
             _clientA.Send();
 
             Assert.That(_wharehouseWaitB.WaitUpdated(), Is.True);
-            Thread.Sleep(100);
             Assert.That(_wharehouseB.GetThing("family").IsConnectedTo(_wharehouseB.GetThing("Bob")), Is.False);
 
             _wharehouseA.NotifyThingUpdate(family);
@@ -288,7 +284,6 @@ namespace ThingModel.Specs
             _clientA.Send();
 
             Assert.That(_wharehouseWaitB.WaitUpdated(), Is.True);
-            Thread.Sleep(100);
             Assert.That(_wharehouseB.GetThing("family").IsConnectedTo(_wharehouseB.GetThing("Bob")), Is.True);
         }
 
