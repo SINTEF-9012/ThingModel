@@ -36,14 +36,14 @@ public class Thing {
 	 *  
 	 *  A property is defined by his key and his value.
 	 */
-	protected HashMap<String, Property> Properties;
+	private HashMap<String, Property> Properties;
 	
 	/**
 	 * A thing can be connected to other things.
 	 * 
 	 * But a thing cannot be connected directly to itself.
 	 */
-	protected HashMap<String, Thing> Connections;
+	private HashMap<String, Thing> Connections;
 	
 	public Thing(String id) {
 		this(id, null);
@@ -148,7 +148,7 @@ public class Thing {
         for(Property property: Properties.values()) {
             Property otherProp = other.Properties.get(property.getKey());
 
-            if (otherProp == null || !otherProp.Compare(property)) {
+            if (otherProp == null || !otherProp.CompareValue(property)) {
             	return false;
             }
         }
