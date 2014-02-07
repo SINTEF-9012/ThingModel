@@ -73,6 +73,25 @@ module ThingModel {
 			});
 		}
 
+		public RemoveThing(thing: Thing): void{
+			if (!thing) {
+				return;
+			}
+
+			// Remove all connections
+			_.each(this._things, (t : Thing) => {
+				if (t.IsConnectedTo(thing)) {
+					t.Disconnect(thing);
+					this.NotifyThingUpdate(t);
+				}
+			});
+
+			if (_.has(this._things, thing.ID)) {
+				delete this._things[thing.ID];
+				this.NotifyThingDeleted(thing);
+			}
+		}
+
 		public RegisterObserver(observer: IWharehouseObserver): void {
 			this._observers.push(observer);
 		}
