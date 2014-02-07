@@ -79,7 +79,9 @@ module ThingModel {
 			return prop;
 		}
 
-		public Connect(thing : Thing) : void {
+		public Connect(thing: Thing): void {
+			if (!thing) return;
+
 			if (thing === this || thing._id === this._id) {
 				throw "You can't connect a thing directly to itself";
 			}
@@ -104,7 +106,7 @@ module ThingModel {
 		}
 
 		public IsConnectedTo(thing: Thing): boolean {
-			return _.has(this._connections, thing._id);
+			return thing && _.has(this._connections, thing._id);
 		}
 
 		public get ConnectedThings(): Thing[] {

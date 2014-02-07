@@ -71,6 +71,8 @@ namespace ThingModel
 
         public void Connect(Thing thing)
         {
+	        if (thing == null) return;
+
             if (thing == this || thing._id == _id)
             {
                 throw new Exception("Cannot connect a thing to itself");
@@ -80,11 +82,12 @@ namespace ThingModel
 
         public bool Disconnect(Thing thing)
         {
-            return Connections.Remove(thing._id);
+	        return thing != null && Connections.Remove(thing._id);
         }
 
-        public bool IsConnectedTo(Thing thing)
+	    public bool IsConnectedTo(Thing thing)
         {
+	        if (thing == null) return false;
             return Connections.ContainsKey(thing._id);
         }
 

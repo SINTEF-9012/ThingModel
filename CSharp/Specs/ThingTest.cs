@@ -47,6 +47,9 @@ namespace ThingModel.Specs
         public void Connect()
         {
             Assert.That(_thing.IsConnectedTo(_otherThing), Is.True);
+			_thing.Connect(null);
+            Assert.That(_thing.IsConnectedTo(null), Is.False);
+			_thing.Disconnect(null);
         }
 
         [Test]
