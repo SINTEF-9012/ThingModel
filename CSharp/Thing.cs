@@ -106,6 +106,11 @@ namespace ThingModel
             get { return new List<Thing>(Connections.Values); }
         }
 
+	    public int ConnectedThingsCount
+	    {
+			get { return Connections.Count; }
+	    }
+
 
         /**
          * Compare if two things are equals

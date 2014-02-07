@@ -113,6 +113,10 @@ module ThingModel {
 			return _.values(this._connections);
 		}
 
+		public get ConnectedThingsCount(): number {
+			return this._connectionsCount;
+		}
+
 		public get Properties(): Property[] {
 			return _.values(this._properties);
 		}

@@ -111,8 +111,8 @@ namespace ThingModel.Proto
                 change = true;
             }
 
-            if ((previousThing == null && thing.ConnectedThings.Count > 0)
-                || (previousThing != null && previousThing.connections.Count != thing.ConnectedThings.Count))
+            if ((previousThing == null && thing.ConnectedThingsCount > 0)
+                || (previousThing != null && previousThing.connections.Count != thing.ConnectedThingsCount))
             {
                 publication.connections_change = true;
             }
