@@ -2,22 +2,20 @@ package org.thingmodel;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class Wharehouse {
 
-	private ConcurrentHashMap<String, ThingType> _thingTypes;
-	private ConcurrentHashMap<String, Thing> _things;
-	private HashSet<IWharehouseObserver> _observers;
+	private HashMap<String, ThingType> _thingTypes = new HashMap<>();
+	private HashMap<String, Thing> _things = new HashMap<>();
+	private HashSet<IWharehouseObserver> _observers = new HashSet<>();
 	
-	public Wharehouse() {
-		_thingTypes = new ConcurrentHashMap<>();
-		_things = new ConcurrentHashMap<>();
-		_observers = new HashSet<>();
-	}
-
+	private Object _lockThingTypes = new Object();
+	private Object _lockThings = new Object();
+	
+	
 	public void RegisterType(ThingType type) {
 		RegisterType(type, true);
 	}
@@ -28,8 +26,19 @@ public class Wharehouse {
 		}
 	
 		String name = type.getName();
-		if (force || !_thingTypes.containsKey(name)) {
-			_thingTypes.put(name, type);
+		boolean register = force;
+		
+		if (!register) {
+			synchronized (_lockThingTypes) {
+				register = !_thingTypes.containsKey(name);
+			}
+		}
+		
+		if (register) {
+			
+			synchronized (_lockThingTypes) {
+				_thingTypes.put(name, type);
+			}
 			
 			NotifyThingTypeDefine(type);
 		}
@@ -45,8 +54,12 @@ public class Wharehouse {
 		}
 		
 		String id = thing.getId();
-		boolean creation = !_things.containsKey(id);
-		_things.put(id, thing);
+		boolean creation;
+	
+		synchronized (_lockThings) {
+			creation = !_things.containsKey(id);
+			_things.put(id, thing);
+		}
 		
 		if (alsoRegisterTypes && thing.getType() != null) {
 			RegisterType(thing.getType(), false);
@@ -105,18 +118,33 @@ public class Wharehouse {
 			return;
 		}
 		
+		ArrayList<Thing> thingsToDisconnect = new ArrayList<>();
+	
 		// Remove all connections
-		for(Thing t : _things.values()) {
-			if (t.IsConnectedTo(thing)) {
-				t.Disconnect(thing);
-				NotifyThingUpdate(t);
+		synchronized (_lockThings) {
+			for(Thing t : _things.values()) {
+				if (t.IsConnectedTo(thing)) {
+				}
 			}
 		}
-	
+
+		boolean removed;
 		String id = thing.getId();
-		if (_things.containsKey(id)) {
-			_things.remove(id);
+		
+		synchronized (_lockThings) {
+			removed = _things.containsKey(id);
+			if (removed) {
+				_things.remove(id);
+			}
+		}
+		
+		if (removed) {
 			NotifyThingDeleted(thing);
+		}
+		
+		for (Thing t : thingsToDisconnect) {
+			t.Disconnect(thing);
+			NotifyThingUpdate(t);
 		}
 	}
 	
@@ -153,14 +181,20 @@ public class Wharehouse {
 	}
 	
 	public Thing getThing(String id) {
-		return _things.get(id);
+		synchronized (_lockThings) {
+			return _things.get(id);
+		}
 	}
 	
 	public ThingType getThingType(String name) {
-		return _thingTypes.get(name);
+		synchronized (_lockThingTypes) {
+			return _thingTypes.get(name);
+		}
 	}
 	
 	public List<Thing> getThings() {
-		return new ArrayList<>(_things.values());
+		synchronized (_lockThings) {
+			return new ArrayList<>(_things.values());
+		}
 	}
 }
