@@ -38,7 +38,7 @@ namespace ThingModel
            var creation = !_things.ContainsKey(thing.ID);
             _things[thing.ID] = thing;
 
-            if (alsoRegisterTypes)
+            if (alsoRegisterTypes && thing.Type != null)
             {
                 RegisterType(thing.Type, false);
             }

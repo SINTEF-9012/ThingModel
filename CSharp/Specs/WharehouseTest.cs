@@ -102,6 +102,13 @@ namespace ThingModel.Specs
             _wharehouse.RegisterThing(_thing, false, true);
 
             Assert.That(_wharehouseChangeObserver.DefineType, Is.True);
+
+			_wharehouseChangeObserver.Reset();
+
+	        var newThing = new Thing("without type");
+			_wharehouse.RegisterThing(newThing, false, true);
+
+            Assert.That(_wharehouseChangeObserver.DefineType, Is.False);
         }
 
         [Test]

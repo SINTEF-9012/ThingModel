@@ -31,7 +31,7 @@ module ThingModel {
 			var creation = !_.has(this._things, thing.ID);
 			this._things[thing.ID] = thing;
 
-			if (alsoRegisterTypes) {
+			if (alsoRegisterTypes && thing.Type) {
 				this.RegisterType(thing.Type, false);
 			}
 
