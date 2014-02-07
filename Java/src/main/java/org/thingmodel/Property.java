@@ -87,15 +87,15 @@ public abstract class Property {
 			super(key, null);
 		}
 		
-		public Double(java.lang.String key, Double value) {
+		public Double(java.lang.String key, java.lang.Double value) {
 			super(key, value);
 		}
 		
-		public Double getValue() {
-			return (Double)_value;
+		public java.lang.Double getValue() {
+			return (java.lang.Double)_value;
 		}
 		
-		public void setValue(Double value) {
+		public void setValue(java.lang.Double value) {
 			_value = value;
 		}
 	}
@@ -106,15 +106,15 @@ public abstract class Property {
 			super(key, null);
 		}
 		
-		public Integer(java.lang.String key, Integer value) {
+		public Integer(java.lang.String key, java.lang.Integer value) {
 			super(key, value);
 		}
 		
-		public Integer getValue() {
-			return (Integer)_value;
+		public java.lang.Integer getValue() {
+			return (java.lang.Integer)_value;
 		}
 		
-		public void setValue(Integer value) {
+		public void setValue(java.lang.Integer value) {
 			_value = value;
 		}
 	}
@@ -125,15 +125,15 @@ public abstract class Property {
 			super(key, null);
 		}
 		
-		public Boolean(java.lang.String key, Boolean value) {
+		public Boolean(java.lang.String key, java.lang.Boolean value) {
 			super(key, value);
 		}
 		
-		public Boolean getValue() {
-			return (Boolean)_value;
+		public java.lang.Boolean getValue() {
+			return (java.lang.Boolean)_value;
 		}
 		
-		public void setValue(Boolean value) {
+		public void setValue(java.lang.Boolean value) {
 			_value = value;
 		}
 	}
