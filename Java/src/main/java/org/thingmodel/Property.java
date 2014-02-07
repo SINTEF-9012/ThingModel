@@ -49,15 +49,15 @@ public abstract class Property {
 			super(key, null);
 		}
 		
-		public Location(java.lang.String key, Location value) {
+		public Location(java.lang.String key, org.thingmodel.Location value) {
 			super(key, value);
 		}
 		
-		public Location getValue() {
-			return (Location)_value;
+		public org.thingmodel.Location getValue() {
+			return (org.thingmodel.Location)_value;
 		}
 		
-		public void setValue(Location value) {
+		public void setValue(org.thingmodel.Location value) {
 			_value = value;
 		}
 	}
@@ -144,15 +144,15 @@ public abstract class Property {
 			super(key, null);
 		}
 		
-		public Date(java.lang.String key, Date value) {
+		public Date(java.lang.String key, java.util.Date value) {
 			super(key, value);
 		}
 		
-		public Date getValue() {
-			return (Date)_value;
+		public java.util.Date getValue() {
+			return (java.util.Date)_value;
 		}
 		
-		public void setValue(Date value) {
+		public void setValue(java.util.Date value) {
 			_value = value;
 		}
 	}
