@@ -11,7 +11,7 @@ namespace ThingModel.Proto
 {
     public class ToProtobuf
     {
-        // String declarations dictionary, in the sender side
+        // String declarations dictionary, for the sender side
         protected readonly IDictionary<string, int> StringDeclarations = new Dictionary<string, int>();
 
         // Current transaction object
@@ -31,8 +31,8 @@ namespace ThingModel.Proto
                 {typeof (ThingModel.Property.DateTime), PropertyType.Type.DATETIME},
             };
 
-        // When a string is in this collection, it should be sended
-        // as an int key with the StringToKey method
+        // When a string is in this collection, it should be sent
+        // as StringDeclaration for the next transaction
         private readonly HashSet<string> _stringToDeclare = new HashSet<string>();
 
         private readonly Dictionary<int, Thing> _thingsState = new Dictionary<int, Thing>();
@@ -73,7 +73,7 @@ namespace ThingModel.Proto
 
             foreach (var thing in publish)
             {
-                Convert(thing);
+                ConvertThing(thing);
             }
 
             ConvertDeleteList(delete);
@@ -92,7 +92,7 @@ namespace ThingModel.Proto
             return _memoryInput.ToArray();
         }
 
-        protected Thing Convert(ThingModel.Thing thing)
+        protected void ConvertThing(ThingModel.Thing thing)
         {
             var change = false;
 
@@ -199,8 +199,6 @@ namespace ThingModel.Proto
                 Transaction.things_publish_list.Add(publication);
                 _thingsState[publication.string_id] = publication;
             }
-
-            return publication;
         }
 
         protected void ConvertDeleteList(IEnumerable<ThingModel.Thing> publish)
