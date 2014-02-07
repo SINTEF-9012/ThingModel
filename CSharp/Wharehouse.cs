@@ -1,16 +1,18 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 
 namespace ThingModel
 {
     public class Wharehouse
     {
-        private readonly ConcurrentDictionary<string, ThingType> _thingTypes = new ConcurrentDictionary<string, ThingType>();
+        private readonly Dictionary<string, ThingType> _thingTypes = new Dictionary<string, ThingType>();
 
-        private readonly ConcurrentDictionary<string, Thing> _things = new ConcurrentDictionary<string, Thing>();
+        private readonly Dictionary<string, Thing> _things = new Dictionary<string, Thing>();
 
         private readonly HashSet<IWharehouseObserver> _observers = new HashSet<IWharehouseObserver>();
+
+		private readonly Object _lockDictionaryThingTypes = new object();
+		private readonly Object _lockDictionaryThings = new object();
  
         public void RegisterType(ThingType type, bool force = true)
         {
@@ -19,9 +21,21 @@ namespace ThingModel
                 throw new Exception("The thing type information is missing.");
             }
 
-            if (force || !_thingTypes.ContainsKey(type.Name))
+	        var register = force;
+
+	        if (!register)
+	        {
+		        lock (_lockDictionaryThingTypes)
+		        {
+			        register = !_thingTypes.ContainsKey(type.Name);
+		        }
+	        }
+            if (register)
             {
-                _thingTypes[type.Name] = type;
+	            lock (_lockDictionaryThingTypes)
+	            {
+	                _thingTypes[type.Name] = type;
+	            }
 
                 NotifyThingTypeDefine(type);
             }
@@ -35,8 +49,12 @@ namespace ThingModel
                 throw new Exception("Null are not allowed in the wharehouse.");
             }
 
-           var creation = !_things.ContainsKey(thing.ID);
-            _things[thing.ID] = thing;
+	        bool creation;
+	        lock (_lockDictionaryThings)
+	        {
+				creation = !_things.ContainsKey(thing.ID);
+	            _things[thing.ID] = thing;
+	        }
 
             if (alsoRegisterTypes && thing.Type != null)
             {
@@ -100,19 +118,35 @@ namespace ThingModel
                 return;
             }
 
+	        var thingsToDisconnect = new List<Thing>();
+
             // Remove all the connections
-            foreach (var t in _things)
-            {
-                if (t.Value.IsConnectedTo(thing))
-                {
-                    t.Value.Disconnect(thing);
-                    NotifyThingUpdate(t.Value);
-                }
-            }
+	        lock (_lockDictionaryThings)
+	        {
+				foreach (var t in _things)
+				{
+					if (t.Value.IsConnectedTo(thing))
+					{
+						thingsToDisconnect.Add(t.Value);
+					}
+				}
+	        }
+
+	        foreach (var t in thingsToDisconnect)
+	        {
+				t.Disconnect(thing);
+				NotifyThingUpdate(t);
+	        }
 
             // Remove the thing
-            Thing uselessThing;
-            if (_things.TryRemove(thing.ID, out uselessThing))
+	        bool removed;
+
+	        lock (_lockDictionaryThings)
+	        {
+		        removed = _things.Remove(thing.ID);
+	        }
+
+            if (removed)
             {
                 NotifyThingDeleted(thing);
             }
@@ -163,17 +197,32 @@ namespace ThingModel
         public Thing GetThing(string id)
         {
             Thing value;
-            _things.TryGetValue(id, out value);
+	        lock (_lockDictionaryThings)
+	        {
+	            _things.TryGetValue(id, out value);
+	        }
             return value;
         }
 
         public ThingType GetThingType(string name)
         {
             ThingType value;
-            _thingTypes.TryGetValue(name, out value);
+	        lock (_lockDictionaryThingTypes)
+	        {
+	            _thingTypes.TryGetValue(name, out value);
+	        }
             return value;
         }
 
-        public IList<Thing> Things { get { return new List<Thing>(_things.Values); } }
+	    public IList<Thing> Things
+	    {
+		    get
+		    {
+			    lock (_lockDictionaryThings)
+			    {
+				    return new List<Thing>(_things.Values);
+			    }
+		    }
+	    }
     }
 }
