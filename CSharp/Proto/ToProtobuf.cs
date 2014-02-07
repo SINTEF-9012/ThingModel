@@ -111,6 +111,8 @@ namespace ThingModel.Proto
                 change = true;
             }
 
+	        IList<ThingModel.Thing> connectedThingCache = null;
+
             if ((previousThing == null && thing.ConnectedThingsCount > 0)
                 || (previousThing != null && previousThing.connections.Count != thing.ConnectedThingsCount))
             {
@@ -118,7 +120,8 @@ namespace ThingModel.Proto
             }
             else
             {
-                foreach (var connectedThing in thing.ConnectedThings)
+	            connectedThingCache = thing.ConnectedThings;
+                foreach (var connectedThing in connectedThingCache)
                 {
                     var connectionKey = StringToKey(connectedThing.ID);
 
@@ -134,7 +137,12 @@ namespace ThingModel.Proto
             if (publication.connections_change)
             {
                 change = true;
-                foreach (var connectedThing in thing.ConnectedThings)
+	            if (connectedThingCache == null)
+	            {
+		            connectedThingCache = thing.ConnectedThings;
+	            }
+
+                foreach (var connectedThing in connectedThingCache)
                 {
                     var connectionKey = StringToKey(connectedThing.ID);
                     publication.connections.Add(connectionKey);

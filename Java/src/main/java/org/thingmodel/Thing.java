@@ -105,6 +105,10 @@ public class Thing {
 		return new ArrayList<>(Connections.values());
 	}
 	
+	public int getConnectedThingsCount() {
+		return Connections.size();
+	}
+	
 	public List<Property> getProperties() {
 		return new ArrayList<>(Properties.values());
 	}
