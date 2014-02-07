@@ -146,6 +146,16 @@ namespace ThingModel.Specs
             Assert.That(_wharehouseChangeObserver.DeletedThing, Is.False);
         }
 
+	    [Test]
+	    public void DeleteAndCreateAgain()
+	    {
+		    _wharehouse.RegisterThing(_thing);
+			_wharehouse.RemoveThing(_thing);
+			_wharehouseChangeObserver.Reset();
+			_wharehouse.RegisterThing(_thing);
+            Assert.That(_wharehouseChangeObserver.NewThing, Is.True);
+	    }
+
         [Test]
         public void RecursiveRegistration()
         {

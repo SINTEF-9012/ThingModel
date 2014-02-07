@@ -75,6 +75,7 @@ namespace ThingModel.WebSockets
             {
                 var senderName = _fromProtobuf.Convert(args.RawData);
                 Console.WriteLine(SenderID + " | Binary message from : " + senderName);
+				_toProtobuf.ApplyThingSuppressions(_thingModelObserver.Deletions);
                 _thingModelObserver.Reset();
             }
         }

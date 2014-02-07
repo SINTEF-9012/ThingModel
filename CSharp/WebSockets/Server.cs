@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using ThingModel.Proto;
 using WebSocketSharp;
 using WebSocketSharp.Server;
@@ -43,9 +44,8 @@ namespace ThingModel.WebSockets
                     var senderID = FromProtobuf.Convert(e.RawData, true);
                     Console.WriteLine("Server | Message from : " + senderID);
                     
-                    var analyzedTransaction = ProtoModelObserver.GetTransaction(ToProtobuf, senderID);
-                    
-                    
+//                    var analyzedTransaction = ProtoModelObserver.GetTransaction(ToProtobuf, senderID);
+                    ToProtobuf.ApplyThingSuppressions(ProtoModelObserver.Deletions);
 
                     // Broadcast to other clients
                     foreach (var session in Sessions.Sessions)
@@ -55,6 +55,11 @@ namespace ThingModel.WebSockets
                             var s = session as ServerService;
                             if (s != null)
                             {
+								var analyzedTransaction = s.ToProtobuf.Convert(
+									new List<ThingModel.Thing>(ProtoModelObserver.Updates),
+									new List<ThingModel.Thing>(ProtoModelObserver.Deletions),
+									new List<ThingModel.ThingType>(ProtoModelObserver.Definitions),
+									senderID);
                                 s.Send(analyzedTransaction);
                             }
                         }

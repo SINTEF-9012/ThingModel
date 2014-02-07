@@ -1,6 +1,7 @@
 ﻿#region
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using ProtoBuf;
@@ -71,12 +72,13 @@ namespace ThingModel.Proto
 
             Transaction.string_sender_id = StringToKey(senderID);
 
+            ConvertDeleteList(delete);
+
             foreach (var thing in publish)
             {
                 ConvertThing(thing);
             }
 
-            ConvertDeleteList(delete);
             ConvertDeclarationList(declarations);
 
             return Transaction;
@@ -111,7 +113,7 @@ namespace ThingModel.Proto
                 change = true;
             }
 
-	        IList<ThingModel.Thing> connectedThingCache = null;
+	        IList<ThingModel.Thing> connectedThingsCache = null;
 
             if ((previousThing == null && thing.ConnectedThingsCount > 0)
                 || (previousThing != null && previousThing.connections.Count != thing.ConnectedThingsCount))
@@ -120,8 +122,8 @@ namespace ThingModel.Proto
             }
             else
             {
-	            connectedThingCache = thing.ConnectedThings;
-                foreach (var connectedThing in connectedThingCache)
+	            connectedThingsCache = thing.ConnectedThings;
+                foreach (var connectedThing in connectedThingsCache)
                 {
                     var connectionKey = StringToKey(connectedThing.ID);
 
@@ -137,12 +139,12 @@ namespace ThingModel.Proto
             if (publication.connections_change)
             {
                 change = true;
-	            if (connectedThingCache == null)
+	            if (connectedThingsCache == null)
 	            {
-		            connectedThingCache = thing.ConnectedThings;
+		            connectedThingsCache = thing.ConnectedThings;
 	            }
 
-                foreach (var connectedThing in connectedThingCache)
+                foreach (var connectedThing in connectedThingsCache)
                 {
                     var connectionKey = StringToKey(connectedThing.ID);
                     publication.connections.Add(connectionKey);
@@ -215,7 +217,7 @@ namespace ThingModel.Proto
             {
                 var key = StringToKey(thing.ID);
                 Transaction.things_remove_list.Add(key);
-                _thingsState.Remove(key);
+				ManageThingSuppression(key);
             }
         }
 
@@ -319,5 +321,36 @@ namespace ThingModel.Proto
             proto.type = Property.Type.DATETIME;
             proto.datetime_value = property.Value.Ticks;
         }
+
+	    protected void ManageThingSuppression(int thingId)
+	    {
+		    _thingsState.Remove(thingId);
+
+		    var toRemove = new List<Tuple<int, int>>();
+		    foreach (var tuple in _propertiesState.Keys)
+		    {
+			    if (tuple.Item1 == thingId)
+			    {
+				    toRemove.Add(tuple);
+			    }
+		    }
+
+		    foreach (var tuple in toRemove)
+		    {
+			    _propertiesState.Remove(tuple);
+		    }
+	    }
+
+	    public void ApplyThingSuppressions(IEnumerable<ThingModel.Thing> things)
+	    {
+		    foreach (var thing in things)
+		    {
+				int key;
+				if (StringDeclarations.TryGetValue(thing.ID, out key))
+				{
+					ManageThingSuppression(key);
+				}
+		    }
+	    }
     }
 }
