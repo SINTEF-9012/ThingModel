@@ -31,7 +31,7 @@ namespace ThingModel.WebSockets
 
             protected override void OnOpen()
             {
-                var transaction = ToProtobuf.Convert(Wharehouse.Things, new Thing[0], new ThingType[0], ServerSenderID);
+                var transaction = ToProtobuf.Convert(Wharehouse.Things, new Thing[0], Wharehouse.ThingTypes, ServerSenderID);
                 Send(transaction);
             }
 

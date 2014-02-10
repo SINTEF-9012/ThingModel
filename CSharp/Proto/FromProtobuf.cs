@@ -143,7 +143,7 @@ namespace ThingModel.Proto
 				type == null && modelThing.Type != null ||
 				(modelThing.Type != null && type != null && modelThing.Type.Name != type.Name)))
             {
-                modelThing = new ThingModel.Thing(KeyToString(thing.string_id), type);
+                modelThing = new ThingModel.Thing(id, type);
             }
 
             foreach (var property in thing.properties)

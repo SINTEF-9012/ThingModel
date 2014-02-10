@@ -262,7 +262,10 @@ namespace ThingModel.Specs
                     creationB.Start();
                     deletions.Start();
 
-                    Assert.That(WaitHandle.WaitAll(new WaitHandle[] {a, b, c}, 5000), Is.True);
+					Assert.That(a.WaitOne(5000), Is.True);
+					Assert.That(b.WaitOne(5000), Is.True);
+					Assert.That(c.WaitOne(5000), Is.True);
+//                    Assert.That(WaitHandle.WaitAll(new WaitHandle[] {a, b, c}, 5000), Is.True);
                 });
 
         }

@@ -117,16 +117,34 @@ namespace ThingModel.Specs
         }
 
         [Test]
-        public void TestReconnection()
+        public void TestServerReconnection()
         {
             Assert.That(_clientA.IsConnected(), Is.True);
             _server.Close();
             Assert.That(_clientA.IsConnected(), Is.False);
             _server = new Server(Path);
-
-            Thread.Sleep(2000);
+	
+			Thread.Sleep(2500);
             Assert.That(_clientA.IsConnected(), Is.True);
         }
+
+	    [Test]
+	    public void TestClientReconnection()
+	    {
+			_clientB.Close();
+
+			_wharehouseA.RegisterThing(new Thing("groaw", new ThingType("duck")), false, true);
+			_clientA.Send();
+
+			_clientB.Connect();
+
+
+            Assert.That(_wharehouseWaitB.WaitNew(5000), Is.True);
+	
+			var thing = _wharehouseB.GetThing("groaw");
+            Assert.That(thing, Is.Not.Null);
+            Assert.That(thing.Type, Is.Not.Null);
+	    }
 
         [Test]
         public void TestNew()

@@ -225,5 +225,16 @@ namespace ThingModel
 			    }
 		    }
 	    }
+
+	    public IList<ThingType> ThingTypes
+	    {
+		    get
+		    {
+			    lock (_lockDictionaryThingTypes)
+			    {
+				    return new List<ThingType>(_thingTypes.Values);
+			    }
+			}
+	    } 
     }
 }
