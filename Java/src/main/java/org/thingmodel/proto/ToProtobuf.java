@@ -136,7 +136,7 @@ public class ToProtobuf {
 		
 		Thing.Builder previousThing = _thingsState.get(thingId);
 		
-		if (previousThing == null) {
+		if (previousThing == null || previousThing.getStringTypeName() != publication.getStringTypeName()) {
 			change = true;
 		}
 		

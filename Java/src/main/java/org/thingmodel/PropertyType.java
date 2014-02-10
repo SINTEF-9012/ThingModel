@@ -13,18 +13,18 @@ public class PropertyType {
 
 	public boolean Required;
 	
-	private Class<Property> _type;
+	private Class<? extends Property> _type;
 	
-	public Class<Property> getType() {
+	public Class<? extends Property> getType() {
 		return _type;
 	}
 
 	
-	public PropertyType(String key, Class<Property> type) {
+	public PropertyType(String key, Class<? extends Property> type) {
 		this(key,type,true);
 	}
 	
-	public PropertyType(String key, Class<Property> type, boolean required) {
+	public PropertyType(String key, Class<? extends Property> type, boolean required) {
 		if (key == null || key.isEmpty()) {
 			throw new RuntimeException("The PropertyType key should not be null or empty");
 		}
