@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using NUnit.Framework;
 using ThingModel.WebSockets;
 
@@ -44,22 +45,30 @@ namespace ThingModel.Specs
 
             public bool WaitNew(int millisecondsTimeout = 2500)
             {
-                return _newEvent.WaitOne(millisecondsTimeout);
+	            if (!_newEvent.WaitOne(millisecondsTimeout)) return false;
+	            Thread.Sleep(5);
+	            return true;
             }
 
             public bool WaitDeleted(int millisecondsTimeout = 2500)
             {
-                return _deleteEvent.WaitOne(millisecondsTimeout);
+	            if (!_deleteEvent.WaitOne(millisecondsTimeout)) return false;
+	            Thread.Sleep(5);
+	            return true;
             }
 
             public bool WaitUpdated(int millisecondsTimeout = 2500)
             {
-                return _updatedEvent.WaitOne(millisecondsTimeout);
+	            if (!_updatedEvent.WaitOne(millisecondsTimeout)) return false;
+	            Thread.Sleep(5);
+	            return true;
             }
 
             public bool WaitDefine(int millisecondsTimeout = 2500)
             {
-                return _defineEvent.WaitOne(millisecondsTimeout);
+	            if (!_defineEvent.WaitOne(millisecondsTimeout)) return false;
+	            Thread.Sleep(5);
+	            return true;
             }
            
         }
@@ -175,6 +184,8 @@ namespace ThingModel.Specs
 
             var lapinB = _wharehouseB.GetThing("lapin");
             lapinB.SetProperty(new Property.String("name", "groaw"));
+            _wharehouseB.NotifyThingUpdate(lapinB);
+			Console.WriteLine(" ------ send ------ ");
             _clientB.Send();
 
             Assert.That(_wharehouseWaitA.WaitUpdated(), Is.True);
@@ -216,6 +227,28 @@ namespace ThingModel.Specs
 
             Assert.That(_wharehouseB.GetThing("lapin").Type.Name, Is.EqualTo(type.Name));
         }
+
+	    [Test]
+	    public void TestThingTypeChange()
+	    {
+		    var type = new ThingType("rabbit");
+		    var thing = new Thing("lapin", type);
+			thing.SetProperty(new Property.String("name", "Roger"));
+			_wharehouseA.RegisterThing(thing,true,true);
+			_clientA.Send();
+
+            Assert.That(_wharehouseWaitB.WaitDefine(), Is.True);
+
+			thing = new Thing("lapin");
+			Assert.That(thing.GetProperty<Property.String>("name"), Is.Null);
+		    _wharehouseA.RegisterThing(thing);
+			_clientA.Send();
+
+            Assert.That(_wharehouseWaitB.WaitUpdated(), Is.True);
+
+			Assert.That(thing.GetProperty<Property.String>("name"), Is.Null);
+			Assert.That(_wharehouseB.GetThing("lapin").GetProperty<Property.String>("name"), Is.Null);
+	    }
 
         [Test]
         public void TestNoChanges()
