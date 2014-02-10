@@ -7,7 +7,7 @@ namespace ThingModel.Proto
 {
     public class FromProtobuf
     {
-        private readonly Dictionary<PropertyType.Type, Type> _prototypesBinding = new Dictionary
+        private static readonly Dictionary<PropertyType.Type, Type> PrototypesBinding = new Dictionary
             <PropertyType.Type, Type>
             {
                 {PropertyType.Type.LOCATION, typeof (ThingModel.Property.Location)},
@@ -82,6 +82,8 @@ namespace ThingModel.Proto
                     }
                     
                 }
+
+                Wharehouse.RegisterThing(tuple.Item1, false);    
             }
 
             var senderId = KeyToString(transaction.string_sender_id);
@@ -94,20 +96,20 @@ namespace ThingModel.Proto
             StringDeclarations[declaration.key] = declaration.value;
         }
 
-        public void ConvertDelete(int thingKey)
+        protected void ConvertDelete(int thingKey)
         {
             var id = KeyToString(thingKey);
             Wharehouse.RemoveThing(Wharehouse.GetThing(id));
         }
 
-        public void ConvertThingTypeDeclaration(ThingType thingType)
+        protected void ConvertThingTypeDeclaration(ThingType thingType)
         {
             var modelType = new ThingModel.ThingType(KeyToString(thingType.string_name));
             modelType.Description = KeyToString(thingType.string_description);
 
             foreach (var propertyType in thingType.properties)
             {
-                var type = _prototypesBinding[propertyType.type];
+                var type = PrototypesBinding[propertyType.type];
                 var modelProperty = new ThingModel.PropertyType(KeyToString(propertyType.string_key),
                                                         type);
                 modelProperty.Description = KeyToString(propertyType.string_description);
@@ -119,7 +121,7 @@ namespace ThingModel.Proto
             Wharehouse.RegisterType(modelType);
         }
 
-        public ThingModel.Thing ConvertThingPublication(Thing thing, bool check)
+        protected ThingModel.Thing ConvertThingPublication(Thing thing, bool check)
         {
             ThingModel.ThingType type = null;
             if (thing.string_type_name != 0)
@@ -136,7 +138,10 @@ namespace ThingModel.Proto
             
             var modelThing = Wharehouse.GetThing(id);
                
-            if (modelThing == null || modelThing.Type != type)
+            if (modelThing == null || (
+				modelThing.Type == null && type != null ||
+				type == null && modelThing.Type != null ||
+				(modelThing.Type != null && type != null && modelThing.Type.Name != type.Name)))
             {
                 modelThing = new ThingModel.Thing(KeyToString(thing.string_id), type);
             }
@@ -217,7 +222,7 @@ namespace ThingModel.Proto
             {
                 Console.WriteLine("Object «" + id + "» not valid, ignored");
             }
-            else
+            else if (!thing.connections_change)
             {
                 Wharehouse.RegisterThing(modelThing, false);    
             }

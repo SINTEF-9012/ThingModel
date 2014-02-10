@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using ProtoBuf;
 
 #endregion
@@ -107,7 +108,7 @@ namespace ThingModel.Proto
             Thing previousThing;
             _thingsState.TryGetValue(publication.string_id, out previousThing);
 
-            if (previousThing == null)
+            if (previousThing == null || previousThing.string_type_name != publication.string_type_name)
             {
                 change = true;
             }
