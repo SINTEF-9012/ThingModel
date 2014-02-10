@@ -43,7 +43,7 @@ public abstract class Property {
 				(_value != null && _value.equals(other._value)));
 	}
 	
-	public class Location extends Property {
+	public static class Location extends Property {
 		
 		public Location(java.lang.String key) {
 			super(key, null);
@@ -62,7 +62,7 @@ public abstract class Property {
 		}
 	}
 
-	public class String extends Property {
+	public static class String extends Property {
 		
 		public String(java.lang.String key) {
 			super(key, null);
@@ -81,7 +81,7 @@ public abstract class Property {
 		}
 	}
 	
-	public class Double extends Property {
+	public static class Double extends Property {
 		
 		public Double(java.lang.String key) {
 			super(key, null);
@@ -100,7 +100,7 @@ public abstract class Property {
 		}
 	}
 
-	public class Integer extends Property {
+	public static class Integer extends Property {
 		
 		public Integer(java.lang.String key) {
 			super(key, null);
@@ -119,7 +119,7 @@ public abstract class Property {
 		}
 	}
 
-	public class Boolean extends Property {
+	public static class Boolean extends Property {
 		
 		public Boolean(java.lang.String key) {
 			super(key, null);
@@ -138,7 +138,7 @@ public abstract class Property {
 		}
 	}
 
-	public class Date extends Property {
+	public static class Date extends Property {
 		
 		public Date(java.lang.String key) {
 			super(key, null);

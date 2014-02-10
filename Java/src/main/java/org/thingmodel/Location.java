@@ -85,7 +85,7 @@ public abstract class Location {
 	 *	Simple location value.
 	 *	Often used in videogames.
 	 */
-	public class Point extends Location {
+	public static class Point extends Location {
 
 		public Point() {
 			this(0.0,0.0,null);
@@ -104,7 +104,7 @@ public abstract class Location {
 	 *	Latitude longitude representation, often used for WGS 84 GPS localizations.
 	 *	And if the System property is null, it's considered by default as a WGS 84 LatLng system.
 	 */
-	public class LatLng extends Location {
+	public static class LatLng extends Location {
 		public LatLng() {
 			super(0.0,0.0,null);
 		}
@@ -146,7 +146,7 @@ public abstract class Location {
     /**
      * For location in space.
      */
-	public class Equatorial extends Location {
+	public static class Equatorial extends Location {
 		public Equatorial() {
 			super(0.0,0.0,0.0);
 		}
