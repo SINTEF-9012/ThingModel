@@ -189,11 +189,19 @@ namespace ThingModel.Proto
                         break;
 
                     case Property.Type.STRING:
-                        string value = property.string_value.value;
-                        if (String.IsNullOrEmpty(value) && property.string_value.string_value != 0)
-                        {
-                            value = KeyToString(property.string_value.string_value);
-                        }
+		                string value;
+		                if (property.string_value != null)
+		                {
+			                value = property.string_value.value;
+			                if (String.IsNullOrEmpty(value) && property.string_value.string_value != 0)
+			                {
+				                value = KeyToString(property.string_value.string_value);
+			                }
+		                }
+		                else
+		                {
+			                value = "error";
+		                }
                         modelProperty = new ThingModel.Property.String(key, value);
                         break;
 
