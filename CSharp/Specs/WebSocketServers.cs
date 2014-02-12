@@ -283,6 +283,8 @@ namespace ThingModel.Specs
             _clientA.Send();
 
             Assert.That(_wharehouseWaitB.WaitUpdated(500), Is.False);
+            _clientA.Send();
+            Assert.That(_wharehouseWaitB.WaitUpdated(500), Is.False);
 
             pc.SetProperty(new Property.String("name", "Interstella2"));
             _wharehouseA.NotifyThingUpdate(pc);

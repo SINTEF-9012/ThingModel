@@ -12,8 +12,8 @@ namespace ThingModel.WebSockets
         private Wharehouse _wharehouse;
         private ToProtobuf _toProtobuf;
         private FromProtobuf _fromProtobuf;
-        private bool _close = true;
-        private int _delayReconnection = 1;
+        private bool _closed = true;
+        private int _reconnectionDelay = 1;
         
         private ProtoModelObserver _thingModelObserver;
 
@@ -39,16 +39,19 @@ namespace ThingModel.WebSockets
 
         public void Send()
         {
-            var transaction = _thingModelObserver.GetTransaction(_toProtobuf, SenderID);
-            _ws.Send(_toProtobuf.Convert(transaction));
-            _thingModelObserver.Reset();
+	        if (_thingModelObserver.SomethingChanged())
+	        {
+				var transaction = _thingModelObserver.GetTransaction(_toProtobuf, SenderID);
+				_ws.Send(_toProtobuf.Convert(transaction));
+				_thingModelObserver.Reset();
+	        }
         }
 
         private void WsOnClose(object sender, CloseEventArgs closeEventArgs)
         {
-            if (!_close)
+            if (!_closed)
             {
-                Console.WriteLine("Connection lost, try to connect again in "+_delayReconnection+" seconds");
+                Console.WriteLine("Connection lost, try to connect again in "+_reconnectionDelay+" seconds");
                 // ReSharper disable ObjectCreationAsStatement
                 new Timer(state =>
                 {
@@ -58,12 +61,12 @@ namespace ThingModel.WebSockets
                     }
 
                     // Increase the connection delay until 16 secondes
-                    if (_delayReconnection < 16)
+                    if (_reconnectionDelay < 16)
                     {
-                        _delayReconnection *= 2;   
+                        _reconnectionDelay *= 2;   
                     }
                 },
-                null, _delayReconnection*1, Timeout.Infinite);
+                null, _reconnectionDelay*1, Timeout.Infinite);
                 // ReSharper restore ObjectCreationAsStatement
             }
             
@@ -83,15 +86,15 @@ namespace ThingModel.WebSockets
 
         public void Close()
         {
-            _close = true;
+            _closed = true;
             _ws.Close();
         }
 
         public void Connect()
         {
-            if (_close)
+            if (_closed)
             {
-                _close = false;
+                _closed = false;
                 _ws.Connect();
             }
         }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace ThingModel.Proto
 {
@@ -50,13 +51,28 @@ namespace ThingModel.Proto
 	        }
         }
 
+	    public bool SomethingChanged()
+	    {
+		    lock (_lockHashSet)
+		    {
+				return Updates.Count != 0 || Deletions.Count != 0 || Definitions.Count != 0;
+		    }
+	    }
+
         public Transaction GetTransaction(ToProtobuf toProtobuf, string senderID)
         {
+	        List<ThingModel.Thing> copyUpdates;
+	        List<ThingModel.Thing> copyDeletions;
+	        List<ThingModel.ThingType> copyDefinitions;
+
 	        lock (_lockHashSet)
 	        {
-		        return toProtobuf.Convert(new List<ThingModel.Thing>(Updates), new List<ThingModel.Thing>(Deletions),
-			        new List<ThingModel.ThingType>(Definitions), senderID);
+				copyUpdates = new List<ThingModel.Thing>(Updates);
+				copyDeletions = new List<ThingModel.Thing>(Deletions);
+				copyDefinitions = new List<ThingModel.ThingType>(Definitions);
 	        }
+
+	        return toProtobuf.Convert(copyUpdates, copyDeletions, copyDefinitions, senderID);
         }
     }
 }
