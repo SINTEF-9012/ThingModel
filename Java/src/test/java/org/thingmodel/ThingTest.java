@@ -136,7 +136,121 @@ public class ThingTest {
     }
 
     @Test
-    public void testCompare() throws Exception {
+    public void testCompareWithWrongType() throws Exception {
+        Thing newThing = new Thing(_thing.getId()); // default type
 
+        newThing.setProperty(new Property.String("name", "Alphonse"));
+        newThing.Connect(_otherThing);
+
+        Assert.assertFalse(newThing.Compare(_thing));
+        Assert.assertFalse(_thing.Compare(newThing));
+
+    }
+
+    @Test
+    public void testCompareNotConnected() throws Exception {
+        Thing newThing = new Thing(_thing.getId(), _type);
+        newThing.setProperty(new Property.String("name", "Alphonse"));
+
+        Assert.assertFalse(newThing.Compare(_thing));
+        Assert.assertFalse(_thing.Compare(newThing));
+    }
+
+    @Test
+    public void testCompareWithDifferentID() throws Exception {
+        Thing newThing = new Thing("banana", _type);
+        newThing.setProperty(new Property.String("name", "Alphonse"));
+        newThing.Connect(_otherThing);
+
+        Assert.assertTrue(newThing.Compare(_thing, false, false));
+        Assert.assertTrue(_thing.Compare(newThing, false, false));
+
+
+        Assert.assertFalse(_thing.Compare(newThing, true, false));
+    }
+
+    @Test
+    public void testCompareProperties() throws Exception {
+        Thing newThing = new Thing(_thing.getId(), _type);
+        newThing.setProperty(new Property.String("name", "Alphonse"));
+        newThing.setProperty(new Property.String("surname", "Lapinou"));
+        newThing.Connect(_otherThing);
+
+        Assert.assertFalse(_thing.Compare(newThing));
+        Assert.assertFalse(newThing.Compare(_thing));
+
+        _thing.setProperty(new Property.String("surname", "Lapinou"));
+        Assert.assertTrue(_thing.Compare(newThing));
+        Assert.assertTrue(newThing.Compare(_thing));
+
+        _thing.setProperty(new Property.String("surname", "Roger"));
+        Assert.assertFalse(_thing.Compare(newThing));
+        Assert.assertFalse(newThing.Compare(_thing));
+
+        _thing.setProperty(new Property.String("surname", "Lapinou"));
+        _thing.setProperty(new Property.String("color", "white"));
+        newThing.setProperty(new Property.String("meal", "nothing"));
+        Assert.assertFalse(_thing.Compare(newThing));
+        Assert.assertFalse(newThing.Compare(_thing));
+    }
+
+    @Test
+    public void testDeepComparison() throws Exception {
+        Thing aThingForTheRoad = new Thing("rabbit");
+
+        aThingForTheRoad.setProperty(new Property.Double("speed", 12.0));
+        _thing.Connect(aThingForTheRoad);
+
+        Thing newThing = new Thing(_thing.getId(), _type);
+        newThing.setProperty(new Property.String("name", "Alphonse"));
+        newThing.Connect(aThingForTheRoad);
+        newThing.Connect(_otherThing);
+
+        Assert.assertTrue(_thing.Compare(_thing, true, true));
+        Assert.assertTrue(_thing.Compare(newThing, true, true));
+        Assert.assertTrue(newThing.Compare(_thing, true, true));
+
+        newThing.Disconnect(_otherThing);
+        Thing newOtherThing = new Thing(_otherThing.getId());
+        newThing.Connect(newOtherThing);
+
+
+        Assert.assertTrue(_thing.Compare(newThing, true, true));
+        Assert.assertTrue(newThing.Compare(_thing, true, true));
+
+        newOtherThing.setProperty(new Property.String("name", "Alain"));
+
+        Assert.assertFalse(_thing.Compare(newThing, true, true));
+        Assert.assertFalse(newThing.Compare(_thing, true, true));
+    }
+
+    @Test
+    public void testInfiniteLoopComparison() throws Exception {
+        Thing newThing = new Thing(_thing.getId(), _type);
+        newThing.setProperty(new Property.String("name", "Alphonse"));
+        newThing.Connect(_otherThing);
+
+        // Magic
+        _otherThing.Connect(_thing);
+
+        Assert.assertTrue(_thing.Compare(newThing, true, true));
+        Assert.assertTrue(newThing.Compare(_thing, true, true));
+
+        Thing newOtherThing = new Thing(_otherThing.getId());
+        newThing.Connect(newOtherThing);
+
+        Assert.assertFalse(_thing.Compare(newThing, true, true));
+        Assert.assertFalse(newThing.Compare(_thing, true, true));
+
+        newOtherThing.Connect(_thing);
+
+        Assert.assertTrue(_thing.Compare(newThing, true, true));
+        Assert.assertTrue(newThing.Compare(_thing, true, true));
+    }
+
+    @Test
+    public void testCompareNull() throws Exception {
+
+        Assert.assertFalse(_thing.Compare(null));
     }
 }

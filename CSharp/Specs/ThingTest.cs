@@ -206,7 +206,7 @@ namespace ThingModel.Specs
         }
 
         [Test]
-        public void DeepCompairaison()
+        public void DeepCompairison()
         {
             var aThingForTheRoad = new Thing("rabbit");
             aThingForTheRoad.SetProperty(new Property.Double("speed", 12));
@@ -223,6 +223,11 @@ namespace ThingModel.Specs
 
             newThing.Disconnect(_otherThing);
             var newOtherThing = new Thing(_otherThing.ID);
+			newThing.Connect(newOtherThing);
+
+            Assert.That(_thing.Compare(newThing, true, true), Is.True);
+            Assert.That(newThing.Compare(_thing, true, true), Is.True);
+
             newOtherThing.SetProperty(new Property.String("name", "Alain"));
 
             Assert.That(_thing.Compare(newThing, true, true), Is.False);
