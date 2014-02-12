@@ -343,6 +343,8 @@ public class ToProtobuf {
 			// Use a string declaration next time
 			_stringToDeclare.add(value);
 		}
+
+        proto.setStringValue(st);
 		
 	}
 	
