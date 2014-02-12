@@ -64,13 +64,17 @@ public class Thing {
 	public void setProperty(Property property) {
 		Properties.put(property.getKey(), property);
 	}
-	
+
+    public Property getProperty(String key) {
+        return Properties.get(key);
+    }
+
 	@SuppressWarnings("unchecked") // I check but the compiler is rustic
 	public <T extends Property> T getProperty(String key, Class<T> type) {
 		Property value = Properties.get(key);
 		
 		// TypeErasure is definitely a great idea
-		if (type == null || type.equals(value.getClass())) {
+		if (type == null || value != null && type.equals(value.getClass())) {
 			return (T) value;
 		}
 	
@@ -82,6 +86,10 @@ public class Thing {
 	}
 	
 	public void Connect(Thing thing) {
+        if (thing == null) {
+            return;
+        }
+
 		if (thing == this || _id.equals(thing._id)) {
 			throw new RuntimeException("You can't connect a thing directly to itself");
 		}
@@ -90,7 +98,7 @@ public class Thing {
 	}
 
 	public boolean Disconnect(Thing thing) {
-		return Connections.remove(thing._id) != null;
+		return thing != null && Connections.remove(thing._id) != null;
 	}
 	
 	public void DisconnectAll() {
@@ -98,7 +106,7 @@ public class Thing {
 	}
 	
 	public boolean IsConnectedTo(Thing thing) {
-		return Connections.containsKey(thing._id);
+		return thing != null && Connections.containsKey(thing._id);
 	}
 	
 	public List<Thing> getConnectedThings() {
