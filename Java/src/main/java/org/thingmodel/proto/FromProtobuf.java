@@ -187,11 +187,19 @@ public class FromProtobuf {
 				break;
 			case STRING:
 				org.thingmodel.proto.ProtoProperty.Property.String sv = property.getStringValue();
-				String value = sv.getValue();
-				
-				if (value == null || value.length() == 0 && sv.getStringValue() != 0) {
-					value = keyToString(sv.getStringValue());
-				}
+
+                String value;
+
+                if (sv != null) {
+                    value = sv.getValue();
+
+                    if (value == null || value.length() == 0 && sv.getStringValue() != 0) {
+                        value = keyToString(sv.getStringValue());
+                    }
+                } else {
+                    value = "undefined";
+                }
+
 				
 				modelProperty = new Property.String(key, value);
 				break;
@@ -214,7 +222,7 @@ public class FromProtobuf {
 		}
 	
 		if (check && type != null && !type.Check(modelThing)) {
-			System.out.println("Object «"+id+"» not valid, ignored");
+			System.out.println("Object "+id+" not valid, ignored");
 		} else if (!thing.getConnectionsChange()) {
 			_wharehouse.RegisterThing(modelThing, false, false);
 		}

@@ -200,7 +200,7 @@ namespace ThingModel.Proto
 		                }
 		                else
 		                {
-			                value = "error";
+			                value = "undefined";
 		                }
                         modelProperty = new ThingModel.Property.String(key, value);
                         break;
