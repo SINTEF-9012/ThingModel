@@ -25,14 +25,6 @@ public abstract class Property {
 	
 	protected Object _value;
 	
-	public Object getValue() {
-		return _value;
-	}
-	
-	public void setValue(Object value) {
-		_value = value;
-	}
-	
 	public java.lang.String ValueToString() {
 		return _value != null ? _value.toString() : "";
 	}

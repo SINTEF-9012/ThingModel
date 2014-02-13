@@ -193,7 +193,7 @@ public class Thing {
 		
 		// And start the recursion for connected things
 		for (Thing connectedThing : Connections.values()) {
-			Thing otherThing = other.Connections.get(connectedThing);
+			Thing otherThing = other.Connections.get(connectedThing.getId());
 			
 			if (!connectedThing.RecursiveCompare(otherThing, alreadyVisitedThings)) {
 				return false;

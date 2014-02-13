@@ -12,8 +12,8 @@ public class Wharehouse {
 	private HashMap<String, Thing> _things = new HashMap<>();
 	private HashSet<IWharehouseObserver> _observers = new HashSet<>();
 	
-	private Object _lockThingTypes = new Object();
-	private Object _lockThings = new Object();
+	private final Object _lockThingTypes = new Object();
+	private final Object _lockThings = new Object();
 	
 	
 	public void RegisterType(ThingType type) {
@@ -124,6 +124,7 @@ public class Wharehouse {
 		synchronized (_lockThings) {
 			for(Thing t : _things.values()) {
 				if (t.IsConnectedTo(thing)) {
+                    thingsToDisconnect.add(t);
 				}
 			}
 		}

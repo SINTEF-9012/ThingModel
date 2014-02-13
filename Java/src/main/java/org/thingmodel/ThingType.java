@@ -47,14 +47,11 @@ public class ThingType {
      */
     public boolean Check(Thing thing) {
     	ThingType thingType = thing.getType();
+
     	
-    	if (thingType == this) {
-    		return true;
-    	}
-    	
-    	if (thingType != null && thingType._name.equals(_name)) {
+    	if (thingType == this || (thingType != null && thingType._name.equals(_name))) {
     		for (PropertyType propertyType : Properties.values()) {
-    			if (!propertyType.Check(thing.getProperty(propertyType.getKey(), Property.class))) {
+    			if (!propertyType.Check(thing.getProperty(propertyType.getKey(), propertyType.getType()))) {
     				return false;
     			}
 			}
