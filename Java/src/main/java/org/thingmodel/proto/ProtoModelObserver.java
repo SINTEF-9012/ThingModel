@@ -34,6 +34,7 @@ public class ProtoModelObserver implements IWharehouseObserver {
 	@Override
 	public void Deleted(Thing thing) {
 		synchronized (_lock) {
+            Updates.remove(thing);
 			Deletions.add(thing);
 		}
 	}

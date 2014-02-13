@@ -191,6 +191,22 @@ namespace ThingModel.Specs
             Assert.That(_wharehouseB.GetThing("lapin"), Is.Not.Null);
         }
 
+		[Test]
+		public void TestDeleteAndCreateInSameTransaction()
+		{
+			var lapin = new Thing("lapin");
+			_wharehouseA.RegisterThing(lapin);
+			_wharehouseA.RemoveThing(lapin);
+
+			_wharehouseA.RegisterThing(new Thing("ping"));
+			_clientA.Send();
+
+			_wharehouseWaitB.WaitNew();
+
+			Assert.That(_wharehouseB.GetThing("lapin"), Is.Null);
+
+		}
+
         [Test]
         public void TestUpdate()
         {

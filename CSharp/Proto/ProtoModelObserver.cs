@@ -31,6 +31,7 @@ namespace ThingModel.Proto
         {
 	        lock (_lockHashSet)
 	        {
+		        Updates.Remove(thing);
 		        Deletions.Add(thing);
 	        }
         }
