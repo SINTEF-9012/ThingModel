@@ -92,7 +92,7 @@ public class Client extends WebSocketClient {
 			
 			System.out.println(senderID+" | Binary message from : "+senderName);
 			
-			_toProtobuf.ApplyThingsSuppressions(_thingModelObserver.Deletions);
+			_toProtobuf.ApplyThingsSuppressions(_thingModelObserver.Deletions.values());
 			_thingModelObserver.Reset();
 			
 		} catch (InvalidProtocolBufferException e) {
