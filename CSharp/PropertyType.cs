@@ -60,6 +60,13 @@ namespace ThingModel
                 (property != null && property.GetType() == Type && Key.Equals(property.Key));
         }
 
-
+	    public PropertyType Clone()
+	    {
+			return new PropertyType(_key, _type, Required)
+			{
+				Name = Name,
+				Description = Description
+			};
+	    }
     }
 }

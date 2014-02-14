@@ -49,6 +49,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Builders\BuildANewThing.cs" />
+    <Compile Include="Builders\BuildANewThingType.cs" />
     <Compile Include="Proto\FromProtobuf.cs" />
     <Compile Include="Proto\ProtoModelObserver.cs" />
     <Compile Include="Proto\ToProtobuf.cs" />
@@ -62,6 +64,7 @@
     <Compile Include="Proto\Thing.cs" />
     <Compile Include="Proto\ThingType.cs" />
     <Compile Include="Proto\Transaction.cs" />
+    <Compile Include="Specs\BuildersTest.cs" />
     <Compile Include="Specs\PropertyTest.cs" />
     <Compile Include="Specs\ProtoConversions.cs" />
     <Compile Include="Specs\ThingTest.cs" />
