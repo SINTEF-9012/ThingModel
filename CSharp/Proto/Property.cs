@@ -11,7 +11,7 @@
 namespace ThingModel.Proto
 {
   [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"Property")]
-  public partial class Property : global::ProtoBuf.IExtensible
+  internal partial class Property : global::ProtoBuf.IExtensible
   {
     public Property() {}
     
@@ -78,7 +78,7 @@ namespace ThingModel.Proto
       set { _datetime_value = value; }
     }
   [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"Location")]
-  public partial class Location : global::ProtoBuf.IExtensible
+  internal partial class Location : global::ProtoBuf.IExtensible
   {
     public Location() {}
     
@@ -126,7 +126,7 @@ namespace ThingModel.Proto
   }
   
   [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"String")]
-  public partial class String : global::ProtoBuf.IExtensible
+  internal partial class String : global::ProtoBuf.IExtensible
   {
     public String() {}
     

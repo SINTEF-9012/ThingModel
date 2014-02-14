@@ -11,27 +11,27 @@ namespace ThingModel.WebSockets
         public const string ServerSenderID = "ThingModel C# Broadcaster";
         protected Wharehouse Wharehouse;
 
-        protected class ServerService : WebSocketService
+        private class ServerService : WebSocketService
         {
-            protected ToProtobuf ToProtobuf;
-            protected FromProtobuf FromProtobuf;
-            protected Wharehouse Wharehouse;
-            protected ProtoModelObserver ProtoModelObserver;
+            private readonly ToProtobuf _toProtobuf;
+            private readonly FromProtobuf _fromProtobuf;
+            private readonly Wharehouse _wharehouse;
+            private readonly ProtoModelObserver _protoModelObserver;
 
             public ServerService(Wharehouse wharehouse)
             {
-                Wharehouse = wharehouse;
+                _wharehouse = wharehouse;
 
-                ProtoModelObserver = new ProtoModelObserver();
-                Wharehouse.RegisterObserver(ProtoModelObserver);
+                _protoModelObserver = new ProtoModelObserver();
+                _wharehouse.RegisterObserver(_protoModelObserver);
 
-                ToProtobuf = new ToProtobuf();
-                FromProtobuf = new FromProtobuf(wharehouse);
+                _toProtobuf = new ToProtobuf();
+                _fromProtobuf = new FromProtobuf(wharehouse);
             }
 
             protected override void OnOpen()
             {
-                var transaction = ToProtobuf.Convert(Wharehouse.Things, new Thing[0], Wharehouse.ThingTypes, ServerSenderID);
+                var transaction = _toProtobuf.Convert(_wharehouse.Things, new Thing[0], _wharehouse.ThingTypes, ServerSenderID);
                 Send(transaction);
             }
 
@@ -39,13 +39,13 @@ namespace ThingModel.WebSockets
             { 
                 if (e.Type == Opcode.BINARY)
                 {
-                    ProtoModelObserver.Reset();
+                    _protoModelObserver.Reset();
 
-                    var senderID = FromProtobuf.Convert(e.RawData, true);
-                    Console.WriteLine("Server | Message from : " + senderID);
+                    var senderID = _fromProtobuf.Convert(e.RawData, true);
+                    Console.WriteLine("Server | Message from : " + senderID + " | "+e.RawData.Length + " bytes");
                     
 //                    var analyzedTransaction = ProtoModelObserver.GetTransaction(ToProtobuf, senderID);
-                    ToProtobuf.ApplyThingsSuppressions(ProtoModelObserver.Deletions);
+                    _toProtobuf.ApplyThingsSuppressions(_protoModelObserver.Deletions);
 
                     // Broadcast to other clients
                     foreach (var session in Sessions.Sessions)
@@ -55,10 +55,10 @@ namespace ThingModel.WebSockets
                             var s = session as ServerService;
                             if (s != null)
                             {
-								var analyzedTransaction = s.ToProtobuf.Convert(
-									new List<ThingModel.Thing>(ProtoModelObserver.Updates),
-									new List<ThingModel.Thing>(ProtoModelObserver.Deletions),
-									new List<ThingModel.ThingType>(ProtoModelObserver.Definitions),
+								var analyzedTransaction = s._toProtobuf.Convert(
+									new List<Thing>(_protoModelObserver.Updates),
+									new List<Thing>(_protoModelObserver.Deletions),
+									new List<ThingType>(_protoModelObserver.Definitions),
 									senderID);
                                 s.Send(analyzedTransaction);
                             }
@@ -68,14 +68,14 @@ namespace ThingModel.WebSockets
                 
             }
 
-            public void Send(Transaction transaction)
+            private void Send(Transaction transaction)
             {
-                var protoData = ToProtobuf.Convert(transaction);
+                var protoData = _toProtobuf.Convert(transaction);
                 Send(protoData);
             }
         }
 
-        private WebSocketServer _ws;
+        private readonly WebSocketServer _ws;
 
         public Server(string path)
         {

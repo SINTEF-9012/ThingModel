@@ -6,7 +6,7 @@ using ThingModel.Proto;
 namespace ThingModel.Specs
 {
     [TestFixture]
-    public class ProtoConversions
+    class ProtoConversions
     {
         private Wharehouse _wharehouse;
         private FromProtobuf _fromProtobuf;

@@ -14,7 +14,7 @@
 namespace ThingModel.Proto
 {
   [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"Transaction")]
-  public partial class Transaction : global::ProtoBuf.IExtensible
+  internal partial class Transaction : global::ProtoBuf.IExtensible
   {
     public Transaction() {}
     

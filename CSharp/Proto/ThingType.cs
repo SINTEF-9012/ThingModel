@@ -12,7 +12,7 @@
 namespace ThingModel.Proto
 {
   [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"ThingType")]
-  public partial class ThingType : global::ProtoBuf.IExtensible
+  internal partial class ThingType : global::ProtoBuf.IExtensible
   {
     public ThingType() {}
     

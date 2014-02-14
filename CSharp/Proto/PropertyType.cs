@@ -11,7 +11,7 @@
 namespace ThingModel.Proto
 {
   [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"PropertyType")]
-  public partial class PropertyType : global::ProtoBuf.IExtensible
+  internal partial class PropertyType : global::ProtoBuf.IExtensible
   {
     public PropertyType() {}
     

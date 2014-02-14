@@ -8,7 +8,7 @@ using NUnit.Framework;
 namespace ThingModel.Specs
 {
     [TestFixture]
-    public class ThingTypeTest
+    class ThingTypeTest
     {
         private ThingType _type;
         private PropertyType _propertyType;

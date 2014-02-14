@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace ThingModel.Proto
 {
-    public class ProtoModelObserver : IWharehouseObserver
+    internal class ProtoModelObserver : IWharehouseObserver
     {
 	    private readonly object _lockHashSet = new object();
         public readonly HashSet<ThingModel.Thing> Updates = new HashSet<ThingModel.Thing>();

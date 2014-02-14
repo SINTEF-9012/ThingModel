@@ -11,7 +11,7 @@
 namespace ThingModel.Proto
 {
   [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"StringDeclaration")]
-  public partial class StringDeclaration : global::ProtoBuf.IExtensible
+  internal partial class StringDeclaration : global::ProtoBuf.IExtensible
   {
     public StringDeclaration() {}
     

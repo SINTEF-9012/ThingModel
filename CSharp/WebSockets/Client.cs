@@ -8,14 +8,16 @@ namespace ThingModel.WebSockets
     public class Client
     {
         public string SenderID;
-        private WebSocket _ws;
-        private Wharehouse _wharehouse;
-        private ToProtobuf _toProtobuf;
-        private FromProtobuf _fromProtobuf;
+        private readonly WebSocket _ws;
+		
+		// ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable
+        private readonly Wharehouse _wharehouse;
+        private readonly ToProtobuf _toProtobuf;
+        private readonly FromProtobuf _fromProtobuf;
         private bool _closed = true;
         private int _reconnectionDelay = 1;
         
-        private ProtoModelObserver _thingModelObserver;
+        private readonly ProtoModelObserver _thingModelObserver;
 
         public Client(string senderID, string path, Wharehouse wharehouse)
         {

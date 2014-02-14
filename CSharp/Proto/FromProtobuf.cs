@@ -5,7 +5,7 @@ using ProtoBuf;
 
 namespace ThingModel.Proto
 {
-    public class FromProtobuf
+    internal class FromProtobuf
     {
         private static readonly Dictionary<PropertyType.Type, Type> PrototypesBinding = new Dictionary
             <PropertyType.Type, Type>

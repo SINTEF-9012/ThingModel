@@ -3,14 +3,13 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading;
 using ProtoBuf;
 
 #endregion
 
 namespace ThingModel.Proto
 {
-    public class ToProtobuf
+    internal class ToProtobuf
     {
         // String declarations dictionary, for the sender side
         protected readonly IDictionary<string, int> StringDeclarations = new Dictionary<string, int>();
