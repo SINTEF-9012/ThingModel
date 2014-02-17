@@ -11,16 +11,34 @@ namespace ThingModel.WebSockets
         public const string ServerSenderID = "ThingModel C# Broadcaster";
         protected Wharehouse Wharehouse;
 
+	    public delegate void TransactionEventHandler(object sender, TransactionEventArgs e);
+
+	    public event TransactionEventHandler Transaction;
+
+	    public class TransactionEventArgs : EventArgs
+	    {
+			public int Size { private set; get; }
+			public string SenderID { private set; get; }
+
+		    public TransactionEventArgs(string senderID, int size)
+		    {
+			    SenderID = senderID;
+			    Size = size;
+		    }
+	    }
+
         private class ServerService : WebSocketService
         {
             private readonly ToProtobuf _toProtobuf;
             private readonly FromProtobuf _fromProtobuf;
             private readonly Wharehouse _wharehouse;
             private readonly ProtoModelObserver _protoModelObserver;
+	        private readonly Server _server;
 
-            public ServerService(Wharehouse wharehouse)
+            public ServerService(Wharehouse wharehouse, Server server)
             {
                 _wharehouse = wharehouse;
+	            _server = server;
 
                 _protoModelObserver = new ProtoModelObserver();
                 _wharehouse.RegisterObserver(_protoModelObserver);
@@ -42,7 +60,12 @@ namespace ThingModel.WebSockets
                     _protoModelObserver.Reset();
 
                     var senderID = _fromProtobuf.Convert(e.RawData, true);
-                    Console.WriteLine("Server | Message from : " + senderID + " | "+e.RawData.Length + " bytes");
+
+	                if (_server.Transaction != null)
+	                {
+		                _server.Transaction(this,
+							new TransactionEventArgs(senderID, e.RawData.Length));
+	                }
                     
 //                    var analyzedTransaction = ProtoModelObserver.GetTransaction(ToProtobuf, senderID);
                     _toProtobuf.ApplyThingsSuppressions(_protoModelObserver.Deletions);
@@ -72,6 +95,12 @@ namespace ThingModel.WebSockets
             {
                 var protoData = _toProtobuf.Convert(transaction);
                 Send(protoData);
+
+	            if (_server.Transaction != null)
+	            {
+		            _server.Transaction(this,
+			            new TransactionEventArgs(ServerSenderID, protoData.Length));
+	            }
             }
         }
 
@@ -80,9 +109,16 @@ namespace ThingModel.WebSockets
         public Server(string path)
         {
             var house = new Wharehouse();
+
+			Transaction += (sender, args) => 
+				Console.WriteLine("Server | Message from : " + args.SenderID +
+				" | "+ args.Size + " bytes");
+
             _ws = new WebSocketServer(path);
-            _ws.AddWebSocketService("/", () => new ServerService(house));
+            _ws.AddWebSocketService("/", () => new ServerService(house, this));
             _ws.Start();
+
+
         }
 
         public void Close()
