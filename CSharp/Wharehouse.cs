@@ -235,6 +235,24 @@ namespace ThingModel
 				    return new List<ThingType>(_thingTypes.Values);
 			    }
 			}
-	    } 
+	    }
+
+	    private WharehouseEvents _eventsObserver;
+
+	    public WharehouseEvents Events
+	    {
+		    get
+		    {
+			    // Lazy loading
+			    if (_eventsObserver == null)
+			    {
+					_eventsObserver = new WharehouseEvents();
+					RegisterObserver(_eventsObserver);
+			    }
+
+			    return _eventsObserver;
+		    }
+	    }
+
     }
 }

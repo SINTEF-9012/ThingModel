@@ -77,6 +77,7 @@
     <Compile Include="Wharehouse.cs" />
     <Compile Include="WebSockets\Client.cs" />
     <Compile Include="WebSockets\Server.cs" />
+    <Compile Include="WharehouseEvents.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

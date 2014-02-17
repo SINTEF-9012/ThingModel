@@ -269,6 +269,35 @@ namespace ThingModel.Specs
                 });
 
         }
+
+	    [Test]
+	    public void EventsTest()
+	    {
+		    bool define = false;
+		    _wharehouse.Events.OnDefine += (sender, args) => define = true;
+
+			_wharehouse.RegisterType(_type);
+
+			Assert.That(define, Is.True);
+
+		    bool newThing = false;
+		    _wharehouse.Events.OnNew += (sender, args) => newThing = true;
+			_wharehouse.RegisterThing(_thing);
+			Assert.That(newThing, Is.True);
+		    
+			bool update = false;
+		    _wharehouse.Events.OnUpdate += (sender, args) => update = true;
+			_wharehouse.RegisterThing(_thing);
+			Assert.That(update, Is.True);
+			
+			bool delete = false;
+		    _wharehouse.Events.OnDelete += (sender, args) => delete = true;
+			_wharehouse.RemoveThing(_thing);
+		    newThing = false;
+			_wharehouse.RegisterThing(new Thing("canard"));
+			Assert.That(newThing, Is.True);
+			Assert.That(delete, Is.True);
+	    }
     }
 
 }
