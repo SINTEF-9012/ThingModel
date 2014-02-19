@@ -9,7 +9,6 @@ namespace ThingModel.WebSockets
     public class Server
     {
         public const string ServerSenderID = "ThingModel C# Broadcaster";
-        protected Wharehouse Wharehouse;
 
 	    public delegate void TransactionEventHandler(object sender, TransactionEventArgs e);
 
@@ -19,10 +18,12 @@ namespace ThingModel.WebSockets
 	    {
 			public int Size { private set; get; }
 			public string SenderID { private set; get; }
+			public string EndPoint { private set; get; }
 
-		    public TransactionEventArgs(string senderID, int size)
+		    public TransactionEventArgs(string senderID, string endPoint, int size)
 		    {
 			    SenderID = senderID;
+			    EndPoint = endPoint;
 			    Size = size;
 		    }
 	    }
@@ -64,7 +65,7 @@ namespace ThingModel.WebSockets
 	                if (_server.Transaction != null)
 	                {
 		                _server.Transaction(this,
-							new TransactionEventArgs(senderID, e.RawData.Length));
+							new TransactionEventArgs(senderID, Context.UserEndPoint.ToString(), e.RawData.Length));
 	                }
                     
 //                    var analyzedTransaction = ProtoModelObserver.GetTransaction(ToProtobuf, senderID);
@@ -99,7 +100,7 @@ namespace ThingModel.WebSockets
 	            if (_server.Transaction != null)
 	            {
 		            _server.Transaction(this,
-			            new TransactionEventArgs(ServerSenderID, protoData.Length));
+			            new TransactionEventArgs(ServerSenderID, Context.ServerEndPoint.ToString(), protoData.Length));
 	            }
             }
         }
