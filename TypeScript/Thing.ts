@@ -117,7 +117,8 @@ module ThingModel {
 		}
 
 		public IsConnectedTo(thing: Thing): boolean {
-			return thing && _.has(this._connections, thing._id);
+			// !!thing in order will convert the assertion to a boolean
+			return !!thing && _.has(this._connections, thing._id);
 		}
 
 		public get ConnectedThings(): Thing[] {
