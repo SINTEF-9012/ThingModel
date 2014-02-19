@@ -72,11 +72,22 @@ module ThingModel {
 		public GetProperty<T extends Property>(key: string, type?: Type): T {
 
 			var prop = this._properties[key];
-			if (type && prop.Type != type) {
+			if (!prop || (type && prop.Type != type)) {
 				return null;
 			}
 
 			return prop;
+		}
+
+		public GetString(key: string) {
+
+			var prop = this.GetProperty<ThingModel.Property.String>(key, Type.String);
+
+			if (!prop) {
+				return null;
+			}
+
+			return prop.Value;
 		}
 
 		public Connect(thing: Thing): void {

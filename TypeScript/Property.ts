@@ -4,7 +4,7 @@ module ThingModel {
 
 		private _key: string;
 
-		_value: any;
+		/* protected */ _value: any;
 
 		public get Key(): string {
 			return this._key;
