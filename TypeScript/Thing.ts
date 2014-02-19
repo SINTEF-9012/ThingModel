@@ -46,7 +46,7 @@ module ThingModel {
 
 		constructor(id : string, type : ThingType = null) {
 			if (!id) {
-				throw "The thing ID should not be null or empty";
+				throw new Error("The thing ID should not be null or empty");
 			}
 
 			this._id = id;

@@ -4,7 +4,7 @@ module ThingModel {
 
 		private _key: string;
 
-		Value: any;
+		_value: any;
 
 		public get Key(): string {
 			return this._key;
@@ -19,23 +19,23 @@ module ThingModel {
 				throw "The Property key should not be null or empty";
 			}
 			this._key = key;
-			this.Value = value;
+			this._value = value;
 		}
 
 		ValueToString(): string {
-			return this.Value != null ? this.Value.ToString() : "";
+			return this._value != null ? this._value.ToString() : "";
 		}
 
 		CompareValue(other: Property): boolean {
-			if (other == null || (this.Value != null && other.Value == null)) {
+			if (other == null || (this._value != null && other._value == null)) {
 				return false;
 			}
 
-			if (this.Value != null && other.Value != null) {
-				if (this.Value.Compare && other.Value.Compare) {
-					return this.Value.Compare(other.Value);
+			if (this._value != null && other._value != null) {
+				if (this._value.Compare && other._value.Compare) {
+					return this._value.Compare(other._value);
 				} else {
-					return this.Value === other.Value;
+					return this._value === other._value;
 				}
 			}	
 
@@ -51,11 +51,11 @@ module ThingModel {
 			}
 
 			public get Value(): ThingModel.Location {
-				return this.Value;
+				return this._value;
 			}
 
 			public set Value(value: ThingModel.Location) {
-				this.Value = value;
+				this._value = value;
 			}
 
 			public get Type(): Type {
@@ -70,11 +70,11 @@ module ThingModel {
 			}
 
 			public get Value(): string {
-				return this.Value;
+				return this._value;
 			}
 	
 			public set Value(value: string) {
-				this.Value = value;
+				this._value = value;
 			}
 
 			public get Type(): Type {
@@ -88,11 +88,11 @@ module ThingModel {
 			}
 
 			public get Value(): number {
-				return this.Value;
+				return this._value;
 			}
 	
 			public set Value(value: number) {
-				this.Value = value;
+				this._value = value;
 			}
 
 			public get Type(): Type {
@@ -106,11 +106,11 @@ module ThingModel {
 			}
 
 			public get Value(): number {
-				return this.Value;
+				return this._value;
 			}
 	
 			public set Value(value: number) {
-				this.Value = Math.round(value);
+				this._value = Math.round(value);
 			}
 
 			public get Type(): Type {
@@ -124,11 +124,11 @@ module ThingModel {
 			}
 
 			public get Value(): boolean {
-				return this.Value;
+				return this._value;
 			}
 	
 			public set Value(value: boolean) {
-				this.Value = value;
+				this._value = value;
 			}
 
 			public get Type(): Type {
@@ -143,11 +143,11 @@ module ThingModel {
 			}
 
 			public get Value(): Date {
-				return this.Value;
+				return this._value;
 			}
 	
 			public set Value(value: Date) {
-				this.Value = value;
+				this._value = value;
 			}
 
 			public get Type(): Type {
