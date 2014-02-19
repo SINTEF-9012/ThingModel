@@ -7,3 +7,7 @@
 
 # NuGet Packages Directory
 packages
+
+# IDE
+*.sublime-workspace
+*.userprefs
