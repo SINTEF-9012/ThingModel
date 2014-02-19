@@ -38,7 +38,7 @@ public class ThingTest {
 
         try {
 
-            new Thing(null);
+            new Thing("");
             Assert.fail();
         } catch (Exception e) {
 
