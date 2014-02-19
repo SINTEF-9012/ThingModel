@@ -62,7 +62,7 @@ module ThingModel {
 		
 		/**
 		 *	Latitude longitude representation, often used for WGS 84 GPS localizations.
-		 *	And if the System property is null, it's considered by default as a WGS 84 LatLng system.
+		 *	And if the System property is null, it's considered by default as a WGS 84Â LatLng system.
 		 */
 		export class LatLng extends Point {
 
