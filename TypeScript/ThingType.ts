@@ -13,7 +13,7 @@ module ThingModel {
 
 		constructor(name: string) {
 			if (!name) {
-				throw "The name should not be null or empty";
+				throw new Error("The name should not be null or empty");
 			}
 			this._name = name;
 			this._properties = {};
@@ -36,7 +36,7 @@ module ThingModel {
 			return this._properties[key];
 		}
 
-		public GetProperties(): PropertyType[] {
+		public get Properties(): PropertyType[]{
 			return _.values(this._properties);
 		}
 	}

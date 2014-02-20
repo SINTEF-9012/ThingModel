@@ -27,6 +27,7 @@
     <TypeScriptCompile Include="PropertyType.ts" />
     <TypeScriptCompile Include="Specs\PropertyTest.ts" />
     <TypeScriptCompile Include="Specs\ThingTest.ts" />
+    <TypeScriptCompile Include="Specs\ThingTypeTest.ts" />
     <TypeScriptCompile Include="Thing.ts" />
     <TypeScriptCompile Include="ThingType.ts" />
     <TypeScriptCompile Include="Type.ts" />
@@ -78,6 +79,7 @@
     <TypeScriptRemoveComments>true</TypeScriptRemoveComments>
     <TypeScriptSourceMap>True</TypeScriptSourceMap>
     <TypeScriptModuleKind>commonjs</TypeScriptModuleKind>
+    <TypeScriptGeneratesDeclarations>True</TypeScriptGeneratesDeclarations>
   </PropertyGroup>
   <Import Project="$(VSToolsPath)\TypeScript\Microsoft.TypeScript.targets" Condition="Exists('$(VSToolsPath)\TypeScript\Microsoft.TypeScript.targets')" />
 </Project>
