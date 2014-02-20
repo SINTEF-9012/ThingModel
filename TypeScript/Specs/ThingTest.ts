@@ -74,7 +74,188 @@ describe("Thing test", ()=> {
 			thing.IsConnectedTo(null).should.be.false;
 			thing.Disconnect(null);
 		});
+
+		it("should not be connected to itself", ()=> {
+			(()=> {
+				thing.Connect(thing);
+			}).should.throw(/itself/);
+
+			(() => {
+				thing.Connect(new ThingModel.Thing(thing.ID));
+			}).should.throw(/itself/);
+		});
+
+		it("should disconnect a thing properly", ()=> {
+			thing.Disconnect(otherThing);
+			thing.IsConnectedTo(otherThing).should.be.false;
+		});
+
+		it("should disconnect all things if needed", ()=> {
+			thing.DisconnectAll();
+			thing.IsConnectedTo(otherThing).should.be.false;
+		});
+
+		it("should create a list of connected things", () => {
+			_.each(thing.ConnectedThings, (t) => {
+				thing.Disconnect(t);
+			});
+
+			thing.IsConnectedTo(otherThing).should.be.false;
+		});
+
+		it("should count connected things correctly", ()=> {
+			thing.ConnectedThingsCount.should.be.equal(1);
+			thing.Disconnect(otherThing);
+			thing.ConnectedThingsCount.should.be.equal(0);
+		});
 	});
+
+	describe("Test properties", ()=> {
+		it("should contains the name property", () => {
+			_.each(thing.Properties, (p: ThingModel.Property) => {
+				p.Key.should.be.equal("name");
+			});
+		});
+	});
+
+	describe("Test comparisons", () => {
+		it("should handle nulls", () => {
+			thing.Compare(null).should.be.false;
+		});
+
+		it("should return true when it's the same thing", () => {
+			thing.Compare(thing).should.be.true;
+		});
+
+		it("should be different when the type is different", ()=> {
+			var newThing = new ThingModel.Thing(thing.ID); // default type
+
+			newThing.SetProperty(new ThingModel.Property.String("name", "Pierre"));
+			newThing.Connect(otherThing);
+
+			newThing.Compare(thing).should.be.false;
+			thing.Compare(newThing).should.be.false;
+		});
+
+		it("should be different when the connections are different", ()=> {
+			var newThing = new ThingModel.Thing(thing.ID, type);
+			newThing.SetProperty(new ThingModel.Property.String("name", "Pierre"));
+
+			newThing.Compare(thing).should.be.false;
+			thing.Compare(newThing).should.be.false;
+		});
+
+		it("should handle differents ids correctly", ()=> {
+			var newThing = new ThingModel.Thing("banana", type);
+			newThing.SetProperty(new ThingModel.Property.String("name", "Pierre"));
+			newThing.Connect(otherThing);
+
+			newThing.Compare(thing, false, false).should.be.true;
+			thing.Compare(newThing, false, false).should.be.true;
+
+			thing.Compare(newThing, true, false).should.be.false;
+		});
+
+		describe("Properties comparisons", () => {
+
+
+			it("should be different when the list of properties is different", () => {
+
+				var newThing = new ThingModel.Thing(thing.ID, type);
+				newThing.SetProperty(new ThingModel.Property.String("name", "Pierre"));
+				newThing.Connect(otherThing);
+
+				// New property
+				newThing.SetProperty(new ThingModel.Property.String("surname", "Lapinou"));
+
+				newThing.Compare(thing).should.be.false;
+				thing.Compare(newThing).should.be.false;
+
+				thing.SetProperty(new ThingModel.Property.String("surname", "Lapinou"));
+
+				newThing.Compare(thing).should.be.true;
+				thing.Compare(newThing).should.be.true;
+
+				thing.SetProperty(new ThingModel.Property.String("color", "white"));
+				newThing.SetProperty(new ThingModel.Property.String("meal", "carrot"));
+
+				newThing.Compare(thing).should.be.false;
+				thing.Compare(newThing).should.be.false;
+			});
+
+			it("should be different if the properties value are different", ()=> {
+
+				var newThing = new ThingModel.Thing(thing.ID, type);
+				newThing.SetProperty(new ThingModel.Property.String("name", "Bob"));
+				newThing.Connect(otherThing);
+
+				newThing.Compare(thing).should.be.false;
+				thing.Compare(newThing).should.be.false;
+
+				newThing.SetProperty(new ThingModel.Property.Double("name", 12));
+
+				newThing.Compare(thing).should.be.false;
+				thing.Compare(newThing).should.be.false;
+
+				newThing.SetProperty(new ThingModel.Property.String("name", "Pierre"));
+
+				newThing.Compare(thing).should.be.true;
+				thing.Compare(newThing).should.be.true;
+			});
+		});
+
+		it("should handle deep comparisons", ()=> {
+			var aThingForTheRoad = new ThingModel.Thing("rabbit");
+			aThingForTheRoad.SetProperty(new ThingModel.Property.Double("speed", 12));
+			thing.Connect(aThingForTheRoad);
+
+			var newThing = new ThingModel.Thing(thing.ID, type);
+			newThing.SetProperty(new ThingModel.Property.String("name", "Pierre"));
+			newThing.Connect(otherThing);
+			newThing.Connect(aThingForTheRoad);
+
+			thing.Compare(thing, true, true).should.be.true;
+			thing.Compare(newThing, true, true).should.be.true;
+			newThing.Compare(thing, true, true).should.be.true;
+
+			newThing.Disconnect(otherThing);
+			var newOtherThing = new ThingModel.Thing(otherThing.ID);
+			newThing.Connect(newOtherThing);
+
+			thing.Compare(newThing, true, true).should.be.true;
+			newThing.Compare(thing, true, true).should.be.true;
+
+			newOtherThing.SetProperty(new ThingModel.Property.String("name", "Alain"));
+
+			thing.Compare(newThing, true, true).should.be.false;
+			newThing.Compare(thing, true, true).should.be.false;
+		});
+
+		it("should handle infinite loop connections", ()=> {
+
+			var newThing = new ThingModel.Thing(thing.ID, type);
+			newThing.SetProperty(new ThingModel.Property.String("name", "Pierre"));
+			newThing.Connect(otherThing);
+
+			// infinite loop
+			otherThing.Connect(thing);
+
+			thing.Compare(newThing, true, true).should.be.true;
+			newThing.Compare(thing, true, true).should.be.true;
+
+			var newOtherThing = new ThingModel.Thing(otherThing.ID);
+			newThing.Connect(newOtherThing);
+
+			thing.Compare(newThing, true, true).should.be.false;
+			newThing.Compare(thing, true, true).should.be.false;
+
+			newOtherThing.Connect(thing);
+
+			thing.Compare(newThing, true, true).should.be.true;
+			newThing.Compare(thing, true, true).should.be.true;
+		});
+	});
+
 
 // ReSharper restore WrongExpressionStatement
 });

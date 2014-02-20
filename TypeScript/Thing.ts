@@ -94,7 +94,7 @@ module ThingModel {
 			if (!thing) return;
 
 			if (thing === this || thing._id === this._id) {
-				throw "You can't connect a thing directly to itself";
+				throw new Error("You can't connect a thing directly to itself");
 			}
 			if (!this.IsConnectedTo(thing)) {
 				++this._connectionsCount;
@@ -197,15 +197,12 @@ module ThingModel {
 			// Register the thing now, prevent infinite recursions
 			alreadyVisitedObjets[this._id] = true;
 
-			_.each(this._connections, (connectedThing : Thing)=> {
+			return !_.any(this._connections, (connectedThing: Thing)=> {
 				var otherThing = other._connections[connectedThing._id];
 
-				if (!connectedThing.RecursiveCompare(otherThing, alreadyVisitedObjets)) {
-					return false;
-				}
+				return !connectedThing.RecursiveCompare(otherThing, alreadyVisitedObjets);
 			});
-
-			return true;
 		}
-	}
+
+	}	
 }

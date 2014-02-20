@@ -23,12 +23,16 @@ module ThingModel {
 		}
 
 		ValueToString(): string {
-			return this._value != null ? this._value.ToString() : "";
+			return this._value != null ? this._value.toString() : "";
 		}
 
 		CompareValue(other: Property): boolean {
 			if (other == null || (this._value != null && other._value == null)) {
 				return false;
+			}
+
+			if (this._value == null && other._value == null) {
+				return true;
 			}
 
 			if (this._value != null && other._value != null) {
