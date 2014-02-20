@@ -12,7 +12,7 @@ module ThingModel {
 
 		public RegisterType(type: ThingType, force: boolean = true) : void {
 			if (!type) {
-				throw "The thing type information is missing.";
+				throw new Error("The thing type information is null.");
 			}
 
 			if (force || !_.has(this._thingTypes, type.Name)) {
@@ -25,7 +25,7 @@ module ThingModel {
 		public RegisterThing(thing: Thing, alsoRegisterConnections: boolean = true,
 			alsoRegisterTypes: boolean = false): void {
 			if (!thing) {
-				throw "A thing should be something to be allowed in the wharehouse";
+				throw new Error("A thing should not be null if it want to be allowed in the wharehouse");
 			}
 
 			var creation = !_.has(this._things, thing.ID);

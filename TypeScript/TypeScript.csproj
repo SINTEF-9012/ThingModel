@@ -28,6 +28,7 @@
     <TypeScriptCompile Include="Specs\PropertyTest.ts" />
     <TypeScriptCompile Include="Specs\ThingTest.ts" />
     <TypeScriptCompile Include="Specs\ThingTypeTest.ts" />
+    <TypeScriptCompile Include="Specs\WharehouseTest.ts" />
     <TypeScriptCompile Include="Thing.ts" />
     <TypeScriptCompile Include="ThingType.ts" />
     <TypeScriptCompile Include="Type.ts" />
