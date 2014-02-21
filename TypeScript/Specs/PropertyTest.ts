@@ -1,7 +1,7 @@
 /// <reference path="../bower_components/DefinitelyTyped/mocha/mocha.d.ts" />
 /// <reference path="../bower_components/DefinitelyTyped/should/should.d.ts" />
 
-describe("Property Test", ()=> {
+describe("Property Test", ()=> {
 
 // ReSharper disable WrongExpressionStatement
 	describe("Test values", ()=> {

@@ -1,7 +1,7 @@
 /// <reference path="../bower_components/DefinitelyTyped/mocha/mocha.d.ts" />
 /// <reference path="../bower_components/DefinitelyTyped/should/should.d.ts" />
 
-describe("ThingType Test", () => {
+describe("ThingType Test", () => {
 	var type : ThingModel.ThingType;
 	var propertyType: ThingModel.PropertyType;
 

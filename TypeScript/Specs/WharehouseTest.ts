@@ -31,7 +31,7 @@ class WharehouseChangeObserver implements ThingModel.IWharehouseObserver {
 	}
 }
 
-describe("Wharehouse Test", () => {
+describe("Wharehouse Test", () => {
 	var type: ThingModel.ThingType;
 	var thing: ThingModel.Thing;
 	var wharehouse: ThingModel.Wharehouse;

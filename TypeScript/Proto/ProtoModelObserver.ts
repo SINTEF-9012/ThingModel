@@ -1,4 +1,4 @@
- module ThingModel {
+ module ThingModel.Proto {
 	export class ProtoModelObserver implements IWharehouseObserver {
 		 
 		public New(thing: ThingModel.Thing): void {

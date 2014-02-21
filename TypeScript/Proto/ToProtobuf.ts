@@ -1,4 +1,4 @@
- module ThingModel {
+ module ThingModel.Proto {
 	 export class ToProtobuf {
 		 
 	 }
