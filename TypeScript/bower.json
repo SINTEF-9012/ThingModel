@@ -4,7 +4,7 @@
   "dependencies": {
     "underscore": "~1.5.2",
     "DefinitelyTyped": "*",
-    "protobuf": "~1.5.2"
+    "protobuf": "~2.0.5"
   },
   "devDependencies": {
     "mocha": "~1.17.1",

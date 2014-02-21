@@ -26,7 +26,9 @@
     <TypeScriptCompile Include="Property.ts" />
     <TypeScriptCompile Include="PropertyType.ts" />
     <TypeScriptCompile Include="Proto\FromProtobuf.ts" />
+    <TypeScriptCompile Include="Proto\Proto.d.ts" />
     <TypeScriptCompile Include="Proto\ProtoModelObserver.ts" />
+    <TypeScriptCompile Include="Proto\ProtoTools.ts" />
     <TypeScriptCompile Include="Proto\ToProtobuf.ts" />
     <TypeScriptCompile Include="Specs\PropertyTest.ts" />
     <TypeScriptCompile Include="Specs\ProtoConversionsTest.ts" />

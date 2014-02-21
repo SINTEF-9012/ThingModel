@@ -11,6 +11,9 @@
 
 	<script src="../bower_components/underscore/underscore.js"></script>
 	<script src="../bower_components/should/should.js"></script>
+	<script src="../bower_components/long/Long.js"></script>
+	<script src="../bower_components/bytebuffer/ByteBuffer.js"></script>
+	<script src="../bower_components/protobuf/ProtoBuf.noparse.js"></script>
 	<script src="../Location.js"></script>
 	<script src="../Type.js"></script>
 	<script src="../Property.js"></script>
@@ -18,6 +21,10 @@
 	<script src="../ThingType.js"></script>
 	<script src="../Thing.js"></script>
 	<script src="../Wharehouse.js"></script>
+	<script src="../Proto/ProtoTools.js"></script>
+	<script src="../Proto/ProtoModelObserver.js"></script>
+	<script src="../Proto/FromProtobuf.js"></script>
+	<script src="../Proto/ToProtobuf.js"></script>
 	<script src="../bower_components/mocha/mocha.js"></script>
 
 	<script>mocha.setup('bdd')</script>
@@ -26,6 +33,7 @@
 	<script src="ThingTypeTest.js"></script>
 	<script src="ThingTest.js"></script>
 	<script src="WharehouseTest.js"></script>
+	<script src="ProtoConversionsTest.js"></script>
 
 	<script>
 	    mocha.checkLeaks();
