@@ -25,7 +25,11 @@
     <TypeScriptCompile Include="Location.ts" />
     <TypeScriptCompile Include="Property.ts" />
     <TypeScriptCompile Include="PropertyType.ts" />
+    <TypeScriptCompile Include="Proto\FromProtobuf.ts" />
+    <TypeScriptCompile Include="Proto\ProtoModelObserver.ts" />
+    <TypeScriptCompile Include="Proto\ToProtobuf.ts" />
     <TypeScriptCompile Include="Specs\PropertyTest.ts" />
+    <TypeScriptCompile Include="Specs\ProtoConversionsTest.ts" />
     <TypeScriptCompile Include="Specs\ThingTest.ts" />
     <TypeScriptCompile Include="Specs\ThingTypeTest.ts" />
     <TypeScriptCompile Include="Specs\WharehouseTest.ts" />

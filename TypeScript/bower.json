@@ -3,7 +3,8 @@
   "version": "0.0.1",
   "dependencies": {
     "underscore": "~1.5.2",
-    "DefinitelyTyped": "*"
+    "DefinitelyTyped": "*",
+    "protobuf": "~1.5.2"
   },
   "devDependencies": {
     "mocha": "~1.17.1",
