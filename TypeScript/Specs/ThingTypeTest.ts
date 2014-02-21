@@ -1,4 +1,4 @@
-/// <reference path="../bower_components/DefinitelyTyped/qunit/qunit.d.ts" />
+/// <reference path="../bower_components/DefinitelyTyped/mocha/mocha.d.ts" />
 /// <reference path="../bower_components/DefinitelyTyped/should/should.d.ts" />
 
 describe("ThingType Test", () => {
