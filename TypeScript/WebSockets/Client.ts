@@ -51,8 +51,8 @@
 					 var senderName = this._fromProtobuf.Convert(arrayBuffer);
 
 					 console.log("Binary message from: " + senderName);
-					 //this._toProtobuf.AppluyThingsSuppressions(this._thingModelObserver.Deletions);
-					 //this._thingModelObserver.Reset();
+					 this._toProtobuf.ApplyThingsSuppressions(_.values(this._thingModelObserver.Deletions));
+					 this._thingModelObserver.Reset();
 				 };
 
 			 };

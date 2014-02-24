@@ -16,7 +16,9 @@ module ThingModel {
 		 */
 		Compare(other: Location): boolean;
 
-		toString() : string;
+		toString(): string;
+
+		type:string;
 	}
 
 	export module Location {
@@ -29,12 +31,14 @@ module ThingModel {
 			public Y: number;
 			public Z: number;
 			public System: string;
+			public type:string;
 
 			// The last argument can be null, it's a feature
 			constructor(x: number = 0.0, y: number = 0.0, z: number = null) {
 				this.X = x;
 				this.Y = y;
 				this.Z = z;
+				this.type = "point";
 			}
 
 			// Check if the values are the same and if the representation is the same
@@ -68,6 +72,7 @@ module ThingModel {
 
 			constructor(latitude: number = 0.0, longitude: number = 0.0, altitude: number = null) {
 				super(latitude, longitude, altitude);
+				this.type = "latlng";
 			}
 
 			public get Latitude() {
@@ -103,6 +108,7 @@ module ThingModel {
 
 			constructor(rightAscension: number = 0.0, declination: number = 0.0, hourAngle: number = 0.0) {
 				super(rightAscension, declination, hourAngle);
+				this.type = "equatorial";
 			}
 
 			public get RightAscension() {
