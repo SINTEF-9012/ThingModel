@@ -155,6 +155,7 @@ public class ToProtobuf {
 				if (previousThing == null ||
 						!previousThing.getConnectionsList().contains(connectionKey)) {
 					publication.setConnectionsChange(true);
+					break;
 				}
 			}
 		}
@@ -208,11 +209,6 @@ public class ToProtobuf {
 			{
 				proto.setType(Property.Type.DATETIME);
 				proto.setDatetimeValue(((org.thingmodel.Property.Date) property).getValue().getTime());
-			}
-			else if (c == org.thingmodel.Property.Double.class)
-			{
-				proto.setType(Property.Type.DOUBLE);
-				proto.setDoubleValue(((org.thingmodel.Property.Double) property).getValue());
 			}
 			
 			PropertyStateKey key = new PropertyStateKey();

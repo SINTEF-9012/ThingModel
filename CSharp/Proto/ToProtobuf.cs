@@ -129,6 +129,7 @@ namespace ThingModel.Proto
                     if (previousThing == null || !previousThing.connections.Contains(connectionKey))
                     {
                         publication.connections_change = true;
+	                    break;
                     }
                 }
             }
