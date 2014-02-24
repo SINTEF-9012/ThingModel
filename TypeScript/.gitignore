@@ -1,7 +1,12 @@
 bower_components
+node_modules
 *.js.map
 *.js
 *.d.ts
+
+!build/*
+
+!Gruntfile.js
 
 !Proto/Proto.d.ts
 

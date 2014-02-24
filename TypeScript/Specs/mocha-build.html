@@ -1,0 +1,35 @@
+﻿<!DOCTYPE html>
+<!-- ReSharper disable Html.PathError -->
+<html>
+<head>
+	<meta charset="utf-8"/>
+	<title>Mocha test runner</title>
+	<link rel="stylesheet" href="../bower_components/mocha/mocha.css" />
+</head>
+<body>
+	<div id="mocha"></div>
+
+	<script src="../bower_components/underscore/underscore.js"></script>
+	<script src="../bower_components/should/should.js"></script>
+	<script src="../bower_components/long/Long.js"></script>
+	<script src="../bower_components/bytebuffer/ByteBuffer.js"></script>
+	<script src="../bower_components/protobuf/ProtoBuf.noparse.js"></script>
+	<script src="../build/ThingModel.min.js"></script>
+	<script src="../bower_components/mocha/mocha.js"></script>
+
+	<script>mocha.setup('bdd')</script>
+
+	<script src="PropertyTest.js"></script>
+	<script src="ThingTypeTest.js"></script>
+	<script src="ThingTest.js"></script>
+	<script src="WharehouseTest.js"></script>
+	<script src="ProtoConversionsTest.js"></script>
+
+	<script>
+	    mocha.checkLeaks();
+	    mocha.globals(['_']);
+	    mocha.run();
+	</script>
+</body>
+</html>
+<!-- ReSharper restore Html.PathError -->
