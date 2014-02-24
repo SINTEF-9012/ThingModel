@@ -1,4 +1,3 @@
-/// <reference path="./ThingType.ts" />
 /// <reference path="./bower_components/DefinitelyTyped/underscore/underscore.d.ts" />
 
 module ThingModel {
