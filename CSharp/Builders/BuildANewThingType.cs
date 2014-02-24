@@ -14,7 +14,7 @@ namespace ThingModel.Builders
 
 		public class ThingTypePropertyBuilder {
 			private readonly ThingType _type;
-			private bool _nextPropertyIsRequired;
+			private bool _nextPropertyIsNotRequired;
 			private bool _lastPropertyAdded;
 			private PropertyType _lastProperty;
 
@@ -46,7 +46,7 @@ namespace ThingModel.Builders
 			{
 				get
 				{
-					_nextPropertyIsRequired = true;
+					_nextPropertyIsNotRequired = true;
 					return this;
 				}
 			}
@@ -76,9 +76,9 @@ namespace ThingModel.Builders
 				var property = PropertyType.Create<T>(key);
 				property.Name = name;
 
-				if (_nextPropertyIsRequired)
+				if (_nextPropertyIsNotRequired)
 				{
-					_nextPropertyIsRequired = false;
+					_nextPropertyIsNotRequired = false;
 					property.Required = false;
 				}
 

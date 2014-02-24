@@ -31,5 +31,12 @@
 				(property != null && property.Type == this._type &&
 				property.Key == this.Key);
 		}
+
+		public Clone(): PropertyType {
+			var newProp = new PropertyType(this._key, this._type, this.Required);
+			newProp.Name = this.Name;
+			this.Description = this.Description;
+			return newProp;
+		}
 	 }
  }

@@ -48,5 +48,27 @@ describe("ProtoConversions Test", ()=> {
 			.should.be.equal("Hello World");
 
 	});
+
+	it("should work with a type", () => {
+		var type = ThingModel.BuildANewThingType.Named("message")
+			.WhichIs("Just a simple text message")
+			.ContainingA.String("content").Build();
+
+		wharehouseOutput.RegisterType(type);
+
+		var transaction = observer.GetTransaction(toProtobuf, "bob");
+
+		fromProtobuf.Convert(transaction.toArrayBuffer());
+
+		var newType = wharehouseInput.GetThingType("message");
+
+		(newType == null).should.be.false;
+
+		newType.Description.should.be.equal(type.Description);
+		(newType.GetPropertyDefinition("content") == null).should.be.false;
+
+		newType.GetPropertyDefinition("content").Type.should.be.equal(ThingModel.Type.String);
+
+	});
 // ReSharper restore WrongExpressionStatement
 });
