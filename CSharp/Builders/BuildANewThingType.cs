@@ -52,7 +52,7 @@ namespace ThingModel.Builders
 			}
 
 
-			public ThingTypePropertyBuilder WichIs(String description)
+			public ThingTypePropertyBuilder WhichIs(String description)
 			{
 				if (_lastProperty == null)
 				{
@@ -121,7 +121,7 @@ namespace ThingModel.Builders
 				return this;
 			}
 
-			public ThingTypePropertyBuilder CopyOfThis(ThingType otherType)
+			public ThingTypePropertyBuilder CopyOf(ThingType otherType)
 			{
 				foreach (var propertyType in otherType.GetProperties())
 				{

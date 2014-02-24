@@ -10,12 +10,12 @@ namespace ThingModel.Specs
 		public void TestThingTypeBuilder()
 		{
 			ThingType type = BuildANewThingType.Named("rabbit")
-				.WichIs("Just a rabbit")
+				.WhichIs("Just a rabbit")
 				.ContainingA.String("name")
 				.AndA.Location("localization")
 				.AndA.NotRequired.Double("speed")
 				.AndAn.Int("nbChildren", "Number of children")
-					.WichIs("The number of direct children for the rabbit");
+					.WhichIs("The number of direct children for the rabbit");
 
 			Assert.That(type, Is.Not.Null);
 			Assert.That(type.Description, Is.EqualTo("Just a rabbit"));
@@ -27,8 +27,8 @@ namespace ThingModel.Specs
 			Assert.That(type.GetPropertyDefinition("nbChildren").Description, Contains.Substring("direct children"));
 
 			ThingType superRabbit = BuildANewThingType.Named("super_rabbit")
-				.WichIs("A better rabbit")
-				.ContainingA.CopyOfThis(type)
+				.WhichIs("A better rabbit")
+				.ContainingA.CopyOf(type)
 				.AndAn.Int("power");
 
 			Assert.That(superRabbit.GetPropertyDefinition("name"), Is.Not.Null);
