@@ -85,12 +85,15 @@ namespace ThingModel.WebSockets
 								var s = session as ServerService;
 								if (s != null)
 								{
-									var analyzedTransaction = s._toProtobuf.Convert(
-										new List<Thing>(_protoModelObserver.Updates),
-										new List<Thing>(_protoModelObserver.Deletions),
-										new List<ThingType>(_protoModelObserver.Definitions),
-										senderID);
-									s.Send(analyzedTransaction);
+									lock (s._lock)
+									{
+										var analyzedTransaction = s._toProtobuf.Convert(
+											new List<Thing>(_protoModelObserver.Updates),
+											new List<Thing>(_protoModelObserver.Deletions),
+											new List<ThingType>(_protoModelObserver.Definitions),
+											senderID);
+										s.Send(analyzedTransaction);
+									}
 								}
 							}
 						}
