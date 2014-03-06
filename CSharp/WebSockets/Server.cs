@@ -35,6 +35,7 @@ namespace ThingModel.WebSockets
             private readonly Wharehouse _wharehouse;
             private readonly ProtoModelObserver _protoModelObserver;
 	        private readonly Server _server;
+			private readonly object _lock = new Object();
 
             public ServerService(Wharehouse wharehouse, Server server)
             {
@@ -50,58 +51,66 @@ namespace ThingModel.WebSockets
 
             protected override void OnOpen()
             {
-                var transaction = _toProtobuf.Convert(_wharehouse.Things, new Thing[0], _wharehouse.ThingTypes, ServerSenderID);
-                Send(transaction);
+				lock (_lock)
+				{
+					var transaction = _toProtobuf.Convert(_wharehouse.Things, new Thing[0], _wharehouse.ThingTypes, ServerSenderID);
+					Send(transaction);
+				}
             }
 
             protected override void OnMessage(MessageEventArgs e)
-            { 
-                if (e.Type == Opcode.BINARY)
-                {
-                    _protoModelObserver.Reset();
+            {
+				lock (_lock)
+				{
+					if (e.Type == Opcode.BINARY)
+					{
+						_protoModelObserver.Reset();
 
-                    var senderID = _fromProtobuf.Convert(e.RawData, true);
+						var senderID = _fromProtobuf.Convert(e.RawData, true);
 
-	                if (_server.Transaction != null)
-	                {
-		                _server.Transaction(this,
-							new TransactionEventArgs(senderID, Context.UserEndPoint.ToString(), e.RawData.Length));
-	                }
-                    
-//                    var analyzedTransaction = ProtoModelObserver.GetTransaction(ToProtobuf, senderID);
-                    _toProtobuf.ApplyThingsSuppressions(_protoModelObserver.Deletions);
+						if (_server.Transaction != null)
+						{
+							_server.Transaction(this,
+								new TransactionEventArgs(senderID, Context.UserEndPoint.ToString(), e.RawData.Length));
+						}
 
-                    // Broadcast to other clients
-                    foreach (var session in Sessions.Sessions)
-                    {
-                        if (session != this)
-                        {
-                            var s = session as ServerService;
-                            if (s != null)
-                            {
-								var analyzedTransaction = s._toProtobuf.Convert(
-									new List<Thing>(_protoModelObserver.Updates),
-									new List<Thing>(_protoModelObserver.Deletions),
-									new List<ThingType>(_protoModelObserver.Definitions),
-									senderID);
-                                s.Send(analyzedTransaction);
-                            }
-                        }
-                    }   
-                }
-                
+						//                    var analyzedTransaction = ProtoModelObserver.GetTransaction(ToProtobuf, senderID);
+						_toProtobuf.ApplyThingsSuppressions(_protoModelObserver.Deletions);
+
+						// Broadcast to other clients
+						foreach (var session in Sessions.Sessions)
+						{
+							if (session != this)
+							{
+								var s = session as ServerService;
+								if (s != null)
+								{
+									var analyzedTransaction = s._toProtobuf.Convert(
+										new List<Thing>(_protoModelObserver.Updates),
+										new List<Thing>(_protoModelObserver.Deletions),
+										new List<ThingType>(_protoModelObserver.Definitions),
+										senderID);
+									s.Send(analyzedTransaction);
+								}
+							}
+						}
+					}
+				}
             }
 
             private void Send(Transaction transaction)
             {
-                var protoData = _toProtobuf.Convert(transaction);
-                Send(protoData);
+				lock (_lock)
+				{
+					var protoData = _toProtobuf.Convert(transaction);
+					Send(protoData);
 
-	            if (_server.Transaction != null)
-	            {
-		            _server.Transaction(this,
-			            new TransactionEventArgs(ServerSenderID, Context.ServerEndPoint.ToString(), protoData.Length));
-	            }
+					if (_server.Transaction != null)
+					{
+						_server.Transaction(this,
+							new TransactionEventArgs(ServerSenderID, Context.ServerEndPoint.ToString(), protoData.Length));
+					}
+				}
             }
         }
 

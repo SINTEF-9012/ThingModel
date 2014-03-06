@@ -18,6 +18,7 @@ namespace ThingModel.WebSockets
         private int _reconnectionDelay = 1;
         
         private readonly ProtoModelObserver _thingModelObserver;
+		private readonly object _lock = new Object();
 
         public Client(string senderID, string path, Wharehouse wharehouse)
         {
@@ -41,12 +42,14 @@ namespace ThingModel.WebSockets
 
         public void Send()
         {
-	        if (_thingModelObserver.SomethingChanged())
-	        {
-				var transaction = _thingModelObserver.GetTransaction(_toProtobuf, SenderID);
-				_ws.Send(_toProtobuf.Convert(transaction));
-				_thingModelObserver.Reset();
-	        }
+			lock (_lock) {
+				if (_thingModelObserver.SomethingChanged())
+				{
+					var transaction = _thingModelObserver.GetTransaction(_toProtobuf, SenderID);
+					_ws.Send(_toProtobuf.Convert(transaction));
+					_thingModelObserver.Reset();
+				}
+			}
         }
 
         private void WsOnClose(object sender, CloseEventArgs closeEventArgs)
@@ -76,13 +79,16 @@ namespace ThingModel.WebSockets
 
         private void WsOnMessage(object sender, MessageEventArgs args)
         {
-            if (args.Type == Opcode.BINARY)
-            {
-                var senderName = _fromProtobuf.Convert(args.RawData);
-                Console.WriteLine(SenderID + " | Binary message from : " + senderName);
-				_toProtobuf.ApplyThingsSuppressions(_thingModelObserver.Deletions);
-                _thingModelObserver.Reset();
-            }
+			lock (_lock)
+			{
+				if (args.Type == Opcode.BINARY)
+				{
+					var senderName = _fromProtobuf.Convert(args.RawData);
+					Console.WriteLine(SenderID + " | Binary message from : " + senderName);
+					_toProtobuf.ApplyThingsSuppressions(_thingModelObserver.Deletions);
+					_thingModelObserver.Reset();
+				}
+			}
         }
 
 
