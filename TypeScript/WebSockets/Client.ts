@@ -3,6 +3,7 @@
 		 public SenderID: string;
 		 private ws: WebSocket;
 		 private path: string;
+		 private closed: boolean;
 
 		 private _wharehouse: Wharehouse;
 		 private _toProtobuf: Proto.ToProtobuf;
@@ -21,10 +22,15 @@
 			 this._fromProtobuf = new Proto.FromProtobuf(wharehouse);
 			 this._toProtobuf = new Proto.ToProtobuf();
 
+			 this.closed = true;
 			 this.Connect();
 		 }
 
-		 private Connect(): void {
+		 public Connect(): void {
+			 if (!this.closed) {
+				 return;
+			 }
+
 			 this.ws = new WebSocket(this.path);
 
 			 this.ws.onopen = () => {
@@ -32,6 +38,7 @@
 			 };
 
 			 this.ws.onclose = () => {
+				 this.closed = true;
 				 console.log("Connection lost");
 				 this._fromProtobuf = new Proto.FromProtobuf(this._wharehouse);
 				 this._toProtobuf = new Proto.ToProtobuf();
@@ -56,6 +63,25 @@
 				 };
 
 			 };
+		 }
+
+		 public Send(): void {
+			 if (this._thingModelObserver.SomethingChanged) {
+				 var transaction = this._thingModelObserver.GetTransaction(this._toProtobuf, this.SenderID);
+				 this.ws.send(this._toProtobuf.ConvertTransaction(transaction));
+				 this._thingModelObserver.Reset();
+			 }
+		 }
+
+		 public Close(): void {
+			 if (!this.closed) {
+				 this.ws.close();
+				 this.closed = true;
+			 }
+		 }
+
+		 public IsConnected(): boolean {
+			 return this.closed;
 		 }
 	 }
  }

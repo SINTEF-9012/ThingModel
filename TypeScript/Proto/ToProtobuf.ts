@@ -67,6 +67,10 @@ module ThingModel.Proto {
 
 		}
 
+		public ConvertTransaction(transaction: Transaction) : ArrayBuffer {
+			return transaction.toArrayBuffer();
+		}
+
 		private ConvertThing(thing: ThingModel.Thing): void {
 			var change = false;
 

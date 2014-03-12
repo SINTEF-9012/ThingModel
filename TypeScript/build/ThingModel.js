@@ -190,10 +190,15 @@ var ThingModel;
                 this._fromProtobuf = new ThingModel.Proto.FromProtobuf(wharehouse);
                 this._toProtobuf = new ThingModel.Proto.ToProtobuf();
 
+                this.closed = true;
                 this.Connect();
             }
             Client.prototype.Connect = function () {
                 var _this = this;
+                if (!this.closed) {
+                    return;
+                }
+
                 this.ws = new WebSocket(this.path);
 
                 this.ws.onopen = function () {
@@ -201,6 +206,7 @@ var ThingModel;
                 };
 
                 this.ws.onclose = function () {
+                    _this.closed = true;
                     console.log("Connection lost");
                     _this._fromProtobuf = new ThingModel.Proto.FromProtobuf(_this._wharehouse);
                     _this._toProtobuf = new ThingModel.Proto.ToProtobuf();
@@ -225,6 +231,25 @@ var ThingModel;
                         _this._thingModelObserver.Reset();
                     };
                 };
+            };
+
+            Client.prototype.Send = function () {
+                if (this._thingModelObserver.SomethingChanged) {
+                    var transaction = this._thingModelObserver.GetTransaction(this._toProtobuf, this.SenderID);
+                    this.ws.send(this._toProtobuf.ConvertTransaction(transaction));
+                    this._thingModelObserver.Reset();
+                }
+            };
+
+            Client.prototype.Close = function () {
+                if (!this.closed) {
+                    this.ws.close();
+                    this.closed = true;
+                }
+            };
+
+            Client.prototype.IsConnected = function () {
+                return this.closed;
             };
             return Client;
         })();
@@ -554,6 +579,10 @@ var ThingModel;
                 this.ConvertDeclarationList(declarations);
 
                 return this._transaction;
+            };
+
+            ToProtobuf.prototype.ConvertTransaction = function (transaction) {
+                return transaction.toArrayBuffer();
             };
 
             ToProtobuf.prototype.ConvertThing = function (thing) {
