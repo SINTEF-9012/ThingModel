@@ -179,44 +179,57 @@ var ThingModel;
     (function (WebSockets) {
         var Client = (function () {
             function Client(senderID, path, wharehouse) {
+                this._connexionDelay = 2000;
                 this.SenderID = senderID;
-                this.path = path;
+                this._path = path;
 
                 this._wharehouse = wharehouse;
 
                 this._thingModelObserver = new ThingModel.Proto.ProtoModelObserver();
                 wharehouse.RegisterObserver(this._thingModelObserver);
 
-                this._fromProtobuf = new ThingModel.Proto.FromProtobuf(wharehouse);
+                this._fromProtobuf = new ThingModel.Proto.FromProtobuf(this._wharehouse);
                 this._toProtobuf = new ThingModel.Proto.ToProtobuf();
 
-                this.closed = true;
+                this._closed = true;
+                this._reconnection = false;
                 this.Connect();
             }
             Client.prototype.Connect = function () {
                 var _this = this;
-                if (!this.closed) {
+                if (!this._closed) {
                     return;
                 }
 
-                this.ws = new WebSocket(this.path);
+                this._ws = new WebSocket(this._path);
 
-                this.ws.onopen = function () {
-                    console.log("Open connection");
-                };
-
-                this.ws.onclose = function () {
-                    _this.closed = true;
-                    console.log("Connection lost");
+                this._ws.onopen = function () {
+                    console.info("ThingModel: Open connection");
+                    _this._closed = false;
                     _this._fromProtobuf = new ThingModel.Proto.FromProtobuf(_this._wharehouse);
                     _this._toProtobuf = new ThingModel.Proto.ToProtobuf();
+                    _this._connexionDelay = 2000;
+
+                    _this.Send();
+                };
+
+                this._ws.onclose = function () {
+                    if (!_this._closed) {
+                        _this._closed = true;
+                        console.info("ThingModel: Connection lost");
+                    }
+                    _this._reconnection = true;
 
                     setTimeout(function () {
                         return _this.Connect();
-                    }, 2000);
+                    }, _this._connexionDelay);
+
+                    if (_this._connexionDelay < 20000) {
+                        _this._connexionDelay += 3500;
+                    }
                 };
 
-                this.ws.onmessage = function (message) {
+                this._ws.onmessage = function (message) {
                     var fileReader = new FileReader();
 
                     fileReader.readAsArrayBuffer(message.data);
@@ -225,8 +238,8 @@ var ThingModel;
                         var arrayBuffer = fileReader.result;
 
                         var senderName = _this._fromProtobuf.Convert(arrayBuffer);
+                        console.debug("ThingModel: message from: " + senderName);
 
-                        console.log("Binary message from: " + senderName);
                         _this._toProtobuf.ApplyThingsSuppressions(_.values(_this._thingModelObserver.Deletions));
                         _this._thingModelObserver.Reset();
                     };
@@ -234,22 +247,29 @@ var ThingModel;
             };
 
             Client.prototype.Send = function () {
+                if (this._closed) {
+                    console.debug("ThingModel: Does not send, waiting for connexion");
+                    return;
+                }
                 if (this._thingModelObserver.SomethingChanged) {
-                    var transaction = this._thingModelObserver.GetTransaction(this._toProtobuf, this.SenderID);
-                    this.ws.send(this._toProtobuf.ConvertTransaction(transaction));
+                    var transaction = this._thingModelObserver.GetTransaction(this._toProtobuf, this.SenderID, this._reconnection);
+
+                    this._ws.send(this._toProtobuf.ConvertTransaction(transaction));
                     this._thingModelObserver.Reset();
+                    this._reconnection = false;
+                    console.debug("ThingModel: transaction sent");
                 }
             };
 
             Client.prototype.Close = function () {
-                if (!this.closed) {
-                    this.ws.close();
-                    this.closed = true;
+                if (!this._closed) {
+                    this._ws.close();
+                    this._closed = true;
                 }
             };
 
             Client.prototype.IsConnected = function () {
-                return this.closed;
+                return this._closed;
             };
             return Client;
         })();
@@ -471,6 +491,7 @@ var ThingModel;
                 this.Updates = {};
                 this.Deletions = {};
                 this.Definitions = {};
+                this.PermanentDefinitions = {};
                 this.somethingChanged = false;
             }
             ProtoModelObserver.prototype.Reset = function () {
@@ -497,6 +518,7 @@ var ThingModel;
 
             ProtoModelObserver.prototype.Define = function (thingType) {
                 this.Definitions[thingType.Name] = thingType;
+                this.PermanentDefinitions[thingType.Name] = thingType;
                 this.somethingChanged = true;
             };
 
@@ -508,8 +530,9 @@ var ThingModel;
                 configurable: true
             });
 
-            ProtoModelObserver.prototype.GetTransaction = function (toProtobuf, senderID) {
-                return toProtobuf.Convert(_.values(this.Updates), _.values(this.Deletions), _.values(this.Definitions), senderID);
+            ProtoModelObserver.prototype.GetTransaction = function (toProtobuf, senderID, allDefinitions) {
+                if (typeof allDefinitions === "undefined") { allDefinitions = false; }
+                return toProtobuf.Convert(_.values(this.Updates), _.values(this.Deletions), _.values(allDefinitions ? this.PermanentDefinitions : this.Definitions), senderID);
             };
             return ProtoModelObserver;
         })();
@@ -1594,6 +1617,14 @@ var ThingModel;
         Object.defineProperty(Wharehouse.prototype, "Things", {
             get: function () {
                 return _.values(this._things);
+            },
+            enumerable: true,
+            configurable: true
+        });
+
+        Object.defineProperty(Wharehouse.prototype, "ThingsTypes", {
+            get: function () {
+                return _.values(this._thingTypes);
             },
             enumerable: true,
             configurable: true
