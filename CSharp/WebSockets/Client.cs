@@ -16,6 +16,7 @@ namespace ThingModel.WebSockets
         private readonly FromProtobuf _fromProtobuf;
         private bool _closed = true;
         private int _reconnectionDelay = 1;
+	    private bool _reconnection = false;
         
         private readonly ProtoModelObserver _thingModelObserver;
 		private readonly object _lock = new Object();
@@ -36,18 +37,33 @@ namespace ThingModel.WebSockets
 
             _ws.OnMessage += WsOnMessage;
             _ws.OnClose += WsOnClose;
+			_ws.OnOpen += WsOnOpen;
 
             Connect();
         }
 
-        public void Send()
+	    private void WsOnOpen(object sender, EventArgs eventArgs)
+	    {
+		    _reconnectionDelay = 1;
+		    Send();
+	    }
+
+	    public void Send()
         {
 			lock (_lock) {
+				if (_closed)
+				{
+					Console.WriteLine("Does not send, waiting for connexion");
+					return;
+				}
+
 				if (_thingModelObserver.SomethingChanged())
 				{
-					var transaction = _thingModelObserver.GetTransaction(_toProtobuf, SenderID);
+					var transaction = _thingModelObserver.GetTransaction(_toProtobuf, SenderID,
+						_reconnection);
 					_ws.Send(_toProtobuf.Convert(transaction));
 					_thingModelObserver.Reset();
+					_reconnection = false;
 				}
 			}
         }
@@ -57,6 +73,9 @@ namespace ThingModel.WebSockets
             if (!_closed)
             {
                 Console.WriteLine("Connection lost, try to connect again in "+_reconnectionDelay+" seconds");
+	            
+				_reconnection = true;
+
                 // ReSharper disable ObjectCreationAsStatement
                 new Timer(state =>
                 {

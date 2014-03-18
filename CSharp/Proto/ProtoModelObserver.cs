@@ -8,6 +8,7 @@ namespace ThingModel.Proto
         public readonly HashSet<ThingModel.Thing> Updates = new HashSet<ThingModel.Thing>();
         public readonly HashSet<ThingModel.Thing> Deletions = new HashSet<ThingModel.Thing>();
         public readonly HashSet<ThingModel.ThingType> Definitions = new HashSet<ThingModel.ThingType>(); 
+        public readonly HashSet<ThingModel.ThingType> PermanentDefinitions = new HashSet<ThingModel.ThingType>(); 
 
         public void Reset()
        { 
@@ -59,7 +60,8 @@ namespace ThingModel.Proto
 		    }
 	    }
 
-        public Transaction GetTransaction(ToProtobuf toProtobuf, string senderID)
+        public Transaction GetTransaction(ToProtobuf toProtobuf, string senderID,
+			bool allDefinitions = false)
         {
 	        List<ThingModel.Thing> copyUpdates;
 	        List<ThingModel.Thing> copyDeletions;
@@ -69,7 +71,8 @@ namespace ThingModel.Proto
 	        {
 				copyUpdates = new List<ThingModel.Thing>(Updates);
 				copyDeletions = new List<ThingModel.Thing>(Deletions);
-				copyDefinitions = new List<ThingModel.ThingType>(Definitions);
+				copyDefinitions = new List<ThingModel.ThingType>(allDefinitions ?
+					PermanentDefinitions : Definitions);
 	        }
 
 	        return toProtobuf.Convert(copyUpdates, copyDeletions, copyDefinitions, senderID);
