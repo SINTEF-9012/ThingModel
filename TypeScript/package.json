@@ -1,6 +1,6 @@
 {
   "name": "ThingModel",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "devDependencies": {
     "grunt-contrib-concat": "~0.3.0",
     "time-grunt": "~0.2.9",
