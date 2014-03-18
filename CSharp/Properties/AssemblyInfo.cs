@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("ThingModel")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("EVRY AS")]
+[assembly: AssemblyCompany("SINTEF")]
 [assembly: AssemblyProduct("ThingModel")]
-[assembly: AssemblyCopyright("Copyright © EVRY AS 2014")]
+[assembly: AssemblyCopyright("SINTEF")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
