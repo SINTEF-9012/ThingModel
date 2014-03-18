@@ -4,6 +4,7 @@
 		public Updates : {[id:string] : ThingModel.Thing} = {};
 		public Deletions : {[id:string] : ThingModel.Thing} = {};
 		public Definitions: { [name: string]: ThingModel.ThingType } = {};
+		public PermanentDefinitions: { [name: string]: ThingModel.ThingType } = {};
 		private somethingChanged = false;
 
 		public Reset() : void {
@@ -30,6 +31,7 @@
 
 		public Define(thingType: ThingModel.ThingType): void {
 			this.Definitions[thingType.Name] = thingType;
+			this.PermanentDefinitions[thingType.Name] = thingType;
 			this.somethingChanged = true;
 		}
 
@@ -37,11 +39,12 @@
 			return this.somethingChanged;
 		}
 
-		public GetTransaction(toProtobuf: ToProtobuf, senderID: string): Transaction {
+		public GetTransaction(toProtobuf: ToProtobuf, senderID: string,
+			allDefinitions:boolean = false): Transaction {
 			return toProtobuf.Convert(
 				_.values(this.Updates),
 				_.values(this.Deletions),
-				_.values(this.Definitions),
+				_.values(allDefinitions ? this.PermanentDefinitions : this.Definitions),
 				senderID);
 		}
 	}

@@ -136,5 +136,9 @@ module ThingModel {
 		public get Things() : Thing[] {
 			return _.values(this._things);
 		}
+
+		public get ThingsTypes(): ThingType[]{
+			return _.values(this._thingTypes);
+		}
 	}	
 } 
