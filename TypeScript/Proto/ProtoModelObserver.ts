@@ -20,6 +20,7 @@
 		}
 
 		public Deleted(thing: ThingModel.Thing): void {
+			delete this.Updates[thing.ID];
 			this.Deletions[thing.ID] = thing;
 			this.somethingChanged = true;
 		}
