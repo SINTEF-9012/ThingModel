@@ -5,7 +5,7 @@ ThingModel is simple and like a new wheel.
 
 It shares data and models in realtime over the network for multiple devices. Mainly iPads, PC and a PixelSense table.
 
-ThingModel does not need compilation, it does not include a DSL either and everything is done during runtime. Also, it is not dependant to a model, you can build the model on the fly and the connected applications can learn it during their executions.
+ThingModel does not need compilation, it does not include a DSL either and everything is done during runtime. You can build the model on the fly and the connected applications can learn it during their executions.
 
 If you are looking for innovative products about models, you should also take a look at [ThingML](http://thingml.org/) or [Kevoree](http://kevoree.org/kmf/).
 
@@ -31,7 +31,7 @@ If you are looking for innovative products about models, you should also take a 
   * Can work in Node.JS
  * __Java__
   * Mainly for Minecraft
-  * Or a HLA bridge
+  * Or a HLA bridge for VBS
 
 ## Bugs
 
