@@ -131,6 +131,15 @@ namespace ThingModel
 			}
 		}
 
+		public void RegisterCollection(IEnumerable<Thing> collection, bool alsoRegisterTypes = false)
+		{
+			var set = new HashSet<Thing>();
+			foreach (var thing in collection)
+			{
+				RecursiveRegisterThing(thing, alsoRegisterTypes, set);
+			}
+		}
+
 		public void RemoveThing(Thing thing, bool notifyUpdates = true)
 		{
 			if (thing == null)
