@@ -102,27 +102,47 @@ namespace ThingModel
             
         }
 
-        public void RegisterCollection(IEnumerable<Thing> collection, bool alsoRegisterTypes = false)
-        {
-            var set = new HashSet<Thing>();
-            foreach (var thing in collection)
-            {
-                RecursiveRegisterThing(thing, alsoRegisterTypes, set);
-            }
-        }
+		public void RemoveCollection(ISet<Thing> collection)
+		{
+			var thingsToDisconnect = new HashSet<Thing>();
 
-        public void RemoveThing(Thing thing)
-        {
-            if (thing == null)
-            {
-                return;
-            }
+			foreach (var thing in collection)
+			{
+				RemoveThing(thing, false);
 
-	        var thingsToDisconnect = new List<Thing>();
+				lock (_lockDictionaryThings)
+				{
+					foreach (var t in _things)
+					{
+						if (t.Value.IsConnectedTo(thing))
+						{
+							thingsToDisconnect.Add(t.Value);
+						}
+					}
+				}
+			}
 
-            // Remove all the connections
-	        lock (_lockDictionaryThings)
-	        {
+			foreach (var t in thingsToDisconnect)
+			{
+				if (!collection.Contains(t))
+				{
+					NotifyThingUpdate(t);
+				}
+			}
+		}
+
+		public void RemoveThing(Thing thing, bool notifyUpdates = true)
+		{
+			if (thing == null)
+			{
+				return;
+			}
+
+			var thingsToDisconnect = new List<Thing>();
+
+			// Remove all the connections
+			lock (_lockDictionaryThings)
+			{
 				foreach (var t in _things)
 				{
 					if (t.Value.IsConnectedTo(thing))
@@ -130,28 +150,37 @@ namespace ThingModel
 						thingsToDisconnect.Add(t.Value);
 					}
 				}
-	        }
+			}
 
+			// Remove the thing
+			bool removed;
 
-            // Remove the thing
-	        bool removed;
+			lock (_lockDictionaryThings)
+			{
+				removed = _things.Remove(thing.ID);
+			}
 
-	        lock (_lockDictionaryThings)
-	        {
-		        removed = _things.Remove(thing.ID);
-	        }
+			if (removed)
+			{
+				NotifyThingDeleted(thing);
+			}
 
-            if (removed)
-            {
-                NotifyThingDeleted(thing);
-            }
-	        
-			foreach (var t in thingsToDisconnect)
-	        {
-				t.Disconnect(thing);
-				NotifyThingUpdate(t);
-	        }
-        }
+			if (notifyUpdates)
+			{
+				foreach (var t in thingsToDisconnect)
+				{
+					t.Disconnect(thing);
+					NotifyThingUpdate(t);
+				}
+			}
+			else
+			{
+				foreach (var t in thingsToDisconnect)
+				{
+					t.Disconnect(thing);
+				}
+			}
+		}
 
         public void RegisterObserver(IWharehouseObserver modelObserver)
         {

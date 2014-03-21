@@ -54,7 +54,16 @@ namespace ThingModel.Proto
         public string Convert(Transaction transaction, bool check = false)
         {
             transaction.string_declarations.ForEach(ConvertStringDeclaration);
-            transaction.things_remove_list.ForEach(ConvertDelete);
+
+			var thingsToDelete = new HashSet<ThingModel.Thing>();
+
+			foreach (var thingKey in transaction.things_remove_list)
+			{
+				var id = KeyToString(thingKey);
+				thingsToDelete.Add(Wharehouse.GetThing(id));
+			}
+			Wharehouse.RemoveCollection(thingsToDelete);
+
             transaction.thingtypes_declaration_list.ForEach(ConvertThingTypeDeclaration);
 
             var thingsToConnect = new List<Tuple<ThingModel.Thing, Thing>>();
@@ -94,12 +103,6 @@ namespace ThingModel.Proto
         protected void ConvertStringDeclaration(StringDeclaration declaration)
         {
             StringDeclarations[declaration.key] = declaration.value;
-        }
-
-        protected void ConvertDelete(int thingKey)
-        {
-            var id = KeyToString(thingKey);
-            Wharehouse.RemoveThing(Wharehouse.GetThing(id));
         }
 
         protected void ConvertThingTypeDeclaration(ThingType thingType)
