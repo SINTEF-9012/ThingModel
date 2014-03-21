@@ -33,11 +33,17 @@ module ThingModel.Proto {
 				this._stringDeclarations[d.key] = d.value;
 			});
 
+			var thingsToDelete: { [id: string]: ThingModel.Thing } = {};
 			// Remove the things
 			_.each(transaction.things_remove_list, (key: number) => {
 				var id = this.KeyToString(key);
-				this._wharehouse.RemoveThing(this._wharehouse.GetThing(id));
+				var thing = this._wharehouse.GetThing(id);
+				if (thing) {
+					thingsToDelete[thing.ID] = thing;
+				}
 			});
+
+			this._wharehouse.RemoveCollection(thingsToDelete);
 
 			// Declare the things type
 			_.each(transaction.thingtypes_declaration_list, (d: ThingType)=> {

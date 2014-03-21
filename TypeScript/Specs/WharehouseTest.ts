@@ -123,6 +123,7 @@ describe("Wharehouse Test", () => {
 		wharehouseChangeObserver.DeletedThing.should.be.false;
 	});
 
+
 	it("should handle deletions and creations of the same things", () => {
 		wharehouse.RegisterThing(thing);
 		wharehouse.RemoveThing(thing);
@@ -168,6 +169,21 @@ describe("Wharehouse Test", () => {
 
 		wharehouseChangeObserver.DeletedThing.should.be.true;
 		wharehouseChangeObserver.UpdatedThing.should.be.true;
+	});
+
+	it("should delete two connected things", () => {
+		var otherThing = new ThingModel.Thing("lapin");
+		otherThing.Connect(thing);
+
+		wharehouse.RegisterThing(otherThing);
+		wharehouse.RegisterThing(thing);
+		wharehouse.Things.length.should.be.equal(2);
+
+		wharehouseChangeObserver.Reset();
+		wharehouse.RemoveThing(thing);
+		wharehouse.RemoveThing(otherThing);
+
+		wharehouse.Things.length.should.be.equal(0);
 	});
 // ReSharper restore WrongExpressionStatement
 });

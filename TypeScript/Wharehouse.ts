@@ -73,7 +73,28 @@ module ThingModel {
 			});
 		}
 
-		public RemoveThing(thing: Thing): void{
+		public RemoveCollection(collection: { [id: string]: Thing }) {
+			var thingsToDisconnect: { [id: string]: Thing } = {};
+
+			_.each(_.keys(collection), (id: string) => {
+				var thing = collection[id];
+				this.RemoveThing(thing, false);
+
+				_.each(this._things, (t : Thing) => {
+					if (t.IsConnectedTo(thing)) {
+						thingsToDisconnect[t.ID] = t;
+					}
+				});
+			});
+
+			_.each(_.keys(thingsToDisconnect), (id: string) => {
+				if (!collection.hasOwnProperty(id)) {
+					this.NotifyThingUpdate(thingsToDisconnect[id]);
+				}
+			});
+		}
+
+		public RemoveThing(thing: Thing, notifyUpdates = true): void{
 			if (!thing) {
 				return;
 			}
@@ -82,7 +103,9 @@ module ThingModel {
 			_.each(this._things, (t : Thing) => {
 				if (t.IsConnectedTo(thing)) {
 					t.Disconnect(thing);
-					this.NotifyThingUpdate(t);
+					if (notifyUpdates) {
+						this.NotifyThingUpdate(t);
+					}
 				}
 			});
 
