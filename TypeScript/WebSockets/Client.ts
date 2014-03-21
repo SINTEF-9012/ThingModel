@@ -61,23 +61,28 @@
 				 }
 			 };
 
+			 var useFileReader = typeof FileReader !== "undefined";
+
 			 this._ws.onmessage = (message) => {
 				 // Convert the Blob message to an ArrayBuffer object
-				 var fileReader = new FileReader();
 
-				 fileReader.readAsArrayBuffer(message.data);
-
-				 fileReader.onload = () => {
-					 var arrayBuffer = fileReader.result;
-
-					 var senderName = this._fromProtobuf.Convert(arrayBuffer);
-					 console.debug("ThingModel: message from: "+senderName);
-
-					 this._toProtobuf.ApplyThingsSuppressions(_.values(this._thingModelObserver.Deletions));
-					 this._thingModelObserver.Reset();
-				 };
-
+				 if (useFileReader) {
+					 var fileReader = new FileReader();
+					 fileReader.readAsArrayBuffer(message.data);
+					 fileReader.onload = ()=> this.parseBuffer(fileReader.result);
+				 } else {
+					 this.parseBuffer(message.data);
+				 }
 			 };
+
+		 }
+
+		 private parseBuffer(buffer) {
+			 var senderName = this._fromProtobuf.Convert(buffer);
+			 console.debug("ThingModel: message from: "+senderName);
+
+			 this._toProtobuf.ApplyThingsSuppressions(_.values(this._thingModelObserver.Deletions));
+			 this._thingModelObserver.Reset();
 		 }
 
 		 public Send(): void {
