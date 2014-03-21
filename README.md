@@ -3,7 +3,7 @@
 
 ThingModel is simple and like a new wheel.
 
-It shares data and models over the network for multiple devices. Mainly iPads, PC and a PixelSense table.
+It shares data and models in realtime over the network for multiple devices. Mainly iPads, PC and a PixelSense table.
 
 ThingModel does not need compilation, it does not include a DSL either and everything is done during runtime. Also, it is not dependant to a model, you can build the model on the fly and the connected applications can learn it during their executions.
 
@@ -51,7 +51,7 @@ Otherwise: [__Download__](https://github.com/SINTEF-9012/ThingModel/archive/mast
 
 ```csharp
 
-// Create the ThingType Rabbit
+// Declare the rabbit type
 var typeRabbit = BuildANewThingType.Named("rabbit")
 				.WhichIs("Just a rabbit")
 				.ContainingA.String("name")
@@ -66,7 +66,7 @@ var rabbit = BuildANewThing.As(typeRabbit)
 				.AndA.Location("localization", new Location.Point(42,51))
 				.AndAn.Int("nbChildren", 12);
 
-// The wharehouse store the objects
+// The wharehouse stores the objects
 var wharehouse = new Wharehouse();
 
 // Create a websocket client
