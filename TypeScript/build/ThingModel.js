@@ -229,21 +229,27 @@ var ThingModel;
                     }
                 };
 
+                var useFileReader = typeof FileReader !== "undefined";
+
                 this._ws.onmessage = function (message) {
-                    var fileReader = new FileReader();
-
-                    fileReader.readAsArrayBuffer(message.data);
-
-                    fileReader.onload = function () {
-                        var arrayBuffer = fileReader.result;
-
-                        var senderName = _this._fromProtobuf.Convert(arrayBuffer);
-                        console.debug("ThingModel: message from: " + senderName);
-
-                        _this._toProtobuf.ApplyThingsSuppressions(_.values(_this._thingModelObserver.Deletions));
-                        _this._thingModelObserver.Reset();
-                    };
+                    if (useFileReader) {
+                        var fileReader = new FileReader();
+                        fileReader.readAsArrayBuffer(message.data);
+                        fileReader.onload = function () {
+                            return _this.parseBuffer(fileReader.result);
+                        };
+                    } else {
+                        _this.parseBuffer(message.data);
+                    }
                 };
+            };
+
+            Client.prototype.parseBuffer = function (buffer) {
+                var senderName = this._fromProtobuf.Convert(buffer);
+                console.debug("ThingModel: message from: " + senderName);
+
+                this._toProtobuf.ApplyThingsSuppressions(_.values(this._thingModelObserver.Deletions));
+                this._thingModelObserver.Reset();
             };
 
             Client.prototype.Send = function () {
@@ -308,10 +314,17 @@ var ThingModel;
                     _this._stringDeclarations[d.key] = d.value;
                 });
 
+                var thingsToDelete = {};
+
                 _.each(transaction.things_remove_list, function (key) {
                     var id = _this.KeyToString(key);
-                    _this._wharehouse.RemoveThing(_this._wharehouse.GetThing(id));
+                    var thing = _this._wharehouse.GetThing(id);
+                    if (thing) {
+                        thingsToDelete[thing.ID] = thing;
+                    }
                 });
+
+                this._wharehouse.RemoveCollection(thingsToDelete);
 
                 _.each(transaction.thingtypes_declaration_list, function (d) {
                     _this.ConvertThingTypeDeclaration(d);
@@ -507,6 +520,7 @@ var ThingModel;
             };
 
             ProtoModelObserver.prototype.Deleted = function (thing) {
+                delete this.Updates[thing.ID];
                 this.Deletions[thing.ID] = thing;
                 this.somethingChanged = true;
             };
@@ -1555,7 +1569,30 @@ var ThingModel;
             });
         };
 
-        Wharehouse.prototype.RemoveThing = function (thing) {
+        Wharehouse.prototype.RemoveCollection = function (collection) {
+            var _this = this;
+            var thingsToDisconnect = {};
+
+            _.each(_.keys(collection), function (id) {
+                var thing = collection[id];
+                _this.RemoveThing(thing, false);
+
+                _.each(_this._things, function (t) {
+                    if (t.IsConnectedTo(thing)) {
+                        thingsToDisconnect[t.ID] = t;
+                    }
+                });
+            });
+
+            _.each(_.keys(thingsToDisconnect), function (id) {
+                if (!collection.hasOwnProperty(id)) {
+                    _this.NotifyThingUpdate(thingsToDisconnect[id]);
+                }
+            });
+        };
+
+        Wharehouse.prototype.RemoveThing = function (thing, notifyUpdates) {
+            if (typeof notifyUpdates === "undefined") { notifyUpdates = true; }
             var _this = this;
             if (!thing) {
                 return;
@@ -1564,7 +1601,9 @@ var ThingModel;
             _.each(this._things, function (t) {
                 if (t.IsConnectedTo(thing)) {
                     t.Disconnect(thing);
-                    _this.NotifyThingUpdate(t);
+                    if (notifyUpdates) {
+                        _this.NotifyThingUpdate(t);
+                    }
                 }
             });
 
