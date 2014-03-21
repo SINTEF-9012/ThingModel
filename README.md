@@ -3,7 +3,7 @@
 
 ThingModel is simple and like a new wheel.
 
-It shares data and models in realtime over the network for multiple devices. Mainly iPads, PC and a PixelSense table.
+It synchronizes data and models in realtime over the network for multiple devices. Mainly iPads, PC and a PixelSense table.
 
 ThingModel does not need compilation, it does not include a DSL either and everything is done during runtime. You can build the model on the fly and the connected applications can learn it during their executions.
 
