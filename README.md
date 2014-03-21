@@ -1,40 +1,41 @@
 ![ThingModel](https://raw.github.com/SINTEF-9012/ThingModel/master/Documentation/Logo.png)
 ==========
 
-![Model](https://raw2.github.com/SINTEF-9012/ThingModel/master/Documentation/ThingModel.png)
-
-### Simple
-
 ThingModel is simple and like a new wheel.
 
 It shares data and models over the network for multiple devices. Mainly iPads, PC and a PixelSense table.
 
 If you are looking for a innovative product about models, you should take a look at [ThingML](http://thingml.org/) or [Kevoree](http://kevoree.org/kmf/).
 
+## Model
 
-### Light network synchronization
+![Model](https://raw2.github.com/SINTEF-9012/ThingModel/master/Documentation/ThingModel.png)
+
+
+## Light network synchronization
 
  * Clients and servers over WebSockets
  * Light serialization with Protocol Buffers
- * Diff algorithm, for very lights synchronizations
+ * Diff algorithm, only send changes
+ * String cache for smaller messages
 
-### Bugs
+## Multi-plateform
 
-ThingModel is used almost every days. It's a test driven development, but *it's not stable*.
-
-### Multi-plateform
-
- * C# .Net
+ * __C# .Net__
   * For the PixelSense table
-  * And because C# is cool
- * JavaScript (and TypeScript)
+  * And because C# is cool
+ * __JavaScript__ (and TypeScript)
   * Recent HTML5 browsers (need WebSocket support)
   * Can work in Node.JS
- * Java
+ * __Java__
   * Mainly for Minecraft
   * Or a HLA bridge
 
-### Installation
+## Bugs
+
+ThingModel is tested and used almost every days and it works, but *it's not stable*.
+
+## Installation
 
 __Nuget__: ```Install-Package ThingModel```
 
@@ -43,3 +44,45 @@ __Bower__: ```bower install ThingModel```
 __Maven__: *need motivation*
 
 Otherwise: [__Download__](https://github.com/SINTEF-9012/ThingModel/archive/master.zip)
+
+## Example (in CSharp)
+
+```csharp
+
+// Create the ThingType Rabbit
+var typeRabbit = BuildANewThingType.Named("rabbit")
+				.WhichIs("Just a rabbit")
+				.ContainingA.String("name")
+				.AndA.Location("localization")
+				.AndA.NotRequired.Double("speed")
+				.AndAn.Int("nbChildren", "Number of children");
+				
+// Create a rabbit instance
+var rabbit = BuildANewThing.As(typeRabbit)
+				.IdentifiedBy("ab548")
+				.ContainingA.String("name", "Roger")
+				.AndA.Location("localization", new Location.Point(42,51))
+				.AndAn.Int("nbChildren", 12);
+
+// The wharehouse store the objects
+var wharehouse = new Wharehouse();
+
+// Create a websocket client
+var client = new Client("Emitter", "ws://localhost:1234", wharehouse);
+
+// Register the rabbit
+wharehouse.RegisterThing(rabbit);
+
+// Send the changes to the server
+client.Send();
+```
+
+```csharp
+var wharehouse = new Wharehouse();
+var client = new Client("Receiver", "ws://localhost:1234", wharehouse);
+
+wharehouse.Events.OnNew += (sender, args) => {
+    // The GetProperty call is a bit ugly, it will change
+    Console.WriteLine(args.Thing.GetProperty<Property.String>("name").Value);
+};
+```
