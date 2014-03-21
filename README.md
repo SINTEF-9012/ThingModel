@@ -5,7 +5,9 @@ ThingModel is simple and like a new wheel.
 
 It shares data and models over the network for multiple devices. Mainly iPads, PC and a PixelSense table.
 
-If you are looking for a innovative product about models, you should take a look at [ThingML](http://thingml.org/) or [Kevoree](http://kevoree.org/kmf/).
+ThingModel does not need compilation, it does not include a DSL either and everything is done during runtime. Also, it is not dependant to a model, you can build the model on the fly and the connected applications can learn it during their executions.
+
+If you are looking for innovative products about models, you should also take a look at [ThingML](http://thingml.org/) or [Kevoree](http://kevoree.org/kmf/).
 
 ## Model
 
