@@ -206,7 +206,7 @@ namespace ThingModel.Specs
 			Assert.That(_wharehouseB.GetThing("lapin"), Is.Null);
 
 		}
-
+	    
         [Test]
         public void TestUpdate()
         {
@@ -355,6 +355,37 @@ namespace ThingModel.Specs
             Assert.That(_wharehouseWaitB.WaitUpdated(), Is.True);
             Assert.That(_wharehouseB.GetThing("family").IsConnectedTo(_wharehouseB.GetThing("Bob")), Is.True);
         }
+		
+		[Test]
+	    public void TestDeleteTwoConnectedThings()
+	    {
+		    var lapin = new Thing("lapin");
+		    var canard = new Thing("canard");
+			lapin.Connect(canard);
+
+            _wharehouseA.RegisterThing(lapin);
+            _wharehouseA.RegisterThing(canard);
+            Assert.That(_wharehouseWaitA.WaitUpdated(), Is.True);
+            
+			_clientA.Send();
+            Assert.That(_wharehouseWaitB.WaitNew(), Is.True);
+            Assert.That(_wharehouseWaitA.WaitNew(), Is.True);
+
+			_wharehouseB.RemoveThing(_wharehouseB.GetThing("lapin"));
+			_wharehouseB.RemoveThing(_wharehouseB.GetThing("canard"));
+            Assert.That(_wharehouseA.Things.Count, Is.EqualTo(2));
+			_clientB.Send();
+            
+            Assert.That(_wharehouseWaitA.WaitDeleted(), Is.True);
+            Assert.That(_wharehouseWaitA.WaitUpdated(500), Is.False);
+
+            Assert.That(_wharehouseWaitA.WaitNew(500), Is.False);
+			
+            Assert.That(_wharehouseA.Things.Count, Is.EqualTo(0));
+            Assert.That(_wharehouseB.Things.Count, Is.EqualTo(0));
+	    }
+
+
 
         [Test]
         public void TestInvalidObject()

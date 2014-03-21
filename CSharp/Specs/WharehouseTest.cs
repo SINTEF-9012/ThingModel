@@ -218,6 +218,22 @@ namespace ThingModel.Specs
 
         }
 
+	    [Test]
+	    public void DeleteTwoConnectedThings()
+	    {
+		    var otherThing = new Thing("lapin");
+			otherThing.Connect(_thing);
+            _wharehouse.RegisterThing(otherThing);
+            _wharehouse.RegisterThing(_thing);
+            Assert.That(_wharehouse.Things.Count, Is.EqualTo(2));
+
+            _wharehouseChangeObserver.Reset();
+            _wharehouse.RemoveThing(_thing);
+            _wharehouse.RemoveThing(otherThing);
+
+            Assert.That(_wharehouse.Things.Count, Is.EqualTo(0));
+	    }
+
         [Test]
         public void MultiThreadCarnage()
         {
