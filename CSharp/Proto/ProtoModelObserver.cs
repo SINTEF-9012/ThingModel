@@ -2,7 +2,7 @@
 
 namespace ThingModel.Proto
 {
-    internal class ProtoModelObserver : IWharehouseObserver
+    internal class ProtoModelObserver : IWarehouseObserver
     {
 	    private readonly object _lockHashSet = new object();
         public readonly HashSet<ThingModel.Thing> Updates = new HashSet<ThingModel.Thing>();

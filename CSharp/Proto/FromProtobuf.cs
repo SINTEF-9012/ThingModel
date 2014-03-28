@@ -31,11 +31,11 @@ namespace ThingModel.Proto
             return StringDeclarations.TryGetValue(key, out value) ? value : "undefined";
         }
 
-        protected Wharehouse Wharehouse;
+        protected Warehouse Warehouse;
 
-        public FromProtobuf(Wharehouse wharehouse)
+        public FromProtobuf(Warehouse warehouse)
         {
-            Wharehouse = wharehouse;
+            Warehouse = warehouse;
         }
 
         private readonly MemoryStream _memoryInput = new MemoryStream();
@@ -60,9 +60,9 @@ namespace ThingModel.Proto
 			foreach (var thingKey in transaction.things_remove_list)
 			{
 				var id = KeyToString(thingKey);
-				thingsToDelete.Add(Wharehouse.GetThing(id));
+				thingsToDelete.Add(Warehouse.GetThing(id));
 			}
-			Wharehouse.RemoveCollection(thingsToDelete);
+			Warehouse.RemoveCollection(thingsToDelete);
 
             transaction.thingtypes_declaration_list.ForEach(ConvertThingTypeDeclaration);
 
@@ -84,7 +84,7 @@ namespace ThingModel.Proto
 
                 foreach (var connection in tuple.Item2.connections)
                 {
-                    var t = Wharehouse.GetThing(KeyToString(connection));
+                    var t = Warehouse.GetThing(KeyToString(connection));
                     if (t != null)
                     {
                         tuple.Item1.Connect(t);    
@@ -92,7 +92,7 @@ namespace ThingModel.Proto
                     
                 }
 
-                Wharehouse.RegisterThing(tuple.Item1, false);    
+                Warehouse.RegisterThing(tuple.Item1, false);    
             }
 
             var senderId = KeyToString(transaction.string_sender_id);
@@ -121,7 +121,7 @@ namespace ThingModel.Proto
 
                 modelType.DefineProperty(modelProperty);
             }
-            Wharehouse.RegisterType(modelType);
+            Warehouse.RegisterType(modelType);
         }
 
         protected ThingModel.Thing ConvertThingPublication(Thing thing, bool check)
@@ -130,16 +130,16 @@ namespace ThingModel.Proto
             if (thing.string_type_name != 0)
             {
                 // Here the type can be null if the string type name is not registered
-                // in the wharehouse (can be an error from a client)
+                // in the Warehouse (can be an error from a client)
 
                 // So, if the type is null, it rolls back to the default type
                 // It's a robust model
-                type = Wharehouse.GetThingType(KeyToString(thing.string_type_name));
+                type = Warehouse.GetThingType(KeyToString(thing.string_type_name));
             }
 
             var id = KeyToString(thing.string_id);
             
-            var modelThing = Wharehouse.GetThing(id);
+            var modelThing = Warehouse.GetThing(id);
                
             if (modelThing == null || (
 				modelThing.Type == null && type != null ||
@@ -235,7 +235,7 @@ namespace ThingModel.Proto
             }
             else if (!thing.connections_change)
             {
-                Wharehouse.RegisterThing(modelThing, false);    
+                Warehouse.RegisterThing(modelThing, false);    
             }
             
             return modelThing;

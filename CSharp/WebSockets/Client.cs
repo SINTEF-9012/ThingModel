@@ -11,7 +11,7 @@ namespace ThingModel.WebSockets
         private readonly WebSocket _ws;
 		
 		// ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable
-        private readonly Wharehouse _wharehouse;
+        private readonly Warehouse _warehouse;
         private readonly ToProtobuf _toProtobuf;
         private readonly FromProtobuf _fromProtobuf;
         private bool _closed = true;
@@ -21,16 +21,16 @@ namespace ThingModel.WebSockets
         private readonly ProtoModelObserver _thingModelObserver;
 		private readonly object _lock = new Object();
 
-        public Client(string senderID, string path, Wharehouse wharehouse)
+        public Client(string senderID, string path, Warehouse warehouse)
         {
             SenderID = senderID;
 
-            _wharehouse = wharehouse;
+            _warehouse = warehouse;
 
             _thingModelObserver = new ProtoModelObserver();
-            _wharehouse.RegisterObserver(_thingModelObserver);
+            _warehouse.RegisterObserver(_thingModelObserver);
 
-            _fromProtobuf = new FromProtobuf(wharehouse);
+            _fromProtobuf = new FromProtobuf(warehouse);
             _toProtobuf = new ToProtobuf();
 
             _ws = new WebSocket(path);

@@ -55,7 +55,7 @@
     <Compile Include="Proto\ProtoModelObserver.cs" />
     <Compile Include="Proto\ToProtobuf.cs" />
     <Compile Include="Location.cs" />
-    <Compile Include="IWharehouseObserver.cs" />
+    <Compile Include="IWarehouseObserver.cs" />
     <Compile Include="Property.cs" />
     <Compile Include="PropertyType.cs" />
     <Compile Include="Proto\Property.cs" />
@@ -70,14 +70,14 @@
     <Compile Include="Specs\ThingTest.cs" />
     <Compile Include="Specs\ThingTypeTest.cs" />
     <Compile Include="Specs\WebSocketServers.cs" />
-    <Compile Include="Specs\WharehouseTest.cs" />
+    <Compile Include="Specs\WarehouseTest.cs" />
     <Compile Include="Thing.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ThingType.cs" />
-    <Compile Include="Wharehouse.cs" />
+    <Compile Include="Warehouse.cs" />
     <Compile Include="WebSockets\Client.cs" />
     <Compile Include="WebSockets\Server.cs" />
-    <Compile Include="WharehouseEvents.cs" />
+    <Compile Include="WarehouseEvents.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

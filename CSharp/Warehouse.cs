@@ -3,13 +3,13 @@ using System.Collections.Generic;
 
 namespace ThingModel
 {
-    public class Wharehouse
+    public class Warehouse
     {
         private readonly Dictionary<string, ThingType> _thingTypes = new Dictionary<string, ThingType>();
 
         private readonly Dictionary<string, Thing> _things = new Dictionary<string, Thing>();
 
-        private readonly HashSet<IWharehouseObserver> _observers = new HashSet<IWharehouseObserver>();
+        private readonly HashSet<IWarehouseObserver> _observers = new HashSet<IWarehouseObserver>();
 
 		private readonly Object _lockDictionaryThingTypes = new object();
 		private readonly Object _lockDictionaryThings = new object();
@@ -46,7 +46,7 @@ namespace ThingModel
         {
             if (thing == null)
             {
-                throw new Exception("Null are not allowed in the wharehouse.");
+                throw new Exception("Null are not allowed in the warehouse.");
             }
 
 	        bool creation;
@@ -191,12 +191,12 @@ namespace ThingModel
 			}
 		}
 
-        public void RegisterObserver(IWharehouseObserver modelObserver)
+        public void RegisterObserver(IWarehouseObserver modelObserver)
         {
             _observers.Add(modelObserver);
         }
 
-        public void UnregisterObserver(IWharehouseObserver modelObserver)
+        public void UnregisterObserver(IWarehouseObserver modelObserver)
         {
             _observers.Remove(modelObserver);
         }
@@ -275,16 +275,16 @@ namespace ThingModel
 			}
 	    }
 
-	    private WharehouseEvents _eventsObserver;
+	    private WarehouseEvents _eventsObserver;
 
-	    public WharehouseEvents Events
+	    public WarehouseEvents Events
 	    {
 		    get
 		    {
 			    // Lazy loading
 			    if (_eventsObserver == null)
 			    {
-					_eventsObserver = new WharehouseEvents();
+					_eventsObserver = new WarehouseEvents();
 					RegisterObserver(_eventsObserver);
 			    }
 

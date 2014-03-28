@@ -2,7 +2,7 @@
 
 namespace ThingModel
 {
-	public class WharehouseEvents : IWharehouseObserver
+	public class WarehouseEvents : IWarehouseObserver
 	{
 		public class ThingEventArgs : EventArgs
 		{

@@ -13,10 +13,10 @@ namespace ThingModel.Specs
         private Client _clientA;
         private Client _clientB;
         
-        private Wharehouse _wharehouseA;
-        private Wharehouse _wharehouseB;
+        private Warehouse _warehouseA;
+        private Warehouse _warehouseB;
 
-        private class WharehouseWait : IWharehouseObserver
+        private class WarehouseWait : IWarehouseObserver
         {
             private readonly AutoResetEvent _newEvent = new AutoResetEvent(false);
             private readonly AutoResetEvent _deleteEvent = new AutoResetEvent(false);
@@ -73,28 +73,28 @@ namespace ThingModel.Specs
            
         }
 
-        private WharehouseWait _wharehouseWaitA;
-        private WharehouseWait _wharehouseWaitB;
+        private WarehouseWait _warehouseWaitA;
+        private WarehouseWait _warehouseWaitB;
 
         private const string Path = "ws://localhost:4251/";
 
         [SetUp]
         protected void SetUp()
         {
-            _wharehouseA = new Wharehouse();
-            _wharehouseB = new Wharehouse();
+            _warehouseA = new Warehouse();
+            _warehouseB = new Warehouse();
 
             _server = new Server(Path);
             
 
-            _clientA = new Client("UnitTestA", Path, _wharehouseA);
-            _clientB = new Client("UnitTestB", Path, _wharehouseB);
+            _clientA = new Client("UnitTestA", Path, _warehouseA);
+            _clientB = new Client("UnitTestB", Path, _warehouseB);
 
-            _wharehouseWaitA = new WharehouseWait();
-            _wharehouseA.RegisterObserver(_wharehouseWaitA);
+            _warehouseWaitA = new WarehouseWait();
+            _warehouseA.RegisterObserver(_warehouseWaitA);
 
-            _wharehouseWaitB = new WharehouseWait();
-            _wharehouseB.RegisterObserver(_wharehouseWaitB);
+            _warehouseWaitB = new WarehouseWait();
+            _warehouseB.RegisterObserver(_warehouseWaitB);
 
             _server.Debug();
             _clientA.Debug();
@@ -133,15 +133,15 @@ namespace ThingModel.Specs
 	    {
 			_clientB.Close();
 
-			_wharehouseA.RegisterThing(new Thing("groaw", new ThingType("duck")), false, true);
+			_warehouseA.RegisterThing(new Thing("groaw", new ThingType("duck")), false, true);
 			_clientA.Send();
 
 			_clientB.Connect();
 
 
-            Assert.That(_wharehouseWaitB.WaitNew(5000), Is.True);
+            Assert.That(_warehouseWaitB.WaitNew(5000), Is.True);
 	
-			var thing = _wharehouseB.GetThing("groaw");
+			var thing = _warehouseB.GetThing("groaw");
             Assert.That(thing, Is.Not.Null);
             Assert.That(thing.Type, Is.Not.Null);
 	    }
@@ -150,60 +150,60 @@ namespace ThingModel.Specs
         public void TestNew()
         {
             var thing = new Thing("lapin");
-            _wharehouseA.RegisterThing(thing);
+            _warehouseA.RegisterThing(thing);
             _clientA.Send();
 
-            Assert.That(_wharehouseWaitB.WaitNew(), Is.True);
+            Assert.That(_warehouseWaitB.WaitNew(), Is.True);
 
-            Assert.That(_wharehouseB.GetThing("lapin"), Is.Not.Null);
+            Assert.That(_warehouseB.GetThing("lapin"), Is.Not.Null);
         }
     
         [Test]
         public void SaveState()
         {
             _clientB.Close();
-            _wharehouseA.RegisterThing(new Thing("boat"));
+            _warehouseA.RegisterThing(new Thing("boat"));
             _clientA.Send();
             _clientB.Connect();
 
-            Assert.That(_wharehouseWaitB.WaitNew(), Is.True);
-            Assert.That(_wharehouseB.GetThing("boat"), Is.Not.Null);
+            Assert.That(_warehouseWaitB.WaitNew(), Is.True);
+            Assert.That(_warehouseB.GetThing("boat"), Is.Not.Null);
         }
 
         [Test]
         public void TestDelete()
         {
-            _wharehouseA.RegisterThing(new Thing("lapin"));
+            _warehouseA.RegisterThing(new Thing("lapin"));
             _clientA.Send();
 
-            _wharehouseWaitB.WaitNew();
-            _wharehouseB.RemoveThing(_wharehouseB.GetThing("lapin"));
-            Assert.That(_wharehouseB.GetThing("lapin"), Is.Null);
+            _warehouseWaitB.WaitNew();
+            _warehouseB.RemoveThing(_warehouseB.GetThing("lapin"));
+            Assert.That(_warehouseB.GetThing("lapin"), Is.Null);
             _clientB.Send();
 
-            Assert.That( _wharehouseWaitA.WaitDeleted(), Is.True);
-            Assert.That(_wharehouseA.GetThing("lapin"), Is.Null);
+            Assert.That( _warehouseWaitA.WaitDeleted(), Is.True);
+            Assert.That(_warehouseA.GetThing("lapin"), Is.Null);
             
-			_wharehouseA.RegisterThing(new Thing("lapin"));
+			_warehouseA.RegisterThing(new Thing("lapin"));
             _clientA.Send();
 
-            Assert.That( _wharehouseWaitB.WaitNew(), Is.True);
-            Assert.That(_wharehouseB.GetThing("lapin"), Is.Not.Null);
+            Assert.That( _warehouseWaitB.WaitNew(), Is.True);
+            Assert.That(_warehouseB.GetThing("lapin"), Is.Not.Null);
         }
 
 		[Test]
 		public void TestDeleteAndCreateInSameTransaction()
 		{
 			var lapin = new Thing("lapin");
-			_wharehouseA.RegisterThing(lapin);
-			_wharehouseA.RemoveThing(lapin);
+			_warehouseA.RegisterThing(lapin);
+			_warehouseA.RemoveThing(lapin);
 
-			_wharehouseA.RegisterThing(new Thing("ping"));
+			_warehouseA.RegisterThing(new Thing("ping"));
 			_clientA.Send();
 
-			_wharehouseWaitB.WaitNew();
+			_warehouseWaitB.WaitNew();
 
-			Assert.That(_wharehouseB.GetThing("lapin"), Is.Null);
+			Assert.That(_warehouseB.GetThing("lapin"), Is.Null);
 
 		}
 	    
@@ -212,19 +212,19 @@ namespace ThingModel.Specs
         {
             var lapin = new Thing("lapin");
             lapin.SetProperty(new Property.String("name", "roger"));
-            _wharehouseA.RegisterThing(lapin);
+            _warehouseA.RegisterThing(lapin);
             _clientA.Send();
-            _wharehouseWaitB.WaitNew();
+            _warehouseWaitB.WaitNew();
 
-            var lapinB = _wharehouseB.GetThing("lapin");
+            var lapinB = _warehouseB.GetThing("lapin");
             lapinB.SetProperty(new Property.String("name", "groaw"));
-            _wharehouseB.NotifyThingUpdate(lapinB);
+            _warehouseB.NotifyThingUpdate(lapinB);
 			Console.WriteLine(" ------ send ------ ");
             _clientB.Send();
 
-            Assert.That(_wharehouseWaitA.WaitUpdated(), Is.True);
+            Assert.That(_warehouseWaitA.WaitUpdated(), Is.True);
 
-            Assert.That(_wharehouseA.GetThing("lapin")
+            Assert.That(_warehouseA.GetThing("lapin")
                 .GetProperty<Property.String>("name").Value, Is.EqualTo("groaw"));
         }
 
@@ -247,19 +247,19 @@ namespace ThingModel.Specs
 
             var thing = new Thing("lapin", type);
             thing.SetProperty(new Property.String("name", "Roger"));
-            _wharehouseA.RegisterThing(thing, true, true);
+            _warehouseA.RegisterThing(thing, true, true);
             _clientA.Send();
 
-            Assert.That(_wharehouseWaitB.WaitDefine(), Is.True);
+            Assert.That(_warehouseWaitB.WaitDefine(), Is.True);
 
-            var transportedType = _wharehouseB.GetThingType("rabbit");
+            var transportedType = _warehouseB.GetThingType("rabbit");
             Assert.That(transportedType, Is.Not.Null);
 
             Assert.That(type.Description, Is.EqualTo(transportedType.Description));
 
             Assert.That(transportedType.GetPropertyDefinition("position").Description, Is.EqualTo(position.Description));
 
-            Assert.That(_wharehouseB.GetThing("lapin").Type.Name, Is.EqualTo(type.Name));
+            Assert.That(_warehouseB.GetThing("lapin").Type.Name, Is.EqualTo(type.Name));
         }
 
 	    [Test]
@@ -268,20 +268,20 @@ namespace ThingModel.Specs
 		    var type = new ThingType("rabbit");
 		    var thing = new Thing("lapin", type);
 			thing.SetProperty(new Property.String("name", "Roger"));
-			_wharehouseA.RegisterThing(thing,true,true);
+			_warehouseA.RegisterThing(thing,true,true);
 			_clientA.Send();
 
-            Assert.That(_wharehouseWaitB.WaitDefine(), Is.True);
+            Assert.That(_warehouseWaitB.WaitDefine(), Is.True);
 
 			thing = new Thing("lapin");
 			Assert.That(thing.GetProperty<Property.String>("name"), Is.Null);
-		    _wharehouseA.RegisterThing(thing);
+		    _warehouseA.RegisterThing(thing);
 			_clientA.Send();
 
-            Assert.That(_wharehouseWaitB.WaitUpdated(), Is.True);
+            Assert.That(_warehouseWaitB.WaitUpdated(), Is.True);
 
 			Assert.That(thing.GetProperty<Property.String>("name"), Is.Null);
-			Assert.That(_wharehouseB.GetThing("lapin").GetProperty<Property.String>("name"), Is.Null);
+			Assert.That(_warehouseB.GetThing("lapin").GetProperty<Property.String>("name"), Is.Null);
 	    }
 
         [Test]
@@ -290,23 +290,23 @@ namespace ThingModel.Specs
             var pc = new Thing("computer");
             pc.SetProperty(new Property.String("name", "Interstella"));
             pc.SetProperty(new Property.Double("weight", 12));
-            _wharehouseA.RegisterThing(pc);
+            _warehouseA.RegisterThing(pc);
             _clientA.Send();
 
-            Assert.That(_wharehouseWaitB.WaitNew(), Is.True);
+            Assert.That(_warehouseWaitB.WaitNew(), Is.True);
             
-            _wharehouseA.RegisterThing(_wharehouseA.GetThing("computer"));
+            _warehouseA.RegisterThing(_warehouseA.GetThing("computer"));
             _clientA.Send();
 
-            Assert.That(_wharehouseWaitB.WaitUpdated(500), Is.False);
+            Assert.That(_warehouseWaitB.WaitUpdated(500), Is.False);
             _clientA.Send();
-            Assert.That(_wharehouseWaitB.WaitUpdated(500), Is.False);
+            Assert.That(_warehouseWaitB.WaitUpdated(500), Is.False);
 
             pc.SetProperty(new Property.String("name", "Interstella2"));
-            _wharehouseA.NotifyThingUpdate(pc);
+            _warehouseA.NotifyThingUpdate(pc);
             _clientA.Send();
 
-            Assert.That(_wharehouseWaitB.WaitUpdated(), Is.True);
+            Assert.That(_warehouseWaitB.WaitUpdated(), Is.True);
         }
 
         [Test]
@@ -318,42 +318,42 @@ namespace ThingModel.Specs
 
             family.Connect(parentA);
 
-            _wharehouseA.RegisterThing(family);
+            _warehouseA.RegisterThing(family);
             _clientA.Send();
 
-            Assert.That(_wharehouseWaitB.WaitNew(), Is.True);
-            Assert.That(_wharehouseB.GetThing("family").IsConnectedTo(_wharehouseB.GetThing("Patrick")), Is.True);
+            Assert.That(_warehouseWaitB.WaitNew(), Is.True);
+            Assert.That(_warehouseB.GetThing("family").IsConnectedTo(_warehouseB.GetThing("Patrick")), Is.True);
 
             family.Connect(parentB);
-            _wharehouseA.RegisterThing(parentB);
-            _wharehouseA.NotifyThingUpdate(family);
+            _warehouseA.RegisterThing(parentB);
+            _warehouseA.NotifyThingUpdate(family);
             _clientA.Send();
 
 
-            Assert.That(_wharehouseWaitB.WaitUpdated(), Is.True);
-            Assert.That(_wharehouseB.GetThing("family").IsConnectedTo(_wharehouseB.GetThing("Bob")), Is.True);
+            Assert.That(_warehouseWaitB.WaitUpdated(), Is.True);
+            Assert.That(_warehouseB.GetThing("family").IsConnectedTo(_warehouseB.GetThing("Bob")), Is.True);
 
             family.Disconnect(parentB);
 
-            _wharehouseA.NotifyThingUpdate(family);
+            _warehouseA.NotifyThingUpdate(family);
 
             _clientA.Send();
 
-            Assert.That(_wharehouseWaitB.WaitUpdated(), Is.True);
-            Assert.That(_wharehouseB.GetThing("family").IsConnectedTo(_wharehouseB.GetThing("Bob")), Is.False);
+            Assert.That(_warehouseWaitB.WaitUpdated(), Is.True);
+            Assert.That(_warehouseB.GetThing("family").IsConnectedTo(_warehouseB.GetThing("Bob")), Is.False);
 
-            _wharehouseA.NotifyThingUpdate(family);
+            _warehouseA.NotifyThingUpdate(family);
             _clientA.Send();
-            Assert.That(_wharehouseWaitB.WaitUpdated(500), Is.False);
+            Assert.That(_warehouseWaitB.WaitUpdated(500), Is.False);
 
             family.Disconnect(parentA);
             family.Connect(parentB);
-            _wharehouseA.NotifyThingUpdate(family);
+            _warehouseA.NotifyThingUpdate(family);
 
             _clientA.Send();
 
-            Assert.That(_wharehouseWaitB.WaitUpdated(), Is.True);
-            Assert.That(_wharehouseB.GetThing("family").IsConnectedTo(_wharehouseB.GetThing("Bob")), Is.True);
+            Assert.That(_warehouseWaitB.WaitUpdated(), Is.True);
+            Assert.That(_warehouseB.GetThing("family").IsConnectedTo(_warehouseB.GetThing("Bob")), Is.True);
         }
 		
 		[Test]
@@ -363,26 +363,26 @@ namespace ThingModel.Specs
 		    var canard = new Thing("canard");
 			lapin.Connect(canard);
 
-            _wharehouseA.RegisterThing(lapin);
-            _wharehouseA.RegisterThing(canard);
-            Assert.That(_wharehouseWaitA.WaitUpdated(), Is.True);
+            _warehouseA.RegisterThing(lapin);
+            _warehouseA.RegisterThing(canard);
+            Assert.That(_warehouseWaitA.WaitUpdated(), Is.True);
             
 			_clientA.Send();
-            Assert.That(_wharehouseWaitB.WaitNew(), Is.True);
-            Assert.That(_wharehouseWaitA.WaitNew(), Is.True);
+            Assert.That(_warehouseWaitB.WaitNew(), Is.True);
+            Assert.That(_warehouseWaitA.WaitNew(), Is.True);
 
-			_wharehouseB.RemoveThing(_wharehouseB.GetThing("lapin"));
-			_wharehouseB.RemoveThing(_wharehouseB.GetThing("canard"));
-            Assert.That(_wharehouseA.Things.Count, Is.EqualTo(2));
+			_warehouseB.RemoveThing(_warehouseB.GetThing("lapin"));
+			_warehouseB.RemoveThing(_warehouseB.GetThing("canard"));
+            Assert.That(_warehouseA.Things.Count, Is.EqualTo(2));
 			_clientB.Send();
             
-            Assert.That(_wharehouseWaitA.WaitDeleted(), Is.True);
-            Assert.That(_wharehouseWaitA.WaitUpdated(500), Is.False);
+            Assert.That(_warehouseWaitA.WaitDeleted(), Is.True);
+            Assert.That(_warehouseWaitA.WaitUpdated(500), Is.False);
 
-            Assert.That(_wharehouseWaitA.WaitNew(500), Is.False);
+            Assert.That(_warehouseWaitA.WaitNew(500), Is.False);
 			
-            Assert.That(_wharehouseA.Things.Count, Is.EqualTo(0));
-            Assert.That(_wharehouseB.Things.Count, Is.EqualTo(0));
+            Assert.That(_warehouseA.Things.Count, Is.EqualTo(0));
+            Assert.That(_warehouseB.Things.Count, Is.EqualTo(0));
 	    }
 
 
@@ -395,26 +395,26 @@ namespace ThingModel.Specs
             type.DefineProperty(PropertyType.Create<Property.String>("name"));
 
             var thing = new Thing("a", type);
-            _wharehouseA.RegisterThing(thing,true,true);
+            _warehouseA.RegisterThing(thing,true,true);
             _clientA.Send();
 
             // Not sent
-            Assert.That(_wharehouseWaitB.WaitNew(500), Is.False);
+            Assert.That(_warehouseWaitB.WaitNew(500), Is.False);
 
             // Wrong property
             thing.SetProperty(new Property.Double("name", 42));
-            _wharehouseA.NotifyThingUpdate(thing);
+            _warehouseA.NotifyThingUpdate(thing);
             _clientA.Send();
 
             // Still wrong
-            Assert.That(_wharehouseWaitB.WaitNew(500), Is.False);
+            Assert.That(_warehouseWaitB.WaitNew(500), Is.False);
 
             thing.SetProperty(new Property.String("name", "Roger"));
-            _wharehouseA.NotifyThingUpdate(thing);
+            _warehouseA.NotifyThingUpdate(thing);
             _clientA.Send();
 
             // Now, it's OK
-            Assert.That(_wharehouseWaitB.WaitNew(), Is.True);
+            Assert.That(_warehouseWaitB.WaitNew(), Is.True);
         }
     }
 }

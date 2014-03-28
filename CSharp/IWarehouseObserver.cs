@@ -1,6 +1,6 @@
 ﻿namespace ThingModel
 {
-    public interface IWharehouseObserver
+    public interface IWarehouseObserver
     {
         void New(Thing thing);
         void Deleted(Thing thing);

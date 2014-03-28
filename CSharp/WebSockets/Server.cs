@@ -32,28 +32,28 @@ namespace ThingModel.WebSockets
         {
             private readonly ToProtobuf _toProtobuf;
             private readonly FromProtobuf _fromProtobuf;
-            private readonly Wharehouse _wharehouse;
+            private readonly Warehouse _warehouse;
             private readonly ProtoModelObserver _protoModelObserver;
 	        private readonly Server _server;
 			private readonly object _lock = new Object();
 
-            public ServerService(Wharehouse wharehouse, Server server)
+            public ServerService(Warehouse warehouse, Server server)
             {
-                _wharehouse = wharehouse;
+                _warehouse = warehouse;
 	            _server = server;
 
                 _protoModelObserver = new ProtoModelObserver();
-                _wharehouse.RegisterObserver(_protoModelObserver);
+                _warehouse.RegisterObserver(_protoModelObserver);
 
                 _toProtobuf = new ToProtobuf();
-                _fromProtobuf = new FromProtobuf(wharehouse);
+                _fromProtobuf = new FromProtobuf(warehouse);
             }
 
             protected override void OnOpen()
             {
 				lock (_lock)
 				{
-					var transaction = _toProtobuf.Convert(_wharehouse.Things, new Thing[0], _wharehouse.ThingTypes, ServerSenderID);
+					var transaction = _toProtobuf.Convert(_warehouse.Things, new Thing[0], _warehouse.ThingTypes, ServerSenderID);
 					Send(transaction);
 				}
             }
@@ -121,7 +121,7 @@ namespace ThingModel.WebSockets
 
         public Server(string path)
         {
-            var house = new Wharehouse();
+            var house = new Warehouse();
 
 			Transaction += (sender, args) => 
 				Console.WriteLine("Server | Message from : " + args.SenderID +

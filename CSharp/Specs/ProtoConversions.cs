@@ -8,15 +8,15 @@ namespace ThingModel.Specs
     [TestFixture]
     class ProtoConversions
     {
-        private Wharehouse _wharehouse;
+        private Warehouse _warehouse;
         private FromProtobuf _fromProtobuf;
         private ToProtobuf _toProtobuf;
 
         [SetUp]
         protected void SetUp()
         {
-            _wharehouse = new Wharehouse();
-            _fromProtobuf = new FromProtobuf(_wharehouse);
+            _warehouse = new Warehouse();
+            _fromProtobuf = new FromProtobuf(_warehouse);
             _toProtobuf = new ToProtobuf();
         }
 
@@ -32,7 +32,7 @@ namespace ThingModel.Specs
             var senderId = _fromProtobuf.Convert(transaction);
             Assert.That(senderId, Is.EqualTo("tests"));
 
-            var newMessage = _wharehouse.GetThing("first");
+            var newMessage = _warehouse.GetThing("first");
             Assert.That(newMessage, Is.Not.Null);
 
             Assert.That(message.ID, Is.EqualTo(newMessage.ID));
@@ -53,7 +53,7 @@ namespace ThingModel.Specs
 
             _fromProtobuf.Convert(transaction);
 
-            var newType = _wharehouse.GetThingType("message");
+            var newType = _warehouse.GetThingType("message");
 
             Assert.That(newType, Is.Not.Null);
 
@@ -74,9 +74,9 @@ namespace ThingModel.Specs
 
             _fromProtobuf.Convert(_toProtobuf.Convert(new [] {message}, new Thing[0], new [] {type}, "bob"));
             
-            Assert.That(_wharehouse.GetThing("first"), Is.Not.Null);
-            Assert.That(_wharehouse.GetThingType("message"), Is.Not.Null);
-            Assert.That(_wharehouse.GetThing("first").Type, Is.EqualTo(_wharehouse.GetThingType("message")));
+            Assert.That(_warehouse.GetThing("first"), Is.Not.Null);
+            Assert.That(_warehouse.GetThingType("message"), Is.Not.Null);
+            Assert.That(_warehouse.GetThing("first").Type, Is.EqualTo(_warehouse.GetThingType("message")));
         }
 
         [Test]
@@ -95,7 +95,7 @@ namespace ThingModel.Specs
         public void CheckDeletes()
         {
             var duck = new Thing("canard");
-            _wharehouse.RegisterThing(duck);
+            _warehouse.RegisterThing(duck);
 
             var transaction = _toProtobuf.Convert(new Thing[0], new [] {duck}, new ThingType[0], "bob");
 
@@ -103,7 +103,7 @@ namespace ThingModel.Specs
 
             _fromProtobuf.Convert(transaction);
 
-            Assert.That(_wharehouse.GetThing("canard"), Is.Null);
+            Assert.That(_warehouse.GetThing("canard"), Is.Null);
         }
 
         [Test]
@@ -116,7 +116,7 @@ namespace ThingModel.Specs
 
             _fromProtobuf.Convert(_toProtobuf.Convert(new [] {thing}, new Thing[0], new ThingType[0], "earth"));
 
-            var newThing = _wharehouse.GetThing("earth");
+            var newThing = _warehouse.GetThing("earth");
             
             Assert.That(newThing, Is.Not.Null);
             Assert.That(newThing.GetProperty<Property.Location>("point").Value.X, Is.EqualTo(42));
@@ -139,7 +139,7 @@ namespace ThingModel.Specs
 
             _fromProtobuf.Convert(transaction);
 
-            Assert.That(_wharehouse.GetThing("computer").GetProperty<Property.String>("name").Value, Is.EqualTo("Interstella"));
+            Assert.That(_warehouse.GetThing("computer").GetProperty<Property.String>("name").Value, Is.EqualTo("Interstella"));
         }
 
         [Test]
@@ -150,7 +150,7 @@ namespace ThingModel.Specs
 
             _fromProtobuf.Convert(_toProtobuf.Convert(new[] { thing }, new Thing[0], new ThingType[0], null));
 
-            Assert.That(_wharehouse.GetThing("twingo").GetProperty<Property.Double>("speed").Value, Is.EqualTo(45.71));
+            Assert.That(_warehouse.GetThing("twingo").GetProperty<Property.Double>("speed").Value, Is.EqualTo(45.71));
         }
 
         [Test]
@@ -161,7 +161,7 @@ namespace ThingModel.Specs
 
             _fromProtobuf.Convert(_toProtobuf.Convert(new[] { thing }, new Thing[0], new ThingType[0], null));
 
-            Assert.That(_wharehouse.GetThing("twingo").GetProperty<Property.Int>("doors").Value, Is.EqualTo(3));
+            Assert.That(_warehouse.GetThing("twingo").GetProperty<Property.Int>("doors").Value, Is.EqualTo(3));
         }
 
         [Test]
@@ -172,7 +172,7 @@ namespace ThingModel.Specs
 
             _fromProtobuf.Convert(_toProtobuf.Convert(new[] { thing }, new Thing[0], new ThingType[0], null));
 
-            Assert.That(_wharehouse.GetThing("twingo").GetProperty<Property.Boolean>("moving").Value, Is.True);
+            Assert.That(_warehouse.GetThing("twingo").GetProperty<Property.Boolean>("moving").Value, Is.True);
         }
 
         [Test]
@@ -184,7 +184,7 @@ namespace ThingModel.Specs
 
             _fromProtobuf.Convert(_toProtobuf.Convert(new[] { thing }, new Thing[0], new ThingType[0], null));
 
-            Assert.That(_wharehouse.GetThing("twingo").GetProperty<Property.DateTime>("birthdate").Value, Is.EqualTo(birthdate));
+            Assert.That(_warehouse.GetThing("twingo").GetProperty<Property.DateTime>("birthdate").Value, Is.EqualTo(birthdate));
         }
 
         [Test]
@@ -199,7 +199,7 @@ namespace ThingModel.Specs
 
             _fromProtobuf.Convert(_toProtobuf.Convert(new[] { group, roger, alain }, new Thing[0], new ThingType[0], null));
 
-            Assert.That(_wharehouse.GetThing("family").ConnectedThings.Count, Is.EqualTo(2));
+            Assert.That(_warehouse.GetThing("family").ConnectedThings.Count, Is.EqualTo(2));
         }
 
         [Test]
@@ -212,7 +212,7 @@ namespace ThingModel.Specs
 
             _fromProtobuf.Convert(_toProtobuf.Convert(new[] { thing }, new Thing[0], new ThingType[0], null));
 
-            var newLocation = _wharehouse.GetThing("8712C").GetProperty<Property.Location>("position").Value;
+            var newLocation = _warehouse.GetThing("8712C").GetProperty<Property.Location>("position").Value;
             
             Assert.That(location.Compare(newLocation), Is.True);
 
@@ -237,7 +237,7 @@ namespace ThingModel.Specs
 
             _fromProtobuf.Convert(_toProtobuf.Convert(new[] { thing }, new Thing[0], new ThingType[0], null));
 
-            var newThing = _wharehouse.GetThing("rocket");
+            var newThing = _warehouse.GetThing("rocket");
 
             Assert.That(newThing.GetProperty<Property.String>("name").Value, Is.EqualTo("Ariane"));
             Assert.That(newThing.GetProperty<Property.Double>("speed").Value, Is.EqualTo(1200.0));
@@ -257,13 +257,13 @@ namespace ThingModel.Specs
 
             _fromProtobuf.Convert(_toProtobuf.Convert(new[] { couple,a,b }, new Thing[0], new ThingType[0], null));
 
-            Assert.That(_wharehouse.GetThing("couple").ConnectedThings.Count, Is.EqualTo(2));
+            Assert.That(_warehouse.GetThing("couple").ConnectedThings.Count, Is.EqualTo(2));
 
             // Germaine doesn't want to live with James anymore
             couple.Disconnect(b);
             _fromProtobuf.Convert(_toProtobuf.Convert(new[] {couple}, new Thing[0], new ThingType[0], null));
 
-            Assert.That(_wharehouse.GetThing("couple").ConnectedThings.Count, Is.EqualTo(1));
+            Assert.That(_warehouse.GetThing("couple").ConnectedThings.Count, Is.EqualTo(1));
 
 
         }
