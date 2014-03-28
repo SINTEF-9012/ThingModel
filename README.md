@@ -1,15 +1,15 @@
 ![ThingModel](https://raw.github.com/SINTEF-9012/ThingModel/master/Documentation/Logo.png)
 ==========
 
-ThingModel is simple and like a new wheel.
+ThingModel synchronizes data and models in realtime over the network for multiple devices. Mainly iPads, PC and a PixelSense table.
 
-It synchronizes data and models in realtime over the network for multiple devices. Mainly iPads, PC and a PixelSense table.
+ThingModel is a new wheel, but a simple, fast and light one.
 
 ThingModel does not need compilation, it does not include a DSL either and everything is done during runtime. You can build the model on the fly and the connected applications can learn it during their executions.
 
 If you are looking for innovative products about models, you should also take a look at [ThingML](http://thingml.org/) or [Kevoree](http://kevoree.org/kmf/).
 
-## Model
+## The model
 
 ![Model](https://raw2.github.com/SINTEF-9012/ThingModel/master/Documentation/ThingModel.png)
 
