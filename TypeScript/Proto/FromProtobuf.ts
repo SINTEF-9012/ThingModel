@@ -1,12 +1,12 @@
-module ThingModel.Proto {
+﻿module ThingModel.Proto {
 
 	export class FromProtobuf {
-		private _wharehouse: Wharehouse;
+		private _warehouse: Warehouse;
 
 		private _stringDeclarations: { [key: number]: string };
 
-		constructor(wharehouse: Wharehouse) {
-			this._wharehouse = wharehouse;
+		constructor(warehouse: Warehouse) {
+			this._warehouse = warehouse;
 			this._stringDeclarations = {};
 		}
 
@@ -37,13 +37,13 @@ module ThingModel.Proto {
 			// Remove the things
 			_.each(transaction.things_remove_list, (key: number) => {
 				var id = this.KeyToString(key);
-				var thing = this._wharehouse.GetThing(id);
+				var thing = this._warehouse.GetThing(id);
 				if (thing) {
 					thingsToDelete[thing.ID] = thing;
 				}
 			});
 
-			this._wharehouse.RemoveCollection(thingsToDelete);
+			this._warehouse.RemoveCollection(thingsToDelete);
 
 			// Declare the things type
 			_.each(transaction.thingtypes_declaration_list, (d: ThingType)=> {
@@ -66,14 +66,14 @@ module ThingModel.Proto {
 				tuple.model.DisconnectAll();
 
 				_.each(tuple.proto.connections, (connection)=> {
-					var t = this._wharehouse.GetThing(this.KeyToString(connection));
+					var t = this._warehouse.GetThing(this.KeyToString(connection));
 
 					if (t) {
 						tuple.model.Connect(t);
 					}
 				});
 
-				this._wharehouse.RegisterThing(tuple.model, false);
+				this._warehouse.RegisterThing(tuple.model, false);
 			});
 
 			return this.KeyToString(transaction.string_sender_id);
@@ -118,19 +118,19 @@ module ThingModel.Proto {
 				modelType.DefineProperty(modelProperty);
 			});
 
-			this._wharehouse.RegisterType(modelType);
+			this._warehouse.RegisterType(modelType);
 		}
 
 		private ConvertThingPublication(thing: Thing, check: boolean): ThingModel.Thing {
 			var type: ThingModel.ThingType = null;
 
 			if (thing.string_type_name != 0) {
-				type = this._wharehouse.GetThingType(this.KeyToString(thing.string_type_name));
+				type = this._warehouse.GetThingType(this.KeyToString(thing.string_type_name));
 			}
 
 			var id = this.KeyToString(thing.string_id);
 
-			var modelThing = this._wharehouse.GetThing(id);
+			var modelThing = this._warehouse.GetThing(id);
 
 			if (modelThing == null || (
 				modelThing.Type == null && type != null ||
@@ -144,9 +144,9 @@ module ThingModel.Proto {
 			});
 
 			if (check && type != null && !type.Check(modelThing)) {
-				console.log("Object �"+id+"> not valid, ignored");
+				console.log("Object «"+id+"> not valid, ignored");
 			} else if (!thing.connections_change) {
-				this._wharehouse.RegisterThing(modelThing, false);
+				this._warehouse.RegisterThing(modelThing, false);
 			}
 
 			return modelThing;

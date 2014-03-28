@@ -55,19 +55,19 @@ declare module ThingModel.WebSockets {
 		public SenderID: string;
 		private ws;
 		private path;
-		private _wharehouse;
+		private _warehouse;
 		private _toProtobuf;
 		private _fromProtobuf;
 		private _thingModelObserver;
-		constructor(senderID: string, path: string, wharehouse: ThingModel.Wharehouse);
+		constructor(senderID: string, path: string, warehouse: ThingModel.Warehouse);
 		private Connect();
 	}
 }
 declare module ThingModel.Proto {
 	class FromProtobuf {
-		private _wharehouse;
+		private _warehouse;
 		private _stringDeclarations;
-		constructor(wharehouse: ThingModel.Wharehouse);
+		constructor(warehouse: ThingModel.Warehouse);
 		private KeyToString(key);
 		public Convert(data: ArrayBuffer, check?: boolean): string;
 		public ConvertTransaction(transaction: Proto.Transaction, check: boolean): string;
@@ -77,7 +77,7 @@ declare module ThingModel.Proto {
 	}
 }
 declare module ThingModel.Proto {
-	class ProtoModelObserver implements ThingModel.IWharehouseObserver {
+	class ProtoModelObserver implements ThingModel.IWarehouseObserver {
 		public Updates: {
 			[id: string]: ThingModel.Thing;
 		};
@@ -124,7 +124,7 @@ declare module ThingModel.Proto {
 	}
 }
 declare module ThingModel {
-	interface IWharehouseObserver {
+	interface IWarehouseObserver {
 		New(thing: ThingModel.Thing): void;
 		Deleted(thing: ThingModel.Thing): void;
 		Updated(thing: ThingModel.Thing): void;
@@ -274,7 +274,7 @@ declare module ThingModel {
 	}
 }
 declare module ThingModel {
-	class Wharehouse {
+	class Warehouse {
 		private _thingTypes;
 		private _things;
 		private _observers;
@@ -284,8 +284,8 @@ declare module ThingModel {
 		private RecursiveRegisterThing(thing, alsoRegisterTypes, alreadyVisitedObjects);
 		public RegisterCollection(collection: ThingModel.Thing[], alsoRegisterTypes?: boolean): void;
 		public RemoveThing(thing: ThingModel.Thing): void;
-		public RegisterObserver(observer: ThingModel.IWharehouseObserver): void;
-		public UnregisterObserver(observer: ThingModel.IWharehouseObserver): void;
+		public RegisterObserver(observer: ThingModel.IWarehouseObserver): void;
+		public UnregisterObserver(observer: ThingModel.IWarehouseObserver): void;
 		public NotifyThingTypeDefine(type: ThingModel.ThingType): void;
 		public NotifyThingUpdate(thing: ThingModel.Thing): void;
 		public NotifyThingCreation(thing: ThingModel.Thing): void;

@@ -1,5 +1,5 @@
  module ThingModel.Proto {
-	export class ProtoModelObserver implements IWharehouseObserver {
+	export class ProtoModelObserver implements IWarehouseObserver {
 		
 		public Updates : {[id:string] : ThingModel.Thing} = {};
 		public Deletions : {[id:string] : ThingModel.Thing} = {};

@@ -2,8 +2,8 @@
 /// <reference path="../bower_components/DefinitelyTyped/should/should.d.ts" />
 
 describe("ProtoConversions Test", ()=> {
-	var wharehouseInput: ThingModel.Wharehouse;
-	var wharehouseOutput: ThingModel.Wharehouse;
+	var warehouseInput: ThingModel.Warehouse;
+	var warehouseOutput: ThingModel.Warehouse;
 
 	var fromProtobuf: ThingModel.Proto.FromProtobuf;
 	var toProtobuf: ThingModel.Proto.ToProtobuf;
@@ -11,13 +11,13 @@ describe("ProtoConversions Test", ()=> {
 	var observer: ThingModel.Proto.ProtoModelObserver;
 
 	beforeEach(()=> {
-		wharehouseInput = new ThingModel.Wharehouse();
-		wharehouseOutput = new ThingModel.Wharehouse();
+		warehouseInput = new ThingModel.Warehouse();
+		warehouseOutput = new ThingModel.Warehouse();
 
-		fromProtobuf = new ThingModel.Proto.FromProtobuf(wharehouseInput);
+		fromProtobuf = new ThingModel.Proto.FromProtobuf(warehouseInput);
 
 		observer = new ThingModel.Proto.ProtoModelObserver();
-		wharehouseOutput.RegisterObserver(observer);
+		warehouseOutput.RegisterObserver(observer);
 
 		toProtobuf = new ThingModel.Proto.ToProtobuf();
 
@@ -30,7 +30,7 @@ describe("ProtoConversions Test", ()=> {
 			.ContainingA.String("content", "Hello World")
 			.Build();
 
-		wharehouseOutput.RegisterThing(message);
+		warehouseOutput.RegisterThing(message);
 
 		var transaction = observer.GetTransaction(toProtobuf, "RogerEnterpriseBroadcaster");
 
@@ -38,7 +38,7 @@ describe("ProtoConversions Test", ()=> {
 
 		senderId.should.be.equal("RogerEnterpriseBroadcaster");
 
-		var newMessage = wharehouseInput.GetThing("first");
+		var newMessage = warehouseInput.GetThing("first");
 
 		(newMessage == null).should.be.false;
 
@@ -54,13 +54,13 @@ describe("ProtoConversions Test", ()=> {
 			.WhichIs("Just a simple text message")
 			.ContainingA.String("content").Build();
 
-		wharehouseOutput.RegisterType(type);
+		warehouseOutput.RegisterType(type);
 
 		var transaction = observer.GetTransaction(toProtobuf, "bob");
 
 		fromProtobuf.Convert(transaction.toArrayBuffer());
 
-		var newType = wharehouseInput.GetThingType("message");
+		var newType = warehouseInput.GetThingType("message");
 
 		(newType == null).should.be.false;
 

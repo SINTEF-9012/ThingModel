@@ -1,4 +1,4 @@
-var ThingModel;
+﻿var ThingModel;
 (function (ThingModel) {
     var BuildANewThing = (function () {
         function BuildANewThing(type) {
@@ -178,17 +178,17 @@ var ThingModel;
 (function (ThingModel) {
     (function (WebSockets) {
         var Client = (function () {
-            function Client(senderID, path, wharehouse) {
+            function Client(senderID, path, warehouse) {
                 this._connexionDelay = 2000;
                 this.SenderID = senderID;
                 this._path = path;
 
-                this._wharehouse = wharehouse;
+                this._warehouse = warehouse;
 
                 this._thingModelObserver = new ThingModel.Proto.ProtoModelObserver();
-                wharehouse.RegisterObserver(this._thingModelObserver);
+                warehouse.RegisterObserver(this._thingModelObserver);
 
-                this._fromProtobuf = new ThingModel.Proto.FromProtobuf(this._wharehouse);
+                this._fromProtobuf = new ThingModel.Proto.FromProtobuf(this._warehouse);
                 this._toProtobuf = new ThingModel.Proto.ToProtobuf();
 
                 this._closed = true;
@@ -206,7 +206,7 @@ var ThingModel;
                 this._ws.onopen = function () {
                     console.info("ThingModel: Open connection");
                     _this._closed = false;
-                    _this._fromProtobuf = new ThingModel.Proto.FromProtobuf(_this._wharehouse);
+                    _this._fromProtobuf = new ThingModel.Proto.FromProtobuf(_this._warehouse);
                     _this._toProtobuf = new ThingModel.Proto.ToProtobuf();
                     _this._connexionDelay = 2000;
 
@@ -287,8 +287,8 @@ var ThingModel;
 (function (ThingModel) {
     (function (Proto) {
         var FromProtobuf = (function () {
-            function FromProtobuf(wharehouse) {
-                this._wharehouse = wharehouse;
+            function FromProtobuf(warehouse) {
+                this._warehouse = warehouse;
                 this._stringDeclarations = {};
             }
             FromProtobuf.prototype.KeyToString = function (key) {
@@ -318,13 +318,13 @@ var ThingModel;
 
                 _.each(transaction.things_remove_list, function (key) {
                     var id = _this.KeyToString(key);
-                    var thing = _this._wharehouse.GetThing(id);
+                    var thing = _this._warehouse.GetThing(id);
                     if (thing) {
                         thingsToDelete[thing.ID] = thing;
                     }
                 });
 
-                this._wharehouse.RemoveCollection(thingsToDelete);
+                this._warehouse.RemoveCollection(thingsToDelete);
 
                 _.each(transaction.thingtypes_declaration_list, function (d) {
                     _this.ConvertThingTypeDeclaration(d);
@@ -344,14 +344,14 @@ var ThingModel;
                     tuple.model.DisconnectAll();
 
                     _.each(tuple.proto.connections, function (connection) {
-                        var t = _this._wharehouse.GetThing(_this.KeyToString(connection));
+                        var t = _this._warehouse.GetThing(_this.KeyToString(connection));
 
                         if (t) {
                             tuple.model.Connect(t);
                         }
                     });
 
-                    _this._wharehouse.RegisterThing(tuple.model, false);
+                    _this._warehouse.RegisterThing(tuple.model, false);
                 });
 
                 return this.KeyToString(transaction.string_sender_id);
@@ -393,7 +393,7 @@ var ThingModel;
                     modelType.DefineProperty(modelProperty);
                 });
 
-                this._wharehouse.RegisterType(modelType);
+                this._warehouse.RegisterType(modelType);
             };
 
             FromProtobuf.prototype.ConvertThingPublication = function (thing, check) {
@@ -401,12 +401,12 @@ var ThingModel;
                 var type = null;
 
                 if (thing.string_type_name != 0) {
-                    type = this._wharehouse.GetThingType(this.KeyToString(thing.string_type_name));
+                    type = this._warehouse.GetThingType(this.KeyToString(thing.string_type_name));
                 }
 
                 var id = this.KeyToString(thing.string_id);
 
-                var modelThing = this._wharehouse.GetThing(id);
+                var modelThing = this._warehouse.GetThing(id);
 
                 if (modelThing == null || (modelThing.Type == null && type != null || type == null && modelThing.Type != null || (modelThing.Type != null && type != null && modelThing.Type.Name != type.Name))) {
                     modelThing = new ThingModel.Thing(id, type);
@@ -417,9 +417,9 @@ var ThingModel;
                 });
 
                 if (check && type != null && !type.Check(modelThing)) {
-                    console.log("Object �" + id + "> not valid, ignored");
+                    console.log("Object «" + id + "> not valid, ignored");
                 } else if (!thing.connections_change) {
-                    this._wharehouse.RegisterThing(modelThing, false);
+                    this._warehouse.RegisterThing(modelThing, false);
                 }
 
                 return modelThing;
@@ -1497,13 +1497,13 @@ var ThingModel;
 })(ThingModel || (ThingModel = {}));
 var ThingModel;
 (function (ThingModel) {
-    var Wharehouse = (function () {
-        function Wharehouse() {
+    var Warehouse = (function () {
+        function Warehouse() {
             this._thingTypes = {};
             this._things = {};
             this._observers = [];
         }
-        Wharehouse.prototype.RegisterType = function (type, force) {
+        Warehouse.prototype.RegisterType = function (type, force) {
             if (typeof force === "undefined") { force = true; }
             if (!type) {
                 throw new Error("The thing type information is null.");
@@ -1516,12 +1516,12 @@ var ThingModel;
             }
         };
 
-        Wharehouse.prototype.RegisterThing = function (thing, alsoRegisterConnections, alsoRegisterTypes) {
+        Warehouse.prototype.RegisterThing = function (thing, alsoRegisterConnections, alsoRegisterTypes) {
             if (typeof alsoRegisterConnections === "undefined") { alsoRegisterConnections = true; }
             if (typeof alsoRegisterTypes === "undefined") { alsoRegisterTypes = false; }
             var _this = this;
             if (!thing) {
-                throw new Error("A thing should not be null if it want to be allowed in the wharehouse");
+                throw new Error("A thing should not be null if it want to be allowed in the warehouse");
             }
 
             var creation = !_.has(this._things, thing.ID);
@@ -1545,7 +1545,7 @@ var ThingModel;
             }
         };
 
-        Wharehouse.prototype.RecursiveRegisterThing = function (thing, alsoRegisterTypes, alreadyVisitedObjects) {
+        Warehouse.prototype.RecursiveRegisterThing = function (thing, alsoRegisterTypes, alreadyVisitedObjects) {
             var _this = this;
             if (alreadyVisitedObjects.hasOwnProperty(thing.ID)) {
                 return;
@@ -1560,7 +1560,7 @@ var ThingModel;
             });
         };
 
-        Wharehouse.prototype.RegisterCollection = function (collection, alsoRegisterTypes) {
+        Warehouse.prototype.RegisterCollection = function (collection, alsoRegisterTypes) {
             if (typeof alsoRegisterTypes === "undefined") { alsoRegisterTypes = false; }
             var _this = this;
             var alreadyVisitedObjects = {};
@@ -1569,7 +1569,7 @@ var ThingModel;
             });
         };
 
-        Wharehouse.prototype.RemoveCollection = function (collection) {
+        Warehouse.prototype.RemoveCollection = function (collection) {
             var _this = this;
             var thingsToDisconnect = {};
 
@@ -1591,7 +1591,7 @@ var ThingModel;
             });
         };
 
-        Wharehouse.prototype.RemoveThing = function (thing, notifyUpdates) {
+        Warehouse.prototype.RemoveThing = function (thing, notifyUpdates) {
             if (typeof notifyUpdates === "undefined") { notifyUpdates = true; }
             var _this = this;
             if (!thing) {
@@ -1613,47 +1613,47 @@ var ThingModel;
             }
         };
 
-        Wharehouse.prototype.RegisterObserver = function (observer) {
+        Warehouse.prototype.RegisterObserver = function (observer) {
             this._observers.push(observer);
         };
 
-        Wharehouse.prototype.UnregisterObserver = function (observer) {
+        Warehouse.prototype.UnregisterObserver = function (observer) {
             this._observers.splice(_.indexOf(this._observers, observer), 1);
         };
 
-        Wharehouse.prototype.NotifyThingTypeDefine = function (type) {
+        Warehouse.prototype.NotifyThingTypeDefine = function (type) {
             _.each(this._observers, function (observer) {
                 observer.Define(type);
             });
         };
 
-        Wharehouse.prototype.NotifyThingUpdate = function (thing) {
+        Warehouse.prototype.NotifyThingUpdate = function (thing) {
             _.each(this._observers, function (observer) {
                 observer.Updated(thing);
             });
         };
 
-        Wharehouse.prototype.NotifyThingCreation = function (thing) {
+        Warehouse.prototype.NotifyThingCreation = function (thing) {
             _.each(this._observers, function (observer) {
                 observer.New(thing);
             });
         };
 
-        Wharehouse.prototype.NotifyThingDeleted = function (thing) {
+        Warehouse.prototype.NotifyThingDeleted = function (thing) {
             _.each(this._observers, function (observer) {
                 observer.Deleted(thing);
             });
         };
 
-        Wharehouse.prototype.GetThing = function (id) {
+        Warehouse.prototype.GetThing = function (id) {
             return this._things[id];
         };
 
-        Wharehouse.prototype.GetThingType = function (name) {
+        Warehouse.prototype.GetThingType = function (name) {
             return this._thingTypes[name];
         };
 
-        Object.defineProperty(Wharehouse.prototype, "Things", {
+        Object.defineProperty(Warehouse.prototype, "Things", {
             get: function () {
                 return _.values(this._things);
             },
@@ -1661,15 +1661,15 @@ var ThingModel;
             configurable: true
         });
 
-        Object.defineProperty(Wharehouse.prototype, "ThingsTypes", {
+        Object.defineProperty(Warehouse.prototype, "ThingsTypes", {
             get: function () {
                 return _.values(this._thingTypes);
             },
             enumerable: true,
             configurable: true
         });
-        return Wharehouse;
+        return Warehouse;
     })();
-    ThingModel.Wharehouse = Wharehouse;
+    ThingModel.Warehouse = Warehouse;
 })(ThingModel || (ThingModel = {}));
 //# sourceMappingURL=ThingModel.js.map

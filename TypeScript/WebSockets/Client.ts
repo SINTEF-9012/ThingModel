@@ -6,22 +6,22 @@
 		 private _closed: boolean;
 		 private _reconnection: boolean;
 
-		 private _wharehouse: Wharehouse;
+		 private _warehouse: Warehouse;
 		 private _toProtobuf: Proto.ToProtobuf;
 		 private _fromProtobuf: Proto.FromProtobuf;
 		 private _thingModelObserver: Proto.ProtoModelObserver;
 		 private _connexionDelay = 2000;
 
-		 constructor(senderID: string, path: string, wharehouse: Wharehouse) {
+		 constructor(senderID: string, path: string, warehouse: Warehouse) {
 			 this.SenderID = senderID;
 			 this._path = path;
 
-			 this._wharehouse = wharehouse;
+			 this._warehouse = warehouse;
 
 			 this._thingModelObserver = new Proto.ProtoModelObserver();
-			 wharehouse.RegisterObserver(this._thingModelObserver);
+			 warehouse.RegisterObserver(this._thingModelObserver);
 
-			 this._fromProtobuf = new Proto.FromProtobuf(this._wharehouse);
+			 this._fromProtobuf = new Proto.FromProtobuf(this._warehouse);
 			 this._toProtobuf = new Proto.ToProtobuf();
 
 			 this._closed = true;
@@ -39,7 +39,7 @@
 			 this._ws.onopen = () => {
 				 console.info("ThingModel: Open connection");
 				 this._closed = false;
-				 this._fromProtobuf = new Proto.FromProtobuf(this._wharehouse);
+				 this._fromProtobuf = new Proto.FromProtobuf(this._warehouse);
 				 this._toProtobuf = new Proto.ToProtobuf();
 				 this._connexionDelay = 2000;
 

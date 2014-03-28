@@ -1,8 +1,8 @@
 module ThingModel {
-	export class Wharehouse {
+	export class Warehouse {
 		private _thingTypes: { [key: string]: ThingType };
 		private _things: { [key: string]: Thing };
-		private _observers: IWharehouseObserver[];
+		private _observers: IWarehouseObserver[];
 		
 		constructor() {
 			this._thingTypes = {};
@@ -25,7 +25,7 @@ module ThingModel {
 		public RegisterThing(thing: Thing, alsoRegisterConnections: boolean = true,
 			alsoRegisterTypes: boolean = false): void {
 			if (!thing) {
-				throw new Error("A thing should not be null if it want to be allowed in the wharehouse");
+				throw new Error("A thing should not be null if it want to be allowed in the warehouse");
 			}
 
 			var creation = !_.has(this._things, thing.ID);
@@ -115,11 +115,11 @@ module ThingModel {
 			}
 		}
 
-		public RegisterObserver(observer: IWharehouseObserver): void {
+		public RegisterObserver(observer: IWarehouseObserver): void {
 			this._observers.push(observer);
 		}
 
-		public UnregisterObserver(observer: IWharehouseObserver): void {
+		public UnregisterObserver(observer: IWarehouseObserver): void {
 			// Array remove
 			this._observers.splice(_.indexOf(this._observers, observer), 1);
 		}

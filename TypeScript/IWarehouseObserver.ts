@@ -1,5 +1,5 @@
  module ThingModel {
-	 export interface IWharehouseObserver {
+	 export interface IWarehouseObserver {
 		 New(thing: Thing): void;
 		 Deleted(thing: Thing): void;
 		 Updated(thing: Thing): void;
