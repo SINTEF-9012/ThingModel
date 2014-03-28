@@ -66,24 +66,24 @@ var rabbit = BuildANewThing.As(typeRabbit)
 				.AndA.Location("localization", new Location.Point(42,51))
 				.AndAn.Int("nbChildren", 12);
 
-// The wharehouse stores the objects
-var wharehouse = new Wharehouse();
+// The warehouse stores the objects
+var warehouse = new Warehouse();
 
 // Create a websocket client
-var client = new Client("Emitter", "ws://localhost:1234", wharehouse);
+var client = new Client("Emitter", "ws://localhost:1234", warehouse);
 
 // Register the rabbit
-wharehouse.RegisterThing(rabbit);
+warehouse.RegisterThing(rabbit);
 
 // Send the changes to the server
 client.Send();
 ```
 
 ```csharp
-var wharehouse = new Wharehouse();
-var client = new Client("Receiver", "ws://localhost:1234", wharehouse);
+var warehouse = new Warehouse();
+var client = new Client("Receiver", "ws://localhost:1234", warehouse);
 
-wharehouse.Events.OnNew += (sender, args) => {
+warehouse.Events.OnNew += (sender, args) => {
     // The GetProperty call is a bit ugly, it will change
     Console.WriteLine(args.Thing.GetProperty<Property.String>("name").Value);
 };
