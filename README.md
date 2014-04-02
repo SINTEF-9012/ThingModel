@@ -46,7 +46,7 @@ If this server doesn't suit your needs, you can easely develop your own ThingMod
 
 ![Screenshot timemachine](http://i.imgur.com/WEPVdWf.png)
 
-Saves the model in realtime (maximum rate fixed to 1 second by default). Thanks to protocol buffers, gzip and sqlite, it's very light.
+The time machine Saves the model in realtime (maximum rate fixed to 1 second by default). Thanks to protocol buffers, gzip and sqlite, it's very light.
 
 And you can go back in time just with a HTTP request.
 
@@ -54,7 +54,7 @@ And you can go back in time just with a HTTP request.
 
 ThingModel is tested and used almost every days and it works, but *it's not stable*.
 
-Please follow [the checklist](https://github.com/SINTEF-9012/ThingModel/wiki/Checklist) if you are experiencing some weird experiences.
+Please follow [the checklist](https://github.com/SINTEF-9012/ThingModel/wiki/Checklist) if you are experiencing some weird problems.
 
 ## Installation
 
