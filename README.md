@@ -33,6 +33,23 @@ If you are looking for innovative products about models, you should also take a 
   * Mainly for Minecraft
   * Or a HLA bridge for VBS
 
+
+## A collection of tools
+
+### A broadcast server
+
+![Screenshot server](http://i.imgur.com/pRuHtl9.png)
+
+If this server doesn't suit your needs, you can easely develop your own ThingModel server.
+
+### A time machine
+
+![Screenshot timemachine](http://i.imgur.com/WEPVdWf.png)
+
+Saves the model in realtime (maximum rate fixed to 1 second by default). Thanks to protocol buffers, gzip and sqlite, it's very light.
+
+And you can go back in time just with a HTTP request.
+
 ## Bugs
 
 ThingModel is tested and used almost every days and it works, but *it's not stable*.
