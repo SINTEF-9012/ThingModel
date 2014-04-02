@@ -46,7 +46,7 @@ If this server doesn't suit your needs, you can easely develop your own ThingMod
 
 ![Screenshot timemachine](http://i.imgur.com/WEPVdWf.png)
 
-The time machine Saves the model in realtime (maximum rate fixed to 1 second by default). Thanks to protocol buffers, gzip and sqlite, it's very light.
+The time machine saves the model in realtime (1 hertz at maximum by default). Thanks to protocol buffers, gzip and sqlite, it's very light.
 
 And you can go back in time just with a HTTP request.
 
