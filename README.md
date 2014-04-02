@@ -39,7 +39,7 @@ ThingModel is tested and used almost every days and it works, but *it's not stab
 
 ## Installation
 
-__Nuget__: ```Install-Package ThingModel```
+__Nuget__: ```Install-Package ThingModel -Pre```
 
 __Bower__: ```bower install ThingModel```
 
