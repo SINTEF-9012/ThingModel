@@ -37,6 +37,8 @@ If you are looking for innovative products about models, you should also take a 
 
 ThingModel is tested and used almost every days and it works, but *it's not stable*.
 
+Please follow [the checklist](https://github.com/SINTEF-9012/ThingModel/wiki/Checklist) if you are experiencing some weird experiences.
+
 ## Installation
 
 __Nuget__: ```Install-Package ThingModel -Pre```
