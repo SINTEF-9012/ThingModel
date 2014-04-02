@@ -42,7 +42,7 @@ namespace ThingModel
             
         }
 
-        public void RegisterThing(Thing thing, bool alsoRegisterConnections = true, bool alsoRegisterTypes = false)
+        public void RegisterThing(Thing thing, bool alsoRegisterConnections = true, bool alsoRegisterTypes = true)
         {
             if (thing == null)
             {

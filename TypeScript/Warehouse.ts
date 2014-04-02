@@ -23,7 +23,7 @@ module ThingModel {
 		}
 
 		public RegisterThing(thing: Thing, alsoRegisterConnections: boolean = true,
-			alsoRegisterTypes: boolean = false): void {
+			alsoRegisterTypes: boolean = true): void {
 			if (!thing) {
 				throw new Error("A thing should not be null if it want to be allowed in the warehouse");
 			}
