@@ -13,7 +13,6 @@ If you are looking for innovative products about models, you should also take a 
 
 ![Model](https://raw2.github.com/SINTEF-9012/ThingModel/master/Documentation/ThingModel.png)
 
-
 ## Light network synchronization
 
  * Clients and servers over WebSockets
