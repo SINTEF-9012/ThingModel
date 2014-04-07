@@ -285,7 +285,7 @@ namespace ThingModel.Proto
             proto.type = Property.Type.STRING;
             proto.string_value = new Property.String();
             
-            if (_stringToDeclare.Contains(value))
+            if (!String.IsNullOrEmpty(value) && _stringToDeclare.Contains(value))
             {
                 proto.string_value.string_value = StringToKey(value);
             }
