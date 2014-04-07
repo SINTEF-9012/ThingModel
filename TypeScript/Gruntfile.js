@@ -16,7 +16,8 @@ module.exports = function(grunt) {
 			build: {
 				src:["Builders/*.ts","WebSockets/*.ts","Proto/*.ts","*.ts"],
 				reference: "build/ThingModel.d.ts",
-				out:'build/ThingModel.js',
+				out:'./build/ThingModel.js',
+				// outDir:'build',
 				options:{
 					target: 'es5',
 					module: 'commonjs',

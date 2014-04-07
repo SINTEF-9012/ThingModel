@@ -484,7 +484,7 @@ var ThingModel;
                         break;
 
                     case 7 /* DATETIME */:
-                        modelProperty = new ThingModel.Property.DateTime(key, new Date(property.datetime_value));
+                        modelProperty = new ThingModel.Property.DateTime(key, new Date(property.datetime_value.toNumber()));
                         break;
                 }
 
@@ -697,7 +697,7 @@ var ThingModel;
                             break;
                         case 6 /* DateTime */:
                             proto.setType(7 /* DATETIME */);
-                            proto.setDatetimeValue(+property.Value);
+                            proto.setDatetimeValue(property.Value.getTime());
                             break;
                     }
 
@@ -820,7 +820,7 @@ var ThingModel;
                 proto.setType(3 /* STRING */);
 
                 var st = new ThingModel.Proto.ProtoTools.Builder.Property.String();
-                if (this._stringToDeclare[value]) {
+                if (value && this._stringToDeclare[value]) {
                     st.setStringValue(this.StringToKey(value));
                 } else {
                     st.setValue(value);
@@ -1518,7 +1518,7 @@ var ThingModel;
 
         Warehouse.prototype.RegisterThing = function (thing, alsoRegisterConnections, alsoRegisterTypes) {
             if (typeof alsoRegisterConnections === "undefined") { alsoRegisterConnections = true; }
-            if (typeof alsoRegisterTypes === "undefined") { alsoRegisterTypes = false; }
+            if (typeof alsoRegisterTypes === "undefined") { alsoRegisterTypes = true; }
             var _this = this;
             if (!thing) {
                 throw new Error("A thing should not be null if it want to be allowed in the warehouse");
