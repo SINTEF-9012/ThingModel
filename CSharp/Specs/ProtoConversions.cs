@@ -152,6 +152,17 @@ namespace ThingModel.Specs
 
             Assert.That(_warehouse.GetThing("twingo").GetProperty<Property.Double>("speed").Value, Is.EqualTo(45.71));
         }
+        
+		[Test]
+        public void CheckNegativeDoubleProperty()
+        {
+            var thing = new Thing("twingo");
+            thing.SetProperty(new Property.Double("speed", -45.71));
+
+            _fromProtobuf.Convert(_toProtobuf.Convert(new[] { thing }, new Thing[0], new ThingType[0], null));
+
+            Assert.That(_warehouse.GetThing("twingo").GetProperty<Property.Double>("speed").Value, Is.EqualTo(-45.71));
+        }
 
         [Test]
         public void CheckIntProperty()
@@ -162,6 +173,17 @@ namespace ThingModel.Specs
             _fromProtobuf.Convert(_toProtobuf.Convert(new[] { thing }, new Thing[0], new ThingType[0], null));
 
             Assert.That(_warehouse.GetThing("twingo").GetProperty<Property.Int>("doors").Value, Is.EqualTo(3));
+        }
+        
+		[Test]
+        public void CheckNegativeIntProperty()
+        {
+            var thing = new Thing("submarine");
+            thing.SetProperty(new Property.Int("sea_altitude", -100));
+
+            _fromProtobuf.Convert(_toProtobuf.Convert(new[] { thing }, new Thing[0], new ThingType[0], null));
+
+            Assert.That(_warehouse.GetThing("submarine").GetProperty<Property.Int>("sea_altitude").Value, Is.EqualTo(-100));
         }
 
         [Test]
