@@ -212,7 +212,7 @@
 				
 				case Property.Type.DATETIME:
 					modelProperty = new ThingModel.Property.DateTime(key,
-						new Date(property.datetime_value));
+						new Date((<any>property.datetime_value).toNumber()));
 					break;
 			}
 

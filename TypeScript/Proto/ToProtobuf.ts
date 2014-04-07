@@ -155,7 +155,7 @@ module ThingModel.Proto {
 				case Type.DateTime:
 					proto.setType(Property.Type.DATETIME);
 					proto.setDatetimeValue(
-						+(<ThingModel.Property.DateTime> property).Value);
+						(<ThingModel.Property.DateTime> property).Value.getTime());
 					break;
 				}
 
@@ -297,7 +297,7 @@ module ThingModel.Proto {
 			proto.setType(Property.Type.STRING);
 
 			var st = new ProtoTools.Builder.Property.String();
-			if (this._stringToDeclare[value]) {
+			if (value && this._stringToDeclare[value]) {
 				st.setStringValue(this.StringToKey(value));
 			} else {
 				st.setValue(value);
