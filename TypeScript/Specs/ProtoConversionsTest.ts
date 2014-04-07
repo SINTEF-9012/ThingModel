@@ -1,4 +1,4 @@
-/// <reference path="../bower_components/DefinitelyTyped/mocha/mocha.d.ts" />
+﻿/// <reference path="../bower_components/DefinitelyTyped/mocha/mocha.d.ts" />
 /// <reference path="../bower_components/DefinitelyTyped/should/should.d.ts" />
 
 describe("ProtoConversions Test", ()=> {
@@ -69,6 +69,202 @@ describe("ProtoConversions Test", ()=> {
 
 		newType.GetPropertyDefinition("content").Type.should.be.equal(ThingModel.Type.String);
 
+	});
+
+	it("should have efficient string declarations", () => {
+		var firstTransaction = toProtobuf.Convert([], [], [], "canard");
+
+		firstTransaction.string_declarations.length.should.be.equal(1);
+
+		var secondTransaction = toProtobuf.Convert([], [], [], "canard");
+		secondTransaction.string_declarations.length.should.be.equal(0);
+	});
+
+	it("should work with deletes", () => {
+		var duck = new ThingModel.Thing("canard");
+		warehouseInput.RegisterThing(duck);
+
+		var transaction = toProtobuf.Convert([], [duck], [], "bob");
+		transaction.things_remove_list.length.should.be.equal(1);
+
+		fromProtobuf.ConvertTransaction(transaction, true);
+
+		(warehouseInput.GetThing("canard") == null).should.be.true;
+	});
+
+	it("should contains good location properties", () => {
+		var thing = ThingModel.BuildANewThing.WithoutType.IdentifiedBy("earth")
+			.ContainingA.Location("point", new ThingModel.Location.Point(42, 43, 44))
+			.AndA.Location("latlng", new ThingModel.Location.LatLng(-51, -52, -53))
+			.AndA.Location("equatorial", new ThingModel.Location.Equatorial(27, 28, 29));
+
+		warehouseOutput.RegisterThing(thing.Build());
+
+		var transaction = observer.GetTransaction(toProtobuf, "bob");
+
+		fromProtobuf.Convert(transaction.toArrayBuffer());
+
+		var newThing = warehouseInput.GetThing("earth");
+
+		(newThing == null).should.be.false;
+
+		newThing.GetProperty<ThingModel.Property.Location>("point").Value.X.should.be.equal(42);
+		newThing.GetProperty<ThingModel.Property.Location>("latlng").Value.Y.should.be.equal(-52);
+		newThing.GetProperty<ThingModel.Property.Location>("equatorial").Value.Z.should.be.equal(29);
+	});
+
+	it("should has efficient string properties", () => {
+		var thing = ThingModel.BuildANewThing.WithoutType.IdentifiedBy("computer")
+			.ContainingA.String("name", "Interstella")
+			.AndA.String("hostname", "Interstella");
+
+		warehouseOutput.RegisterThing(thing.Build());
+
+		var transaction = observer.GetTransaction(toProtobuf, "");
+
+		transaction.string_declarations.length.should.be.equal(4);
+
+		fromProtobuf.Convert(transaction.toArrayBuffer());
+
+		var newThing = warehouseInput.GetThing("computer");
+		newThing.GetProperty<ThingModel.Property.String>("name").Value
+			.should.be.equal("Interstella");
+	});
+
+	it("should has correct double properties", () => {
+		var thing = ThingModel.BuildANewThing.WithoutType.IdentifiedBy("twingo")
+			.ContainingA.Double("speed", 45.71)
+			.AndA.Double("acceleration", -5.14);
+
+		warehouseOutput.RegisterThing(thing.Build());
+		fromProtobuf.Convert(observer.GetTransaction(toProtobuf, null).toArrayBuffer());
+
+		var newThing = warehouseInput.GetThing("twingo");
+		newThing.GetProperty<ThingModel.Property.Double>("speed").Value.should.be.equal(45.71);
+		newThing.GetProperty<ThingModel.Property.Double>("acceleration").Value.should.be.equal(-5.14);
+	});
+
+	it("should has correct int properties", () => {
+		var thing = ThingModel.BuildANewThing.WithoutType.IdentifiedBy("twingo")
+			.ContainingAn.Int("doors", 3)
+			.AndAn.Int("altitude", -5);
+
+		warehouseOutput.RegisterThing(thing.Build());
+		fromProtobuf.Convert(observer.GetTransaction(toProtobuf, null).toArrayBuffer());
+
+		var newThing = warehouseInput.GetThing("twingo");
+		newThing.GetProperty<ThingModel.Property.Int>("doors").Value.should.be.equal(3);
+		newThing.GetProperty<ThingModel.Property.Int>("altitude").Value.should.be.equal(-5);
+	});
+
+	it("should has correct boolean properties", () => {
+		var thing = ThingModel.BuildANewThing.WithoutType.IdentifiedBy("twingo")
+			.ContainingA.Boolean("moving", true);
+
+		warehouseOutput.RegisterThing(thing.Build());
+		fromProtobuf.Convert(observer.GetTransaction(toProtobuf, null).toArrayBuffer());
+
+		var newThing = warehouseInput.GetThing("twingo");
+		newThing.GetProperty<ThingModel.Property.Boolean>("moving").Value.should.be.true;
+	});
+
+	it("should has correct datetime properties", () => {
+		var thing = ThingModel.BuildANewThing.WithoutType.IdentifiedBy("twingo")
+			.ContainingA.DateTime("birthdate", new Date(Date.UTC(1998,6,24)))
+			.AndA.DateTime("now", new Date());
+
+		warehouseOutput.RegisterThing(thing.Build());
+		fromProtobuf.Convert(observer.GetTransaction(toProtobuf, null).toArrayBuffer());
+
+		var newThing = warehouseInput.GetThing("twingo");
+		newThing.GetProperty<ThingModel.Property.DateTime>("birthdate").Value.should.be.eql(
+			new Date(Date.UTC(1998,6,24)));
+		(+newThing.GetProperty<ThingModel.Property.DateTime>("now").Value).should.be.lessThan(
+			+new Date());
+	});
+
+	it("works with connexions", () => {
+		var group = new ThingModel.Thing("family"),
+			roger = new ThingModel.Thing("roger"),
+			alain = new ThingModel.Thing("alain");
+
+		group.Connect(roger);
+		group.Connect(alain);
+
+		warehouseOutput.RegisterThing(group);
+		fromProtobuf.Convert(observer.GetTransaction(toProtobuf, null).toArrayBuffer());
+
+		warehouseInput.GetThing("family").ConnectedThingsCount.should.be.equal(2);
+	});
+
+	it("has independent instances", () => {
+		var location = new ThingModel.Location.LatLng(25, 2);
+
+		var thing = new ThingModel.Thing("8712C");
+		thing.SetProperty(new ThingModel.Property.Location("position", location));
+
+		warehouseOutput.RegisterThing(thing);
+		fromProtobuf.Convert(observer.GetTransaction(toProtobuf, null).toArrayBuffer());
+
+		var newLocation = warehouseInput.GetThing("8712C").GetProperty<ThingModel.Property.Location>("position").Value;
+
+		location.Compare(newLocation).should.be.true;
+
+		newLocation.Y = 27;
+		location.Compare(newLocation).should.be.false;
+	});
+
+	it("has incremental properties updates", () => {
+		var thing = ThingModel.BuildANewThing.WithoutType.IdentifiedBy("rocket")
+			.ContainingA.Double("speed", 1500.0)
+			.AndA.String("name", "Ariane").Build();
+
+		warehouseOutput.RegisterThing(thing);
+		fromProtobuf.Convert(observer.GetTransaction(toProtobuf, null).toArrayBuffer());
+
+		thing = ThingModel.BuildANewThing.WithoutType.IdentifiedBy("rocket")
+			.ContainingA.Double("speed", 1200.0)
+			.AndA.Boolean("space", true).Build();
+
+		warehouseOutput.NotifyThingUpdate(thing);
+		fromProtobuf.Convert(observer.GetTransaction(toProtobuf, null).toArrayBuffer());
+
+		var newThing = warehouseInput.GetThing("rocket");
+
+		newThing.GetProperty<ThingModel.Property.String>("name").Value.should.be.equal("Ariane");
+		newThing.GetProperty<ThingModel.Property.Double>("speed").Value.should.be.equal(1200);
+		newThing.GetProperty<ThingModel.Property.Boolean>("space").Value.should.be.true;
+	});
+
+	it("has incremental updates and disconnection", () => {
+		var couple = new ThingModel.Thing("couple"),
+			a = new ThingModel.Thing("James"),
+			b = new ThingModel.Thing("Germaine");
+
+		couple.Connect(a);
+		couple.Connect(b);
+
+		warehouseOutput.RegisterThing(couple);
+		fromProtobuf.Convert(observer.GetTransaction(toProtobuf, null).toArrayBuffer());
+
+		warehouseInput.GetThing("couple").ConnectedThingsCount.should.be.equal(2);
+
+		couple.Disconnect(b);
+		var transaction = toProtobuf.Convert([couple], [], [], "yeah");
+		fromProtobuf.ConvertTransaction(transaction, true);
+
+		warehouseInput.GetThing("couple").ConnectedThingsCount.should.be.equal(1);
+	});
+
+	it("doesn't change un unchanged object", () => {
+		var thing = new ThingModel.Thing("café");
+		thing.SetProperty(new ThingModel.Property.Double("temperature", 40.0));
+
+		var transaction = toProtobuf.Convert([thing], [], [], "yeah");
+		transaction.things_publish_list.length.should.be.equal(1);
+
+		var transaction = toProtobuf.Convert([thing], [], [], "yeah");
+		transaction.things_publish_list.length.should.be.equal(0);
 	});
 // ReSharper restore WrongExpressionStatement
 });
