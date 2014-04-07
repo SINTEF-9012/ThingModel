@@ -221,7 +221,10 @@ namespace ThingModel.Proto
                         break;
 
                     case Property.Type.DATETIME:
-                        modelProperty = new ThingModel.Property.DateTime(key, new DateTime(property.datetime_value));
+		                var dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+
+		                modelProperty = new ThingModel.Property.DateTime(key,
+			                dtDateTime.AddMilliseconds(property.datetime_value));
                         break;
                 }
                 

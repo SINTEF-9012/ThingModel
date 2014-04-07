@@ -316,10 +316,13 @@ namespace ThingModel.Proto
             proto.boolean_value = property.Value;
         }
 
+		private static readonly TimeSpan DateTimeEpoch = new TimeSpan(
+			new DateTime(1970,1,1,0,0,0, DateTimeKind.Utc).Ticks);
+
         protected void ConvertProperty(ThingModel.Property.DateTime property, Property proto)
         {
             proto.type = Property.Type.DATETIME;
-            proto.datetime_value = property.Value.Ticks;
+	        proto.datetime_value = property.Value.Subtract(DateTimeEpoch).Ticks/10000;
         }
 
 	    protected void ManageThingSuppression(int thingId)
