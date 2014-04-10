@@ -440,16 +440,16 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.49497475"
-     inkscape:cx="794.53659"
-     inkscape:cy="728.27145"
+     inkscape:zoom="0.35"
+     inkscape:cx="643.45295"
+     inkscape:cy="872.52096"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
      inkscape:window-width="1522"
      inkscape:window-height="842"
-     inkscape:window-x="754"
-     inkscape:window-y="62"
+     inkscape:window-x="467"
+     inkscape:window-y="129"
      inkscape:window-maximized="0" />
   <metadata
      id="metadata7">
@@ -459,7 +459,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -838,28 +838,6 @@
          inkscape:connector-curvature="0"
          transform="translate(0,-435.82701)" />
     </g>
-    <g
-       id="g5864"
-       transform="matrix(0.035002,-0.15538978,0.15538978,0.035002,732.81154,109.51064)"
-       inkscape:transform-center-x="24.937684"
-       inkscape:transform-center-y="14.259816">
-      <path
-         inkscape:original-d="m 1551.082,741.41849 -168.5714,0 -40,-168.57143 171.4285,2.85714 z"
-         inkscape:path-effect="#path-effect5848"
-         sodipodi:nodetypes="ccccc"
-         inkscape:connector-curvature="0"
-         id="path5866"
-         d="m 1552.1686,741.40953 c -39.9291,-1.46184 -80.8615,0.31552 -122.59,0.93474 -16.8949,0.25071 -32.988,0.30231 -48.6254,0.27874 -4.6783,-23.1977 -8.3716,-46.55785 -12.1792,-69.68666 -0.069,-0.4207 -0.1393,-0.84121 -0.2102,-1.26154 m 9.1479,16.72227 c -10.8724,-38.80757 -19.4636,-76.54084 -30.6682,-112.88887 -0.4364,-1.41567 -0.8659,-2.83811 -1.2887,-4.26686 28.9739,2.18921 60.4274,2.0077 91.8128,2.77053 m -29.2038,1.66448 c 35.5045,0.40687 69.7823,0.60133 105.8727,0.24417 1.624,5.57192 3.3017,11.1275 5.0486,16.66501 10.283,32.59598 14.889,68.84438 19.921,106.1855 m -1.1774,-21.77892 c 4.862,22.31931 10.566,45.43821 16.7913,68.59245 -15.6433,0.0746 -31.036,0.16614 -46.2849,0.0199 -37.0675,-0.35558 -79.6234,0.0452 -119.5173,0.16088 -0.044,-0.18206 -0.087,-0.36412 -0.1309,-0.5462 -3.5033,-14.63122 -7.1546,-29.34355 -10.9624,-44.11792 m 20.5594,-127.32124 95.6117,1.59353"
-         style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:18.83438492;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1" />
-      <path
-         transform="translate(0,-435.82701)"
-         inkscape:connector-curvature="0"
-         inkscape:original-d="m 1345.7143,1006.7604 45.7143,172.1429 165,0.7142 -21.4286,-65 -20,-100 z"
-         inkscape:path-effect="#path-effect5852"
-         id="path5868"
-         d="m 1345.7143,1006.7604 45.7143,172.1429 165,0.7142 -21.4286,-65 -20,-100 -169.2857,-7.8571"
-         style="fill:#000000;stroke:#000000;stroke-width:6.27812815px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
-    </g>
     <text
        xml:space="preserve"
        style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:xkcd;-inkscape-font-specification:xkcd"
@@ -871,14 +849,6 @@
          id="tspan5880"
          x="1234.4395"
          y="5.1175833">0..*</tspan></text>
-    <path
-       inkscape:original-d="m 1027.0868,-38.638468 20.1463,17.75042 -12.9699,24.3583451 -20.187,-18.3927341 z"
-       inkscape:path-effect="#path-effect5898"
-       sodipodi:nodetypes="ccccc"
-       inkscape:connector-curvature="0"
-       id="path5884"
-       d="m 1028.1736,-38.647361 c 6.7305,5.589666 13.4108,11.341584 20.0431,17.206445 -4.4086,8.066084 -8.8679,16.2514715 -13.3753,24.5026325 -6.9112,-6.000567 -13.8695,-11.9367203 -20.8724,-17.8603405 4.0656,-7.700019 8.0874,-15.387741 12.0677,-23.113585 2.6497,2.538621 5.2923,5.070726 7.928,7.592752 3.6923,3.533111 7.468,7.045534 11.3155,10.541426 -4.4481,8.196061 -8.6735,16.3408303 -12.7397,24.4570231 -5.7752,-5.4715917 -11.4263,-10.9654506 -16.9969,-16.4659531 m 13.5673,10.5629323 -14.1371,-12.8805473"
-       style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:3.00000024;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1" />
     <text
        sodipodi:linespacing="125%"
        id="text5904"
