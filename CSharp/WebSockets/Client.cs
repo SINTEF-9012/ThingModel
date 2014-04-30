@@ -102,10 +102,17 @@ namespace ThingModel.WebSockets
 			{
 				if (args.Type == Opcode.BINARY)
 				{
-					var senderName = _fromProtobuf.Convert(args.RawData);
-					Console.WriteLine(SenderID + " | Binary message from : " + senderName);
-					_toProtobuf.ApplyThingsSuppressions(_thingModelObserver.Deletions);
-					_thingModelObserver.Reset();
+					try
+					{
+						var senderName = _fromProtobuf.Convert(args.RawData);
+						_toProtobuf.ApplyThingsSuppressions(_thingModelObserver.Deletions);
+						_thingModelObserver.Reset();
+						Console.WriteLine(SenderID + " | Binary message from : " + senderName);
+					}
+					catch (Exception e)
+					{
+						Console.WriteLine(SenderID + " | Big exception when receiving the message : " + e.Message);
+					}	
 				}
 			}
         }
