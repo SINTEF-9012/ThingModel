@@ -54,7 +54,7 @@ namespace ThingModel.Proto
       set { _double_value = value; }
     }
     private int _int_value = default(int);
-    [global::ProtoBuf.ProtoMember(6, IsRequired = false, Name=@"int_value", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::ProtoBuf.ProtoMember(6, IsRequired = false, Name=@"int_value", DataFormat = global::ProtoBuf.DataFormat.ZigZag)]
     [global::System.ComponentModel.DefaultValue(default(int))]
     public int int_value
     {

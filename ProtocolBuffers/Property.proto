@@ -47,7 +47,7 @@ message Property {
 	optional Location location_value = 3;
 	optional String string_value = 4;
 	optional double double_value = 5;
-	optional int32 int_value = 6;
+	optional sint32 int_value = 6;
 	optional bool boolean_value = 7;
 	optional int64 datetime_value = 8;
 
