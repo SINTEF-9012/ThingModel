@@ -59,7 +59,7 @@ namespace ThingModel
 
             if (alsoRegisterTypes && thing.Type != null)
             {
-                RegisterType(thing.Type, false);
+                RegisterType(thing.Type, false, sender);
             }
 
 
