@@ -31,22 +31,22 @@ namespace ThingModel.Specs
                 DefineType = false;
             }
 
-            public void New(Thing thing)
+            public void New(Thing thing, string sender)
             {
                 NewThing = true;
             }
 
-            public void Deleted(Thing thing)
+            public void Deleted(Thing thing, string sender)
             {
                 DeletedThing = true;
             }
 
-            public void Updated(Thing thing)
+            public void Updated(Thing thing, string sender)
             {
                 UpdatedThing = true;
             }
 
-            public void Define(ThingType thing)
+            public void Define(ThingType thing, string sender)
             {
                 DefineType = true;
             }
@@ -313,6 +313,27 @@ namespace ThingModel.Specs
 			_warehouse.RegisterThing(new Thing("canard"));
 			Assert.That(newThing, Is.True);
 			Assert.That(delete, Is.True);
+	    }
+
+	    [Test]
+	    public void CheckEventSenderInformation()
+	    {
+			_warehouse.Events.OnDefine += (sender, args) =>
+				Assert.That(args.Sender, Is.EqualTo("testSender"));
+
+			_warehouse.Events.OnNew += (sender, args) =>
+				Assert.That(args.Sender, Is.EqualTo("testSender"));
+
+			_warehouse.Events.OnDelete += (sender, args) =>
+				Assert.That(args.Sender, Is.EqualTo("testSender"));
+			
+			_warehouse.Events.OnUpdate += (sender, args) =>
+				Assert.That(args.Sender, Is.EqualTo("testSender"));
+
+		    _warehouse.RegisterType(_type, true, "testSender");
+			_warehouse.RegisterThing(_thing, true, true, "testSender");
+			_warehouse.RegisterThing(_thing, true, true, "testSender");
+			_warehouse.RemoveThing(_thing, true, "testSender");
 	    }
     }
 

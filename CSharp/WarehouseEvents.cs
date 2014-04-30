@@ -7,20 +7,24 @@ namespace ThingModel
 		public class ThingEventArgs : EventArgs
 		{
 			public Thing Thing { private set; get; }
+			public string Sender { private set; get; }
 
-			public ThingEventArgs(Thing thing)
+			public ThingEventArgs(Thing thing, string sender)
 			{
 				Thing = thing;
+				Sender = sender;
 			}
 		}
 
 		public class ThingTypeEventArgs : EventArgs
 		{
 			public ThingType ThingType { private set; get; }
+			public string Sender { private set; get; }
 
-			public ThingTypeEventArgs(ThingType thingType)
+			public ThingTypeEventArgs(ThingType thingType, string sender)
 			{
 				ThingType = thingType;
+				Sender = sender;
 			}
 		}
 
@@ -32,35 +36,83 @@ namespace ThingModel
 		public event ThingEventHandler OnUpdate;
 		public event ThingTypeEventHandler OnDefine;
 
-		public void New(Thing thing)
+		public event ThingEventHandler OnReceivedNew;
+		public event ThingEventHandler OnReceivedDelete;
+		public event ThingEventHandler OnReceivedUpdate;
+		public event ThingTypeEventHandler OnReceivedDefine;
+
+		public void New(Thing thing, string sender)
 		{
+			ThingEventArgs args = null;
 			if (OnNew != null)
 			{
-				OnNew(this, new ThingEventArgs(thing));
+				args = new ThingEventArgs(thing, sender);
+				OnNew(this, args);
+			}
+			if (OnReceivedNew != null && sender != null)
+			{
+				if (args == null)
+				{
+					args = new ThingEventArgs(thing, sender);	
+				}
+				OnReceivedNew(this, args);
 			}
 		}
 
-		public void Deleted(Thing thing)
+		public void Deleted(Thing thing, string sender)
 		{
+			ThingEventArgs args = null;
 			if (OnDelete != null)
 			{
-				OnDelete(this, new ThingEventArgs(thing));
+				args = new ThingEventArgs(thing, sender);
+				OnDelete(this, args);
+			}
+
+			if (OnReceivedDelete != null && sender != null)
+			{
+				if (args == null)
+				{
+					args = new ThingEventArgs(thing, sender);	
+				}
+				OnReceivedDelete(this, args);
 			}
 		}
 
-		public void Updated(Thing thing)
+		public void Updated(Thing thing, string sender)
 		{
+			ThingEventArgs args = null;
 			if (OnUpdate != null)
 			{
-				OnUpdate(this, new ThingEventArgs(thing));
+				args = new ThingEventArgs(thing, sender);
+				OnUpdate(this, args);
+			}
+
+			if (OnReceivedUpdate != null && sender != null)
+			{
+				if (args == null)
+				{
+					args = new ThingEventArgs(thing, sender);	
+				}
+				OnReceivedUpdate(this, args);
 			}
 		}
 
-		public void Define(ThingType thingType)
+		public void Define(ThingType thingType, string sender)
 		{
+			ThingTypeEventArgs args = null;
 			if (OnDefine != null)
 			{
-				OnDefine(this, new ThingTypeEventArgs(thingType));
+				args = new ThingTypeEventArgs(thingType, sender);
+				OnDefine(this, args);
+			}
+
+			if (OnReceivedDefine != null && sender != null)
+			{
+				if (args == null)
+				{
+					args = new ThingTypeEventArgs(thingType, sender);	
+				}
+				OnReceivedDefine(this, args);
 			}
 		}
 	}

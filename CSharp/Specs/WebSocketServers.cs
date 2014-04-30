@@ -23,22 +23,22 @@ namespace ThingModel.Specs
             private readonly AutoResetEvent _updatedEvent = new AutoResetEvent(false);
             private readonly AutoResetEvent _defineEvent = new AutoResetEvent(false);
 
-            public void New(Thing thing)
+            public void New(Thing thing, string sender)
             {
                 _newEvent.Set();
             }
 
-            public void Deleted(Thing thing)
+            public void Deleted(Thing thing, string sender)
             {
                 _deleteEvent.Set();
             }
 
-            public void Updated(Thing thing)
+            public void Updated(Thing thing, string sender)
             {
                 _updatedEvent.Set();
             }
 
-            public void Define(ThingType thing)
+            public void Define(ThingType thing, string sender)
             {
                 _defineEvent.Set();
             }
@@ -218,7 +218,7 @@ namespace ThingModel.Specs
 
             var lapinB = _warehouseB.GetThing("lapin");
             lapinB.SetProperty(new Property.String("name", "groaw"));
-            _warehouseB.NotifyThingUpdate(lapinB);
+            _warehouseB.NotifyThingUpdate(lapinB, "op");
 			Console.WriteLine(" ------ send ------ ");
             _clientB.Send();
 
@@ -303,7 +303,7 @@ namespace ThingModel.Specs
             Assert.That(_warehouseWaitB.WaitUpdated(500), Is.False);
 
             pc.SetProperty(new Property.String("name", "Interstella2"));
-            _warehouseA.NotifyThingUpdate(pc);
+            _warehouseA.NotifyThingUpdate(pc, "op");
             _clientA.Send();
 
             Assert.That(_warehouseWaitB.WaitUpdated(), Is.True);
@@ -326,7 +326,7 @@ namespace ThingModel.Specs
 
             family.Connect(parentB);
             _warehouseA.RegisterThing(parentB);
-            _warehouseA.NotifyThingUpdate(family);
+            _warehouseA.NotifyThingUpdate(family, "op");
             _clientA.Send();
 
 
@@ -335,20 +335,20 @@ namespace ThingModel.Specs
 
             family.Disconnect(parentB);
 
-            _warehouseA.NotifyThingUpdate(family);
+            _warehouseA.NotifyThingUpdate(family, "op");
 
             _clientA.Send();
 
             Assert.That(_warehouseWaitB.WaitUpdated(), Is.True);
             Assert.That(_warehouseB.GetThing("family").IsConnectedTo(_warehouseB.GetThing("Bob")), Is.False);
 
-            _warehouseA.NotifyThingUpdate(family);
+            _warehouseA.NotifyThingUpdate(family, "op");
             _clientA.Send();
             Assert.That(_warehouseWaitB.WaitUpdated(500), Is.False);
 
             family.Disconnect(parentA);
             family.Connect(parentB);
-            _warehouseA.NotifyThingUpdate(family);
+            _warehouseA.NotifyThingUpdate(family, "op");
 
             _clientA.Send();
 
@@ -403,14 +403,14 @@ namespace ThingModel.Specs
 
             // Wrong property
             thing.SetProperty(new Property.Double("name", 42));
-            _warehouseA.NotifyThingUpdate(thing);
+            _warehouseA.NotifyThingUpdate(thing, "op");
             _clientA.Send();
 
             // Still wrong
             Assert.That(_warehouseWaitB.WaitNew(500), Is.False);
 
             thing.SetProperty(new Property.String("name", "Roger"));
-            _warehouseA.NotifyThingUpdate(thing);
+            _warehouseA.NotifyThingUpdate(thing, "op");
             _clientA.Send();
 
             // Now, it's OK

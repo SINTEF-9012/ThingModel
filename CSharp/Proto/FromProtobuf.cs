@@ -53,7 +53,9 @@ namespace ThingModel.Proto
 
         public string Convert(Transaction transaction, bool check = false)
         {
+
             transaction.string_declarations.ForEach(ConvertStringDeclaration);
+            var senderId = KeyToString(transaction.string_sender_id);
 
 			var thingsToDelete = new HashSet<ThingModel.Thing>();
 
@@ -62,15 +64,18 @@ namespace ThingModel.Proto
 				var id = KeyToString(thingKey);
 				thingsToDelete.Add(Warehouse.GetThing(id));
 			}
-			Warehouse.RemoveCollection(thingsToDelete);
+			Warehouse.RemoveCollection(thingsToDelete, senderId);
 
-            transaction.thingtypes_declaration_list.ForEach(ConvertThingTypeDeclaration);
+	        foreach (var type in transaction.thingtypes_declaration_list)
+	        {
+		        ConvertThingTypeDeclaration(type, senderId);
+	        }
 
             var thingsToConnect = new List<Tuple<ThingModel.Thing, Thing>>();
             
             foreach (var thing in transaction.things_publish_list)
             {
-                var modelThing = ConvertThingPublication(thing, check);
+                var modelThing = ConvertThingPublication(thing, check, senderId);
                 
                 if (thing.connections_change)
                 {
@@ -95,7 +100,6 @@ namespace ThingModel.Proto
                 Warehouse.RegisterThing(tuple.Item1, false);    
             }
 
-            var senderId = KeyToString(transaction.string_sender_id);
 
             return senderId;
         }
@@ -105,7 +109,7 @@ namespace ThingModel.Proto
             StringDeclarations[declaration.key] = declaration.value;
         }
 
-        protected void ConvertThingTypeDeclaration(ThingType thingType)
+        protected void ConvertThingTypeDeclaration(ThingType thingType, string senderId)
         {
             var modelType = new ThingModel.ThingType(KeyToString(thingType.string_name));
             modelType.Description = KeyToString(thingType.string_description);
@@ -121,10 +125,10 @@ namespace ThingModel.Proto
 
                 modelType.DefineProperty(modelProperty);
             }
-            Warehouse.RegisterType(modelType);
+            Warehouse.RegisterType(modelType, true, senderId);
         }
 
-        protected ThingModel.Thing ConvertThingPublication(Thing thing, bool check)
+        protected ThingModel.Thing ConvertThingPublication(Thing thing, bool check, string senderId)
         {
             ThingModel.ThingType type = null;
             if (thing.string_type_name != 0)
@@ -234,11 +238,11 @@ namespace ThingModel.Proto
 
             if (check && type != null && !type.Check(modelThing))
             {
-                Console.WriteLine("Object «" + id + "» not valid, ignored");
+                Console.WriteLine("Object «" + id + "» from «"+senderId+"» is not valid, ignored");
             }
             else if (!thing.connections_change)
             {
-                Warehouse.RegisterThing(modelThing, false);    
+                Warehouse.RegisterThing(modelThing, false, false, senderId);    
             }
             
             return modelThing;

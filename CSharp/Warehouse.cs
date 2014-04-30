@@ -14,7 +14,7 @@ namespace ThingModel
 		private readonly Object _lockDictionaryThingTypes = new object();
 		private readonly Object _lockDictionaryThings = new object();
  
-        public void RegisterType(ThingType type, bool force = true)
+        public void RegisterType(ThingType type, bool force = true, string sender = null)
         {
             if (type == null)
             {
@@ -37,12 +37,12 @@ namespace ThingModel
 	                _thingTypes[type.Name] = type;
 	            }
 
-                NotifyThingTypeDefine(type);
+                NotifyThingTypeDefine(type, sender);
             }
             
         }
 
-        public void RegisterThing(Thing thing, bool alsoRegisterConnections = true, bool alsoRegisterTypes = true)
+        public void RegisterThing(Thing thing, bool alsoRegisterConnections = true, bool alsoRegisterTypes = true, string sender = null)
         {
             if (thing == null)
             {
@@ -67,22 +67,22 @@ namespace ThingModel
                 var set = new HashSet<Thing>();
                 foreach (var connectedThing in thing.ConnectedThings)
                 {
-                    RecursiveRegisterThing(connectedThing, alsoRegisterTypes, set);
+                    RecursiveRegisterThing(connectedThing, alsoRegisterTypes, set, sender);
                 }
             }
 
             if (creation)
             {
-                NotifyThingCreation(thing);
+                NotifyThingCreation(thing, sender);
             }
             else
             {
-                NotifyThingUpdate(thing);
+                NotifyThingUpdate(thing, sender);
             }
             
         }
 
-        private void RecursiveRegisterThing(Thing thing, bool alsoRegisterTypes, HashSet<Thing> alreadyRegisteredThings)
+        private void RecursiveRegisterThing(Thing thing, bool alsoRegisterTypes, HashSet<Thing> alreadyRegisteredThings, string sender)
         {
             
             // Avoid infinite recursions
@@ -93,22 +93,22 @@ namespace ThingModel
 
             alreadyRegisteredThings.Add(thing);
             
-            RegisterThing(thing, false, alsoRegisterTypes);
+            RegisterThing(thing, false, alsoRegisterTypes, sender);
             
             foreach (var connectedThing in thing.ConnectedThings)
             {
-                RecursiveRegisterThing(connectedThing, alsoRegisterTypes, alreadyRegisteredThings);
+                RecursiveRegisterThing(connectedThing, alsoRegisterTypes, alreadyRegisteredThings, sender);
             }
             
         }
 
-		public void RemoveCollection(ISet<Thing> collection)
+		public void RemoveCollection(ISet<Thing> collection, string sender = null)
 		{
 			var thingsToDisconnect = new HashSet<Thing>();
 
 			foreach (var thing in collection)
 			{
-				RemoveThing(thing, false);
+				RemoveThing(thing, false, sender);
 
 				lock (_lockDictionaryThings)
 				{
@@ -126,21 +126,21 @@ namespace ThingModel
 			{
 				if (!collection.Contains(t))
 				{
-					NotifyThingUpdate(t);
+					NotifyThingUpdate(t, sender);
 				}
 			}
 		}
 
-		public void RegisterCollection(IEnumerable<Thing> collection, bool alsoRegisterTypes = false)
+		public void RegisterCollection(IEnumerable<Thing> collection, bool alsoRegisterTypes = false, string sender = null)
 		{
 			var set = new HashSet<Thing>();
 			foreach (var thing in collection)
 			{
-				RecursiveRegisterThing(thing, alsoRegisterTypes, set);
+				RecursiveRegisterThing(thing, alsoRegisterTypes, set, sender);
 			}
 		}
 
-		public void RemoveThing(Thing thing, bool notifyUpdates = true)
+		public void RemoveThing(Thing thing, bool notifyUpdates = true, string sender = null)
 		{
 			if (thing == null)
 			{
@@ -171,7 +171,7 @@ namespace ThingModel
 
 			if (removed)
 			{
-				NotifyThingDeleted(thing);
+				NotifyThingDeleted(thing, sender);
 			}
 
 			if (notifyUpdates)
@@ -179,7 +179,7 @@ namespace ThingModel
 				foreach (var t in thingsToDisconnect)
 				{
 					t.Disconnect(thing);
-					NotifyThingUpdate(t);
+					NotifyThingUpdate(t, sender);
 				}
 			}
 			else
@@ -217,19 +217,29 @@ namespace ThingModel
             }
         }
 
-        public void NotifyThingCreation(Thing thing)
+        public void NotifyThingCreation(Thing thing, string sender)
         {
-            foreach (var observer in _observers)
+	        IList<IWarehouseObserver> observers = null;
+			lock (_lockHashSetObservers)
+			{
+				observers = new List<IWarehouseObserver>(_observers);
+			}
+            foreach (var observer in observers)
             {
-                observer.New(thing);
+                observer.New(thing, sender);
             }
         }
 
-        public void NotifyThingDeleted(Thing thing)
+        public void NotifyThingDeleted(Thing thing, string sender)
         {
-            foreach (var observer in _observers)
+	        IList<IWarehouseObserver> observers = null;
+			lock (_lockHashSetObservers)
+			{
+				observers = new List<IWarehouseObserver>(_observers);
+			}
+            foreach (var observer in observers)
             {
-                observer.Deleted(thing);
+                observer.Deleted(thing, sender);
             }
         }
 

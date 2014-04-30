@@ -234,11 +234,11 @@ namespace ThingModel.Specs
 
             _fromProtobuf.Convert(_toProtobuf.Convert(new[] { thing }, new Thing[0], new ThingType[0], null));
 
-            var newLocation = _warehouse.GetThing("8712C").GetProperty<Property.Location>("position").Value;
-            
+            var newLocation = _warehouse.GetThing("8712C").GetProperty<Property.Location>("position").Value as Location.LatLng;
+
             Assert.That(location.Compare(newLocation), Is.True);
 
-            newLocation.Y = 27;
+            newLocation.Latitude = 27;
 
             Assert.That(location.Compare(newLocation), Is.False);
 
@@ -305,5 +305,33 @@ namespace ThingModel.Specs
 
             Assert.That(transaction.things_publish_list.Count, Is.EqualTo(0));
         }
+
+	    [Test]
+	    public void SenderIdInformation()
+	    {
+		    
+            var type = new ThingType("message");
+            type.DefineProperty(PropertyType.Create<Property.String>("content"));
+
+            var message = new Thing("first", type);
+            message.SetProperty(new Property.String("content", "Hello World"));
+
+		    _warehouse.Events.OnReceivedNew += (sender, args) => Assert.That(args.Sender, Is.EqualTo("niceSenderIdNew")); 
+		    _warehouse.Events.OnDefine += (sender, args) => Assert.That(args.Sender, Is.EqualTo("niceSenderIdNew"));
+
+		    _warehouse.Events.OnUpdate += (sender, args) => Assert.That(args.Sender, Is.EqualTo("niceSenderIdUpdate")); 
+		    _warehouse.Events.OnDelete += (sender, args) => Assert.That(args.Sender, Is.EqualTo("niceSenderIdDelete")); 
+
+            _fromProtobuf.Convert(_toProtobuf.Convert(new [] {message}, new Thing[0], new [] {type}, "niceSenderIdNew"));
+
+            message.SetProperty(new Property.String("content", "Hello World2"));
+            _fromProtobuf.Convert(_toProtobuf.Convert(new [] {message}, new Thing[0], new ThingType[0], "niceSenderIdUpdate"));
+
+			var duck = new Thing("canard");
+		    _warehouse.RegisterThing(duck);
+
+            var transaction = _toProtobuf.Convert(new Thing[0], new [] {duck}, new ThingType[0], "niceSenderIdDelete");
+            _fromProtobuf.Convert(transaction);
+	    }
     }
 }

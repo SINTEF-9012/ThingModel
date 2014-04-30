@@ -19,7 +19,7 @@ namespace ThingModel.Proto
 			}
         }
 
-        public void New(ThingModel.Thing thing)
+        public void New(ThingModel.Thing thing, string sender)
         {
 	        lock (_lockHashSet)
 	        {
@@ -27,7 +27,7 @@ namespace ThingModel.Proto
 	        }
         }
 
-        public void Deleted(ThingModel.Thing thing)
+        public void Deleted(ThingModel.Thing thing, string sender)
         {
 	        lock (_lockHashSet)
 	        {
@@ -36,7 +36,7 @@ namespace ThingModel.Proto
 	        }
         }
 
-        public void Updated(ThingModel.Thing thing)
+        public void Updated(ThingModel.Thing thing, string sender)
         {
 	        lock (_lockHashSet)
 	        {
@@ -44,7 +44,7 @@ namespace ThingModel.Proto
 	        }
         }
 
-        public void Define(ThingModel.ThingType thing)
+        public void Define(ThingModel.ThingType thing, string sender)
         {
 	        lock (_lockHashSet)
 	        {
