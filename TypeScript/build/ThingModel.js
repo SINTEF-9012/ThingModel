@@ -303,7 +303,7 @@ var ThingModel;
 
             FromProtobuf.prototype.Convert = function (data, check) {
                 if (typeof check === "undefined") { check = false; }
-                var transaction = ThingModel.Proto.ProtoTools.Builder.Transaction.decode(data);
+                var transaction = Proto.ProtoTools.Builder.Transaction.decode(data);
 
                 return this.ConvertTransaction(transaction, check);
             };
@@ -313,6 +313,8 @@ var ThingModel;
                 _.each(transaction.string_declarations, function (d) {
                     _this._stringDeclarations[d.key] = d.value;
                 });
+
+                var senderId = this.KeyToString(transaction.string_sender_id);
 
                 var thingsToDelete = {};
 
@@ -324,16 +326,16 @@ var ThingModel;
                     }
                 });
 
-                this._warehouse.RemoveCollection(thingsToDelete);
+                this._warehouse.RemoveCollection(thingsToDelete, senderId);
 
                 _.each(transaction.thingtypes_declaration_list, function (d) {
-                    _this.ConvertThingTypeDeclaration(d);
+                    _this.ConvertThingTypeDeclaration(d, senderId);
                 });
 
                 var thingsToConnect = [];
 
                 _.each(transaction.things_publish_list, function (t) {
-                    var modelThing = _this.ConvertThingPublication(t, check);
+                    var modelThing = _this.ConvertThingPublication(t, check, senderId);
 
                     if (t.connections_change) {
                         thingsToConnect.push({ proto: t, model: modelThing });
@@ -351,13 +353,13 @@ var ThingModel;
                         }
                     });
 
-                    _this._warehouse.RegisterThing(tuple.model, false);
+                    _this._warehouse.RegisterThing(tuple.model, false, false, senderId);
                 });
 
-                return this.KeyToString(transaction.string_sender_id);
+                return senderId;
             };
 
-            FromProtobuf.prototype.ConvertThingTypeDeclaration = function (thingType) {
+            FromProtobuf.prototype.ConvertThingTypeDeclaration = function (thingType, senderId) {
                 var _this = this;
                 var modelType = new ThingModel.ThingType(this.KeyToString(thingType.string_name));
                 modelType.Description = this.KeyToString(thingType.string_description);
@@ -393,10 +395,10 @@ var ThingModel;
                     modelType.DefineProperty(modelProperty);
                 });
 
-                this._warehouse.RegisterType(modelType);
+                this._warehouse.RegisterType(modelType, true, senderId);
             };
 
-            FromProtobuf.prototype.ConvertThingPublication = function (thing, check) {
+            FromProtobuf.prototype.ConvertThingPublication = function (thing, check, senderId) {
                 var _this = this;
                 var type = null;
 
@@ -417,9 +419,9 @@ var ThingModel;
                 });
 
                 if (check && type != null && !type.Check(modelThing)) {
-                    console.log("Object «" + id + "> not valid, ignored");
+                    console.log("Object «" + id + "» from «" + senderId + "»not valid, ignored");
                 } else if (!thing.connections_change) {
-                    this._warehouse.RegisterThing(modelThing, false);
+                    this._warehouse.RegisterThing(modelThing, false, false, senderId);
                 }
 
                 return modelThing;
@@ -560,7 +562,7 @@ var ThingModel;
         var ProtoTools = (function () {
             function ProtoTools() {
             }
-            ProtoTools.Builder = dcodeIO.ProtoBuf.loadJson({ "package": "ThingModel.Proto", "messages": [{ "name": "Property", "fields": [{ "rule": "required", "type": "int32", "name": "string_key", "id": 1, "options": {} }, { "rule": "required", "type": "Type", "name": "type", "id": 2, "options": { "default": "STRING" } }, { "rule": "optional", "type": "Location", "name": "location_value", "id": 3, "options": {} }, { "rule": "optional", "type": "String", "name": "string_value", "id": 4, "options": {} }, { "rule": "optional", "type": "double", "name": "double_value", "id": 5, "options": {} }, { "rule": "optional", "type": "int32", "name": "int_value", "id": 6, "options": {} }, { "rule": "optional", "type": "bool", "name": "boolean_value", "id": 7, "options": {} }, { "rule": "optional", "type": "int64", "name": "datetime_value", "id": 8, "options": {} }], "enums": [{ "name": "Type", "values": [{ "name": "LOCATION_POINT", "id": 0 }, { "name": "LOCATION_LATLNG", "id": 1 }, { "name": "LOCATION_EQUATORIAL", "id": 2 }, { "name": "STRING", "id": 3 }, { "name": "DOUBLE", "id": 4 }, { "name": "INT", "id": 5 }, { "name": "BOOLEAN", "id": 6 }, { "name": "DATETIME", "id": 7 }], "options": {} }], "messages": [{ "name": "Location", "fields": [{ "rule": "required", "type": "double", "name": "x", "id": 1, "options": { "default": 0 } }, { "rule": "required", "type": "double", "name": "y", "id": 2, "options": { "default": 0 } }, { "rule": "optional", "type": "double", "name": "z", "id": 3, "options": { "default": 0 } }, { "rule": "optional", "type": "int32", "name": "string_system", "id": 4, "options": {} }, { "rule": "optional", "type": "bool", "name": "z_null", "id": 5, "options": { "default": false } }], "enums": [], "messages": [], "options": {} }, { "name": "String", "fields": [{ "rule": "optional", "type": "string", "name": "value", "id": 1, "options": {} }, { "rule": "optional", "type": "int32", "name": "string_value", "id": 2, "options": { "default": 0 } }], "enums": [], "messages": [], "options": {} }], "options": {} }, { "name": "PropertyType", "fields": [{ "rule": "required", "type": "int32", "name": "string_key", "id": 1, "options": {} }, { "rule": "required", "type": "Type", "name": "type", "id": 2, "options": { "default": "STRING" } }, { "rule": "required", "type": "bool", "name": "required", "id": 3, "options": { "default": true } }, { "rule": "optional", "type": "int32", "name": "string_name", "id": 4, "options": {} }, { "rule": "optional", "type": "int32", "name": "string_description", "id": 5, "options": {} }], "enums": [{ "name": "Type", "values": [{ "name": "LOCATION", "id": 0 }, { "name": "STRING", "id": 1 }, { "name": "DOUBLE", "id": 2 }, { "name": "INT", "id": 3 }, { "name": "BOOLEAN", "id": 4 }, { "name": "DATETIME", "id": 5 }], "options": {} }], "messages": [], "options": {} }, { "name": "StringDeclaration", "fields": [{ "rule": "required", "type": "string", "name": "value", "id": 1, "options": {} }, { "rule": "required", "type": "int32", "name": "key", "id": 2, "options": {} }], "enums": [], "messages": [], "options": {} }, { "name": "Thing", "fields": [{ "rule": "required", "type": "int32", "name": "string_id", "id": 1 }, { "rule": "required", "type": "int32", "name": "string_type_name", "id": 2 }, { "rule": "repeated", "type": "Property", "name": "properties", "id": 3 }, { "rule": "repeated", "type": "int32", "name": "connections", "id": 4, "options": { "packed": true } }, { "rule": "optional", "type": "bool", "name": "connections_change", "id": 5, "options": { "default": false } }], "enums": [], "messages": [] }, { "name": "ThingType", "fields": [{ "rule": "required", "type": "int32", "name": "string_name", "id": 1 }, { "rule": "optional", "type": "int32", "name": "string_description", "id": 2 }, { "rule": "repeated", "type": "PropertyType", "name": "properties", "id": 3 }], "enums": [], "messages": [] }, { "name": "Transaction", "fields": [{ "rule": "repeated", "type": "StringDeclaration", "name": "string_declarations", "id": 1 }, { "rule": "repeated", "type": "Thing", "name": "things_publish_list", "id": 2 }, { "rule": "repeated", "type": "int32", "name": "things_remove_list", "id": 3, "options": { "packed": true } }, { "rule": "repeated", "type": "ThingType", "name": "thingtypes_declaration_list", "id": 4 }, { "rule": "required", "type": "int32", "name": "string_sender_id", "id": 5 }], "enums": [], "messages": [] }], "enums": [], "imports": [], "services": [] }).build("ThingModel.Proto");
+            ProtoTools.Builder = dcodeIO.ProtoBuf.loadJson({ "package": "ThingModel.Proto", "messages": [{ "name": "Property", "fields": [{ "rule": "required", "type": "int32", "name": "string_key", "id": 1, "options": {} }, { "rule": "required", "type": "Type", "name": "type", "id": 2, "options": { "default": "STRING" } }, { "rule": "optional", "type": "Location", "name": "location_value", "id": 3, "options": {} }, { "rule": "optional", "type": "String", "name": "string_value", "id": 4, "options": {} }, { "rule": "optional", "type": "double", "name": "double_value", "id": 5, "options": {} }, { "rule": "optional", "type": "sint32", "name": "int_value", "id": 6, "options": {} }, { "rule": "optional", "type": "bool", "name": "boolean_value", "id": 7, "options": {} }, { "rule": "optional", "type": "int64", "name": "datetime_value", "id": 8, "options": {} }], "enums": [{ "name": "Type", "values": [{ "name": "LOCATION_POINT", "id": 0 }, { "name": "LOCATION_LATLNG", "id": 1 }, { "name": "LOCATION_EQUATORIAL", "id": 2 }, { "name": "STRING", "id": 3 }, { "name": "DOUBLE", "id": 4 }, { "name": "INT", "id": 5 }, { "name": "BOOLEAN", "id": 6 }, { "name": "DATETIME", "id": 7 }], "options": {} }], "messages": [{ "name": "Location", "fields": [{ "rule": "required", "type": "double", "name": "x", "id": 1, "options": { "default": 0 } }, { "rule": "required", "type": "double", "name": "y", "id": 2, "options": { "default": 0 } }, { "rule": "optional", "type": "double", "name": "z", "id": 3, "options": { "default": 0 } }, { "rule": "optional", "type": "int32", "name": "string_system", "id": 4, "options": {} }, { "rule": "optional", "type": "bool", "name": "z_null", "id": 5, "options": { "default": false } }], "enums": [], "messages": [], "options": {} }, { "name": "String", "fields": [{ "rule": "optional", "type": "string", "name": "value", "id": 1, "options": {} }, { "rule": "optional", "type": "int32", "name": "string_value", "id": 2, "options": { "default": 0 } }], "enums": [], "messages": [], "options": {} }], "options": {} }, { "name": "PropertyType", "fields": [{ "rule": "required", "type": "int32", "name": "string_key", "id": 1, "options": {} }, { "rule": "required", "type": "Type", "name": "type", "id": 2, "options": { "default": "STRING" } }, { "rule": "required", "type": "bool", "name": "required", "id": 3, "options": { "default": true } }, { "rule": "optional", "type": "int32", "name": "string_name", "id": 4, "options": {} }, { "rule": "optional", "type": "int32", "name": "string_description", "id": 5, "options": {} }], "enums": [{ "name": "Type", "values": [{ "name": "LOCATION", "id": 0 }, { "name": "STRING", "id": 1 }, { "name": "DOUBLE", "id": 2 }, { "name": "INT", "id": 3 }, { "name": "BOOLEAN", "id": 4 }, { "name": "DATETIME", "id": 5 }], "options": {} }], "messages": [], "options": {} }, { "name": "StringDeclaration", "fields": [{ "rule": "required", "type": "string", "name": "value", "id": 1, "options": {} }, { "rule": "required", "type": "int32", "name": "key", "id": 2, "options": {} }], "enums": [], "messages": [], "options": {} }, { "name": "Thing", "fields": [{ "rule": "required", "type": "int32", "name": "string_id", "id": 1 }, { "rule": "required", "type": "int32", "name": "string_type_name", "id": 2 }, { "rule": "repeated", "type": "Property", "name": "properties", "id": 3 }, { "rule": "repeated", "type": "int32", "name": "connections", "id": 4, "options": { "packed": true } }, { "rule": "optional", "type": "bool", "name": "connections_change", "id": 5, "options": { "default": false } }], "enums": [], "messages": [] }, { "name": "ThingType", "fields": [{ "rule": "required", "type": "int32", "name": "string_name", "id": 1 }, { "rule": "optional", "type": "int32", "name": "string_description", "id": 2 }, { "rule": "repeated", "type": "PropertyType", "name": "properties", "id": 3 }], "enums": [], "messages": [] }, { "name": "Transaction", "fields": [{ "rule": "repeated", "type": "StringDeclaration", "name": "string_declarations", "id": 1 }, { "rule": "repeated", "type": "Thing", "name": "things_publish_list", "id": 2 }, { "rule": "repeated", "type": "int32", "name": "things_remove_list", "id": 3, "options": { "packed": true } }, { "rule": "repeated", "type": "ThingType", "name": "thingtypes_declaration_list", "id": 4 }, { "rule": "required", "type": "int32", "name": "string_sender_id", "id": 5 }], "enums": [], "messages": [] }], "enums": [], "imports": [], "services": [] }).build("ThingModel.Proto");
             return ProtoTools;
         })();
         Proto.ProtoTools = ProtoTools;
@@ -592,7 +594,7 @@ var ThingModel;
                 key = ++this._stringDeclarationsCpt;
                 this._stringDeclarations[value] = key;
 
-                var stringDeclaration = new ThingModel.Proto.ProtoTools.Builder.StringDeclaration();
+                var stringDeclaration = new Proto.ProtoTools.Builder.StringDeclaration();
 
                 stringDeclaration.setKey(key);
                 stringDeclaration.setValue(value);
@@ -604,7 +606,7 @@ var ThingModel;
 
             ToProtobuf.prototype.Convert = function (publish, deletions, declarations, senderID) {
                 var _this = this;
-                this._transaction = new ThingModel.Proto.ProtoTools.Builder.Transaction();
+                this._transaction = new Proto.ProtoTools.Builder.Transaction();
 
                 this._transaction.setStringSenderId(this.StringToKey(senderID));
 
@@ -628,7 +630,7 @@ var ThingModel;
 
                 var thingID = this.StringToKey(thing.ID);
 
-                var publication = new ThingModel.Proto.ProtoTools.Builder.Thing();
+                var publication = new Proto.ProtoTools.Builder.Thing();
                 publication.setStringId(thingID);
                 publication.setStringTypeName(thing.Type != null ? this.StringToKey(thing.Type.Name) : 0);
                 publication.setConnectionsChange(false);
@@ -673,7 +675,7 @@ var ThingModel;
                 _.each(thing.Properties, function (property) {
                     var propertyId = _this.StringToKey(property.Key);
 
-                    var proto = new ThingModel.Proto.ProtoTools.Builder.Property();
+                    var proto = new Proto.ProtoTools.Builder.Property();
                     proto.setStringKey(propertyId);
 
                     switch (property.Type) {
@@ -745,13 +747,13 @@ var ThingModel;
             ToProtobuf.prototype.ConvertDeclarationList = function (list) {
                 var _this = this;
                 _.each(list, function (thingType) {
-                    var declaration = new ThingModel.Proto.ProtoTools.Builder.ThingType();
+                    var declaration = new Proto.ProtoTools.Builder.ThingType();
 
                     declaration.setStringName(_this.StringToKey(thingType.Name));
                     declaration.setStringDescription(_this.StringToKey(thingType.Description));
 
                     _.each(thingType.Properties, function (propertyType) {
-                        var prop = new ThingModel.Proto.ProtoTools.Builder.PropertyType();
+                        var prop = new Proto.ProtoTools.Builder.PropertyType();
                         prop.setStringKey(_this.StringToKey(propertyType.Key));
                         prop.setStringName(_this.StringToKey(propertyType.Name));
                         prop.setStringDescription(_this.StringToKey(propertyType.Description));
@@ -801,7 +803,7 @@ var ThingModel;
                         break;
                 }
 
-                var loc = new ThingModel.Proto.ProtoTools.Builder.Property.Location();
+                var loc = new Proto.ProtoTools.Builder.Property.Location();
 
                 loc.setX(value.X);
                 loc.setY(value.Y);
@@ -819,7 +821,7 @@ var ThingModel;
                 var value = property.Value;
                 proto.setType(3 /* STRING */);
 
-                var st = new ThingModel.Proto.ProtoTools.Builder.Property.String();
+                var st = new Proto.ProtoTools.Builder.Property.String();
                 if (value && this._stringToDeclare[value]) {
                     st.setStringValue(this.StringToKey(value));
                 } else {
@@ -1076,7 +1078,7 @@ var ThingModel;
                 configurable: true
             });
             return Location;
-        })(ThingModel.Property);
+        })(Property);
         Property.Location = Location;
 
         var String = (function (_super) {
@@ -1104,7 +1106,7 @@ var ThingModel;
                 configurable: true
             });
             return String;
-        })(ThingModel.Property);
+        })(Property);
         Property.String = String;
 
         var Double = (function (_super) {
@@ -1132,7 +1134,7 @@ var ThingModel;
                 configurable: true
             });
             return Double;
-        })(ThingModel.Property);
+        })(Property);
         Property.Double = Double;
 
         var Int = (function (_super) {
@@ -1160,7 +1162,7 @@ var ThingModel;
                 configurable: true
             });
             return Int;
-        })(ThingModel.Property);
+        })(Property);
         Property.Int = Int;
 
         var Boolean = (function (_super) {
@@ -1188,7 +1190,7 @@ var ThingModel;
                 configurable: true
             });
             return Boolean;
-        })(ThingModel.Property);
+        })(Property);
         Property.Boolean = Boolean;
 
         var DateTime = (function (_super) {
@@ -1216,7 +1218,7 @@ var ThingModel;
                 configurable: true
             });
             return DateTime;
-        })(ThingModel.Property);
+        })(Property);
         Property.DateTime = DateTime;
     })(ThingModel.Property || (ThingModel.Property = {}));
     var Property = ThingModel.Property;
@@ -1503,8 +1505,9 @@ var ThingModel;
             this._things = {};
             this._observers = [];
         }
-        Warehouse.prototype.RegisterType = function (type, force) {
+        Warehouse.prototype.RegisterType = function (type, force, sender) {
             if (typeof force === "undefined") { force = true; }
+            if (typeof sender === "undefined") { sender = null; }
             if (!type) {
                 throw new Error("The thing type information is null.");
             }
@@ -1512,14 +1515,15 @@ var ThingModel;
             if (force || !_.has(this._thingTypes, type.Name)) {
                 this._thingTypes[type.Name] = type;
 
-                this.NotifyThingTypeDefine(type);
+                this.NotifyThingTypeDefine(type, sender);
             }
         };
 
-        Warehouse.prototype.RegisterThing = function (thing, alsoRegisterConnections, alsoRegisterTypes) {
+        Warehouse.prototype.RegisterThing = function (thing, alsoRegisterConnections, alsoRegisterTypes, sender) {
+            var _this = this;
             if (typeof alsoRegisterConnections === "undefined") { alsoRegisterConnections = true; }
             if (typeof alsoRegisterTypes === "undefined") { alsoRegisterTypes = true; }
-            var _this = this;
+            if (typeof sender === "undefined") { sender = null; }
             if (!thing) {
                 throw new Error("A thing should not be null if it want to be allowed in the warehouse");
             }
@@ -1528,24 +1532,24 @@ var ThingModel;
             this._things[thing.ID] = thing;
 
             if (alsoRegisterTypes && thing.Type) {
-                this.RegisterType(thing.Type, false);
+                this.RegisterType(thing.Type, false, sender);
             }
 
             if (alsoRegisterConnections) {
                 var alreadyVisitedObjects = {};
                 _.each(thing.ConnectedThings, function (connectedThing) {
-                    _this.RecursiveRegisterThing(connectedThing, alsoRegisterTypes, alreadyVisitedObjects);
+                    _this.RecursiveRegisterThing(connectedThing, alsoRegisterTypes, alreadyVisitedObjects, sender);
                 });
             }
 
             if (creation) {
-                this.NotifyThingCreation(thing);
+                this.NotifyThingCreation(thing, sender);
             } else {
-                this.NotifyThingUpdate(thing);
+                this.NotifyThingUpdate(thing, sender);
             }
         };
 
-        Warehouse.prototype.RecursiveRegisterThing = function (thing, alsoRegisterTypes, alreadyVisitedObjects) {
+        Warehouse.prototype.RecursiveRegisterThing = function (thing, alsoRegisterTypes, alreadyVisitedObjects, sender) {
             var _this = this;
             if (alreadyVisitedObjects.hasOwnProperty(thing.ID)) {
                 return;
@@ -1553,29 +1557,31 @@ var ThingModel;
 
             alreadyVisitedObjects[thing.ID] = true;
 
-            this.RegisterThing(thing, false, alsoRegisterTypes);
+            this.RegisterThing(thing, false, alsoRegisterTypes, sender);
 
             _.each(thing.ConnectedThings, function (connectedThing) {
-                _this.RecursiveRegisterThing(connectedThing, alsoRegisterTypes, alreadyVisitedObjects);
+                _this.RecursiveRegisterThing(connectedThing, alsoRegisterTypes, alreadyVisitedObjects, sender);
             });
         };
 
-        Warehouse.prototype.RegisterCollection = function (collection, alsoRegisterTypes) {
-            if (typeof alsoRegisterTypes === "undefined") { alsoRegisterTypes = false; }
+        Warehouse.prototype.RegisterCollection = function (collection, alsoRegisterTypes, sender) {
             var _this = this;
+            if (typeof alsoRegisterTypes === "undefined") { alsoRegisterTypes = true; }
+            if (typeof sender === "undefined") { sender = null; }
             var alreadyVisitedObjects = {};
             _.each(collection, function (thing) {
-                _this.RecursiveRegisterThing(thing, alsoRegisterTypes, alreadyVisitedObjects);
+                _this.RecursiveRegisterThing(thing, alsoRegisterTypes, alreadyVisitedObjects, sender);
             });
         };
 
-        Warehouse.prototype.RemoveCollection = function (collection) {
+        Warehouse.prototype.RemoveCollection = function (collection, sender) {
             var _this = this;
+            if (typeof sender === "undefined") { sender = null; }
             var thingsToDisconnect = {};
 
             _.each(_.keys(collection), function (id) {
                 var thing = collection[id];
-                _this.RemoveThing(thing, false);
+                _this.RemoveThing(thing, false, sender);
 
                 _.each(_this._things, function (t) {
                     if (t.IsConnectedTo(thing)) {
@@ -1591,9 +1597,10 @@ var ThingModel;
             });
         };
 
-        Warehouse.prototype.RemoveThing = function (thing, notifyUpdates) {
-            if (typeof notifyUpdates === "undefined") { notifyUpdates = true; }
+        Warehouse.prototype.RemoveThing = function (thing, notifyUpdates, sender) {
             var _this = this;
+            if (typeof notifyUpdates === "undefined") { notifyUpdates = true; }
+            if (typeof sender === "undefined") { sender = null; }
             if (!thing) {
                 return;
             }
@@ -1602,14 +1609,14 @@ var ThingModel;
                 if (t.IsConnectedTo(thing)) {
                     t.Disconnect(thing);
                     if (notifyUpdates) {
-                        _this.NotifyThingUpdate(t);
+                        _this.NotifyThingUpdate(t, sender);
                     }
                 }
             });
 
             if (_.has(this._things, thing.ID)) {
                 delete this._things[thing.ID];
-                this.NotifyThingDeleted(thing);
+                this.NotifyThingDeleted(thing, sender);
             }
         };
 
@@ -1621,27 +1628,31 @@ var ThingModel;
             this._observers.splice(_.indexOf(this._observers, observer), 1);
         };
 
-        Warehouse.prototype.NotifyThingTypeDefine = function (type) {
+        Warehouse.prototype.NotifyThingTypeDefine = function (type, sender) {
+            if (typeof sender === "undefined") { sender = null; }
             _.each(this._observers, function (observer) {
-                observer.Define(type);
+                observer.Define(type, sender);
             });
         };
 
-        Warehouse.prototype.NotifyThingUpdate = function (thing) {
+        Warehouse.prototype.NotifyThingUpdate = function (thing, sender) {
+            if (typeof sender === "undefined") { sender = null; }
             _.each(this._observers, function (observer) {
-                observer.Updated(thing);
+                observer.Updated(thing, sender);
             });
         };
 
-        Warehouse.prototype.NotifyThingCreation = function (thing) {
+        Warehouse.prototype.NotifyThingCreation = function (thing, sender) {
+            if (typeof sender === "undefined") { sender = null; }
             _.each(this._observers, function (observer) {
-                observer.New(thing);
+                observer.New(thing, sender);
             });
         };
 
-        Warehouse.prototype.NotifyThingDeleted = function (thing) {
+        Warehouse.prototype.NotifyThingDeleted = function (thing, sender) {
+            if (typeof sender === "undefined") { sender = null; }
             _.each(this._observers, function (observer) {
-                observer.Deleted(thing);
+                observer.Deleted(thing, sender);
             });
         };
 
