@@ -132,7 +132,7 @@ namespace ThingModel
 			}
 		}
 
-		public void RegisterCollection(IEnumerable<Thing> collection, bool alsoRegisterTypes = false, string sender = null)
+		public void RegisterCollection(IEnumerable<Thing> collection, bool alsoRegisterTypes = true, string sender = null)
 		{
 			var set = new HashSet<Thing>();
 			foreach (var thing in collection)
