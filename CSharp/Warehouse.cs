@@ -13,6 +13,7 @@ namespace ThingModel
 
 		private readonly Object _lockDictionaryThingTypes = new object();
 		private readonly Object _lockDictionaryThings = new object();
+		private readonly Object _lockHashSetObservers = new object();
  
         public void RegisterType(ThingType type, bool force = true, string sender = null)
         {
@@ -193,27 +194,45 @@ namespace ThingModel
 
         public void RegisterObserver(IWarehouseObserver modelObserver)
         {
-            _observers.Add(modelObserver);
+	        lock (_lockHashSetObservers)
+	        {
+			    _observers.Add(modelObserver);    
+	        }
+            
         }
 
         public void UnregisterObserver(IWarehouseObserver modelObserver)
         {
-            _observers.Remove(modelObserver);
+	        lock (_lockHashSetObservers)
+	        {
+		        _observers.Remove(modelObserver);
+	        }
         }
         
-        public void NotifyThingTypeDefine(ThingType type)
+        public void NotifyThingTypeDefine(ThingType type, string sender)
         {
-            foreach (var observer in _observers)
+
+	        IList<IWarehouseObserver> observers = null;
+			lock (_lockHashSetObservers)
+			{
+				observers = new List<IWarehouseObserver>(_observers);
+			}
+            foreach (var observer in observers)
             {
-                observer.Define(type);
+                observer.Define(type, sender);
             }
         }
 
-        public void NotifyThingUpdate(Thing thing)
+        public void NotifyThingUpdate(Thing thing, string sender)
         {
-            foreach (var observer in _observers)
+	        IList<IWarehouseObserver> observers = null;
+			lock (_lockHashSetObservers)
+			{
+				observers = new List<IWarehouseObserver>(_observers);
+			}
+            foreach (var observer in observers)
             {
-                observer.Updated(thing);
+                observer.Updated(thing, sender);
             }
         }
 
