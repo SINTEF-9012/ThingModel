@@ -33,6 +33,8 @@
 				this._stringDeclarations[d.key] = d.value;
 			});
 
+			var senderId = this.KeyToString(transaction.string_sender_id);
+
 			var thingsToDelete: { [id: string]: ThingModel.Thing } = {};
 			// Remove the things
 			_.each(transaction.things_remove_list, (key: number) => {
@@ -43,18 +45,18 @@
 				}
 			});
 
-			this._warehouse.RemoveCollection(thingsToDelete);
+			this._warehouse.RemoveCollection(thingsToDelete, senderId);
 
 			// Declare the things type
 			_.each(transaction.thingtypes_declaration_list, (d: ThingType)=> {
-				this.ConvertThingTypeDeclaration(d);
+				this.ConvertThingTypeDeclaration(d, senderId);
 			});
 
 			var thingsToConnect : {model:ThingModel.Thing;proto:Thing}[]= [];
 
 			// Create the things
 			_.each(transaction.things_publish_list, (t: Thing)=> {
-				var modelThing = this.ConvertThingPublication(t, check);
+				var modelThing = this.ConvertThingPublication(t, check, senderId);
 
 				if (t.connections_change) {
 					thingsToConnect.push({ proto: t, model: modelThing });
@@ -73,13 +75,13 @@
 					}
 				});
 
-				this._warehouse.RegisterThing(tuple.model, false);
+				this._warehouse.RegisterThing(tuple.model, false, false, senderId);
 			});
 
-			return this.KeyToString(transaction.string_sender_id);
+			return senderId;
 		}
 
-		private ConvertThingTypeDeclaration(thingType: ThingType): void {
+		private ConvertThingTypeDeclaration(thingType: ThingType, senderId:string): void {
 			var modelType = new ThingModel.ThingType(this.KeyToString(thingType.string_name));
 			modelType.Description = this.KeyToString(thingType.string_description);
 
@@ -118,10 +120,10 @@
 				modelType.DefineProperty(modelProperty);
 			});
 
-			this._warehouse.RegisterType(modelType);
+			this._warehouse.RegisterType(modelType, true, senderId);
 		}
 
-		private ConvertThingPublication(thing: Thing, check: boolean): ThingModel.Thing {
+		private ConvertThingPublication(thing: Thing, check: boolean, senderId:string): ThingModel.Thing {
 			var type: ThingModel.ThingType = null;
 
 			if (thing.string_type_name != 0) {
@@ -144,9 +146,9 @@
 			});
 
 			if (check && type != null && !type.Check(modelThing)) {
-				console.log("Object «"+id+"> not valid, ignored");
+				console.log("Object «"+id+"» from «"+senderId+"»not valid, ignored");
 			} else if (!thing.connections_change) {
-				this._warehouse.RegisterThing(modelThing, false);
+				this._warehouse.RegisterThing(modelThing, false, false, senderId);
 			}
 
 			return modelThing;

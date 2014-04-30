@@ -10,7 +10,7 @@ module ThingModel {
 			this._observers = [];
 		}
 
-		public RegisterType(type: ThingType, force: boolean = true) : void {
+		public RegisterType(type: ThingType, force: boolean = true, sender:string=null) : void {
 			if (!type) {
 				throw new Error("The thing type information is null.");
 			}
@@ -18,12 +18,12 @@ module ThingModel {
 			if (force || !_.has(this._thingTypes, type.Name)) {
 				this._thingTypes[type.Name] = type;
 
-				this.NotifyThingTypeDefine(type);
+				this.NotifyThingTypeDefine(type, sender);
 			}
 		}
 
 		public RegisterThing(thing: Thing, alsoRegisterConnections: boolean = true,
-			alsoRegisterTypes: boolean = true): void {
+			alsoRegisterTypes: boolean = true, sender:string=null): void {
 			if (!thing) {
 				throw new Error("A thing should not be null if it want to be allowed in the warehouse");
 			}
@@ -32,25 +32,25 @@ module ThingModel {
 			this._things[thing.ID] = thing;
 
 			if (alsoRegisterTypes && thing.Type) {
-				this.RegisterType(thing.Type, false);
+				this.RegisterType(thing.Type, false, sender);
 			}
 
 			if (alsoRegisterConnections) {
 				var alreadyVisitedObjects: {[id:string]:boolean} = {};
 				_.each(thing.ConnectedThings, (connectedThing) => {
-					this.RecursiveRegisterThing(connectedThing, alsoRegisterTypes, alreadyVisitedObjects);
+					this.RecursiveRegisterThing(connectedThing, alsoRegisterTypes, alreadyVisitedObjects,sender);
 				});
 			}
 
 			if (creation) {
-				this.NotifyThingCreation(thing);
+				this.NotifyThingCreation(thing, sender);
 			} else {
-				this.NotifyThingUpdate(thing);
+				this.NotifyThingUpdate(thing, sender);
 			}
 		}
 
 		private RecursiveRegisterThing(thing: Thing, alsoRegisterTypes: boolean,
-			alreadyVisitedObjects: { [id: string]: boolean }): void {
+			alreadyVisitedObjects: { [id: string]: boolean }, sender:string): void {
 		
 			// Avoid infinite recursions	
 			if (alreadyVisitedObjects.hasOwnProperty(thing.ID)) {
@@ -59,26 +59,26 @@ module ThingModel {
 
 			alreadyVisitedObjects[thing.ID] = true;
 
-			this.RegisterThing(thing, false, alsoRegisterTypes);
+			this.RegisterThing(thing, false, alsoRegisterTypes, sender);
 
 			_.each(thing.ConnectedThings, (connectedThing)=> {
-				this.RecursiveRegisterThing(connectedThing, alsoRegisterTypes, alreadyVisitedObjects);
+				this.RecursiveRegisterThing(connectedThing, alsoRegisterTypes, alreadyVisitedObjects, sender);
 			});
 		}
 
-		public RegisterCollection(collection: Thing[], alsoRegisterTypes: boolean=false): void {
+		public RegisterCollection(collection: Thing[], alsoRegisterTypes: boolean=true, sender:string=null): void {
 			var alreadyVisitedObjects: { [id: string]: boolean } = {};
 			_.each(collection, (thing) => {
-				this.RecursiveRegisterThing(thing, alsoRegisterTypes, alreadyVisitedObjects);
+				this.RecursiveRegisterThing(thing, alsoRegisterTypes, alreadyVisitedObjects, sender);
 			});
 		}
 
-		public RemoveCollection(collection: { [id: string]: Thing }) {
+		public RemoveCollection(collection: { [id: string]: Thing }, sender:string=null) {
 			var thingsToDisconnect: { [id: string]: Thing } = {};
 
 			_.each(_.keys(collection), (id: string) => {
 				var thing = collection[id];
-				this.RemoveThing(thing, false);
+				this.RemoveThing(thing, false, sender);
 
 				_.each(this._things, (t : Thing) => {
 					if (t.IsConnectedTo(thing)) {
@@ -94,7 +94,7 @@ module ThingModel {
 			});
 		}
 
-		public RemoveThing(thing: Thing, notifyUpdates = true): void{
+		public RemoveThing(thing: Thing, notifyUpdates = true, sender:string=null): void{
 			if (!thing) {
 				return;
 			}
@@ -104,14 +104,14 @@ module ThingModel {
 				if (t.IsConnectedTo(thing)) {
 					t.Disconnect(thing);
 					if (notifyUpdates) {
-						this.NotifyThingUpdate(t);
+						this.NotifyThingUpdate(t, sender);
 					}
 				}
 			});
 
 			if (_.has(this._things, thing.ID)) {
 				delete this._things[thing.ID];
-				this.NotifyThingDeleted(thing);
+				this.NotifyThingDeleted(thing, sender);
 			}
 		}
 
@@ -124,27 +124,27 @@ module ThingModel {
 			this._observers.splice(_.indexOf(this._observers, observer), 1);
 		}
 
-		public NotifyThingTypeDefine(type: ThingType): void {
+		public NotifyThingTypeDefine(type: ThingType, sender:string=null): void {
 			_.each(this._observers, (observer) => {
-				observer.Define(type);
+				observer.Define(type, sender);
 			});
 		}
 
-		public NotifyThingUpdate(thing: Thing): void {
+		public NotifyThingUpdate(thing: Thing, sender:string=null): void {
 			_.each(this._observers, (observer) => {
-				observer.Updated(thing);
+				observer.Updated(thing, sender);
 			});
 		}
 
-		public NotifyThingCreation(thing: Thing): void {
+		public NotifyThingCreation(thing: Thing, sender:string=null): void {
 			_.each(this._observers, (observer) => {
-				observer.New(thing);
+				observer.New(thing, sender);
 			});
 		}
 
-		public NotifyThingDeleted(thing: Thing): void {
+		public NotifyThingDeleted(thing: Thing, sender: string= null): void {
 			_.each(this._observers, (observer) => {
-				observer.Deleted(thing);
+				observer.Deleted(thing, sender);
 			});
 		}
 

@@ -1,8 +1,8 @@
  module ThingModel {
 	 export interface IWarehouseObserver {
-		 New(thing: Thing): void;
-		 Deleted(thing: Thing): void;
-		 Updated(thing: Thing): void;
-		 Define(thing:ThingType): void;
+		 New(thing: Thing, sender:string): void;
+		 Deleted(thing: Thing, sender:string): void;
+		 Updated(thing: Thing, sender:string): void;
+		 Define(thing:ThingType, sender:string): void;
 	 }
  }

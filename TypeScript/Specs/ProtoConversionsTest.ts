@@ -266,5 +266,47 @@ describe("ProtoConversions Test", ()=> {
 		var transaction = toProtobuf.Convert([thing], [], [], "yeah");
 		transaction.things_publish_list.length.should.be.equal(0);
 	});
+
+	it("send sender informations", () => {
+		var type = ThingModel.BuildANewThingType.Named("message")
+			.ContainingA.String("content").Build();
+
+		var message = ThingModel.BuildANewThing.As(type)
+			.IdentifiedBy("first")
+			.ContainingA.String("content", "Hello World").Build();
+
+
+		warehouseInput.RegisterObserver({
+			New: (thingType: ThingModel.Thing, sender: string) => {
+				sender.should.be.equal("niceSenderIdNew");
+			},
+			Define: (thingType: ThingModel.ThingType, sender: string) => {
+				sender.should.be.equal("niceSenderIdNew");
+			},
+			Updated: (thingType: ThingModel.Thing, sender: string) => {
+				sender.should.be.equal("niceSenderIdUpdate");
+			},
+			Deleted: (thingType: ThingModel.Thing, sender: string) => {
+				sender.should.be.equal("niceSenderIdDelete");
+			}
+		});
+
+		warehouseOutput.RegisterThing(message);
+
+		var transaction = observer.GetTransaction(toProtobuf, "niceSenderIdNew");
+		fromProtobuf.Convert(transaction.toArrayBuffer());
+
+		message.SetProperty(new ThingModel.Property.String("content", "Hello world 2"));
+		warehouseOutput.NotifyThingUpdate(message);
+
+		observer.Reset();
+		transaction = observer.GetTransaction(toProtobuf, "niceSenderIdUpdate");
+		fromProtobuf.Convert(transaction.toArrayBuffer());
+
+		warehouseOutput.RemoveThing(message);
+		observer.Reset();
+		transaction = observer.GetTransaction(toProtobuf, "niceSenderIdDelete");
+		fromProtobuf.Convert(transaction.toArrayBuffer());
+	});
 // ReSharper restore WrongExpressionStatement
 });
