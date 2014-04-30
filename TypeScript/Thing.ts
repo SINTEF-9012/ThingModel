@@ -75,7 +75,7 @@ module ThingModel {
 				return null;
 			}
 
-			return prop;
+			return <any>prop;
 		}
 
 		public GetString(key: string) {
