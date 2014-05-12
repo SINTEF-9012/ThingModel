@@ -62,9 +62,21 @@ namespace ThingModel.Builders
 				return this;
 			}
 
-			public ThingPropertyBuilder Location(String key, Location value)
+			public ThingPropertyBuilder Location(String key, Location.Equatorial value)
 			{
-				_thing.SetProperty(new Property.Location(key, value));
+				_thing.SetProperty(new Property.Location.Equatorial(key, value));
+				return this;
+			}
+
+			public ThingPropertyBuilder Location(String key, Location.LatLng value)
+			{
+				_thing.SetProperty(new Property.Location.LatLng(key, value));
+				return this;
+			}
+
+			public ThingPropertyBuilder Location(String key, Location.Point value)
+			{
+				_thing.SetProperty(new Property.Location.Point(key, value));
 				return this;
 			}
 
