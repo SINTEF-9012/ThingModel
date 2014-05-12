@@ -17,7 +17,7 @@ namespace ThingModel.Specs
         protected void SetUp()
         {
             _type = new ThingType("Plane");
-            _propertyType = PropertyType.Create<Property.Location>("location");
+            _propertyType = PropertyType.Create<Property.Location.LatLng>("location");
             _type.DefineProperty(_propertyType);
         }
 
@@ -73,7 +73,7 @@ namespace ThingModel.Specs
             var plane = new Thing("A380", _type);
             Assert.That(_type.Check(plane), Is.False);
 
-            plane.SetProperty(new Property.Location("location", new Location.LatLng(49.010852, 2.547398)));
+            plane.SetProperty(new Property.Location.LatLng("location", new Location.LatLng(49.010852, 2.547398)));
 
             Assert.That(_type.Check(plane), Is.True);
         }

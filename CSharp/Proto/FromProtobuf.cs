@@ -128,6 +128,25 @@ namespace ThingModel.Proto
             Warehouse.RegisterType(modelType, true, senderId);
         }
 
+	    protected void ConvertLocationProperty(Location location, Property property)
+	    {
+			if (property.location_value != null)
+			{
+				location.X = property.location_value.x;
+				location.Y = property.location_value.y;
+				
+				if (!property.location_value.z_null)
+				{
+					location.Z = property.location_value.z;
+				}
+
+				if (property.location_value.string_system != 0)
+				{
+					location.System = KeyToString(property.location_value.string_system);
+				}
+			}
+	    }
+
         protected ThingModel.Thing ConvertThingPublication(Thing thing, bool check, string senderId)
         {
             ThingModel.ThingType type = null;
@@ -157,43 +176,29 @@ namespace ThingModel.Proto
             {
                 ThingModel.Property modelProperty = null;
                 string key = KeyToString(property.string_key);
-                Location location = null;
 
                 switch (property.type)
                 {
                     case Property.Type.LOCATION_POINT:
-                        location = new Location.Point();
+		                var locPoint = new Location.Point();
+						ConvertLocationProperty(locPoint, property);
+						modelProperty = new ThingModel.Property.Location.Point(key,
+							locPoint);
+		                break;
 
-                        // C# imposes a break statements when a case is not empty
-                        // So in 2014 I am using a goto instruction
-                        // for the first time in my life
-                        goto case Property.Type.LOCATION_EQUATORIAL;
-                        
                     case Property.Type.LOCATION_LATLNG:
-                        location = new Location.LatLng();
-                        goto case Property.Type.LOCATION_EQUATORIAL;
+		                var locLatLng = new Location.LatLng();
+						ConvertLocationProperty(locLatLng, property);
+						modelProperty = new ThingModel.Property.Location.LatLng(key,
+							locLatLng);
+		                break;
 
                     case Property.Type.LOCATION_EQUATORIAL:
-                        if (location == null)
-                        {
-                            location = new Location.Equatorial();
-                        }
-                        
-                        if (property.location_value != null)
-                        {
-
-                            location.X = property.location_value.x;
-                            location.Y = property.location_value.y;
-                            
-                            if (!property.location_value.z_null)
-                            {
-                                location.Z = property.location_value.z;
-                            }
-                            
-                        }
-
-                        modelProperty = new ThingModel.Property.Location(key, location);
-                        break;
+		                var locEquatorial = new Location.Equatorial();
+						ConvertLocationProperty(locEquatorial, property);
+						modelProperty = new ThingModel.Property.Location.Equatorial(key,
+							locEquatorial);
+		                break;
 
                     case Property.Type.STRING:
 		                string value;

@@ -108,10 +108,10 @@ namespace ThingModel.Specs
             _type.DefineProperty(PropertyType.Create<Property.Boolean>("beautiful"));
             Assert.That(_type.Check(_thing), Is.False);
 
-            _thing.SetProperty(new Property.Location("beautiful", new Location.Equatorial()));
+            _thing.SetProperty(new Property.Location.Equatorial("beautiful", new Location.Equatorial()));
             Assert.That(_type.Check(_thing), Is.False);
 
-            _type.DefineProperty(PropertyType.Create<Property.Location>("beautiful"));
+            _type.DefineProperty(PropertyType.Create<Property.Location.Equatorial>("beautiful"));
             Assert.That(_type.Check(_thing), Is.True);
         }
 

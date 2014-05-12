@@ -33,11 +33,11 @@ namespace ThingModel
         // After some tests, a generic version is complex and not very performant
         public abstract bool CompareValue(Property other);
 
-        public class Location : Property
+        public abstract class Location : Property
         {
             public ThingModel.Location Value;
 
-            public Location(string key, ThingModel.Location value = null) : base(key)
+            private Location(string key, ThingModel.Location value = null) : base(key)
             {
                 Value = value;
             }
@@ -58,6 +58,27 @@ namespace ThingModel
                 var other = prop as Location;
                 return other != null && ((Value == null && other.Value == null) || (Value!= null && other.Value != null && Value.GetType() == other.Value.GetType() && Value.Compare(other.Value)));
             }
+
+	        public class Point : Location
+	        {
+		        public Point(string key, ThingModel.Location.Point value = null) : base(key, value)
+		        {
+		        }
+	        }
+
+	        public class LatLng : Location
+	        {
+		        public LatLng(string key, ThingModel.Location.LatLng value = null) : base(key, value)
+		        {
+		        }
+	        }
+
+	        public class Equatorial : Location
+	        {
+		        public Equatorial(string key, ThingModel.Location.Equatorial value = null) : base(key, value)
+		        {
+		        }
+	        }
         }
 
         public class String : Property

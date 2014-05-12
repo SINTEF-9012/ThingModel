@@ -110,10 +110,14 @@ namespace ThingModel.Specs
         public void CheckLocationProperty()
         {
             var thing = new Thing("earth");
-            thing.SetProperty(new Property.Location("point", new Location.Point(42,43,44)));
-            thing.SetProperty(new Property.Location("latlng", new Location.LatLng(51, 52, 53)));
-            thing.SetProperty(new Property.Location("equatorial", new Location.Equatorial(27, 28, 29)));
+            thing.SetProperty(new Property.Location.Point("point", new Location.Point(42,43,44)));
+            thing.SetProperty(new Property.Location.LatLng("latlng", new Location.LatLng(51, 52, 53)));
+            thing.SetProperty(new Property.Location.Equatorial("equatorial", new Location.Equatorial(27, 28, 29)));
 
+	        var locSystem = new Location.LatLng(51, 52, 53);
+			locSystem.System = "web mercator";
+	        thing.SetProperty(new Property.Location.LatLng("latlng_system", locSystem));
+ 
             _fromProtobuf.Convert(_toProtobuf.Convert(new [] {thing}, new Thing[0], new ThingType[0], "earth"));
 
             var newThing = _warehouse.GetThing("earth");
@@ -122,6 +126,7 @@ namespace ThingModel.Specs
             Assert.That(newThing.GetProperty<Property.Location>("point").Value.X, Is.EqualTo(42));
             Assert.That(newThing.GetProperty<Property.Location>("latlng").Value.Y, Is.EqualTo(52));
             Assert.That(newThing.GetProperty<Property.Location>("equatorial").Value.Z, Is.EqualTo(29));
+            Assert.That(newThing.GetProperty<Property.Location>("latlng_system").Value.System, Is.EqualTo("web mercator"));
 
         }
 
@@ -230,7 +235,7 @@ namespace ThingModel.Specs
             var location = new Location.LatLng(25, 2);
 
             var thing = new Thing("8712C");
-            thing.SetProperty(new Property.Location("position", location));
+            thing.SetProperty(new Property.Location.LatLng("position", location));
 
             _fromProtobuf.Convert(_toProtobuf.Convert(new[] { thing }, new Thing[0], new ThingType[0], null));
 
@@ -295,7 +300,7 @@ namespace ThingModel.Specs
         {
             var thing = new Thing("café");
             thing.SetProperty(new Property.Double("temperature", 40.0));
-            thing.SetProperty(new Property.Location("location", new Location.Equatorial(48,454,2)));
+            thing.SetProperty(new Property.Location.Equatorial("location", new Location.Equatorial(48,454,2)));
 
             var transaction = _toProtobuf.Convert(new[] { thing }, new Thing[0], new ThingType[0], null);
 

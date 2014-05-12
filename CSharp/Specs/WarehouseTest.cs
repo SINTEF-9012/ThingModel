@@ -64,7 +64,7 @@ namespace ThingModel.Specs
             _thing = new Thing("871", _type);
             _thing.SetProperty(new Property.String("name", "Maurice"));
             _thing.SetProperty(new Property.Double("age", 18));
-            _thing.SetProperty(new Property.Location("localization", new Location.Point(10,44)));
+            _thing.SetProperty(new Property.Location.Point("localization", new Location.Point(10,44)));
 
             _warehouse = new Warehouse();
 

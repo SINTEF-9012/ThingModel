@@ -37,7 +37,7 @@ namespace ThingModel.Specs
 
             Assert.That(new Property.DateTime("time").Value, Is.LessThan(DateTime.Now));
 
-            Assert.That(new Property.Location("localization", new Location.LatLng(42.0,19.6,100)).Value, Is.Not.Null);
+            Assert.That(new Property.Location.LatLng("localization", new Location.LatLng(42.0,19.6,100)).Value, Is.Not.Null);
 
         }
 
@@ -53,17 +53,17 @@ namespace ThingModel.Specs
 
             Assert.That(new Property.DateTime("time").ValueToString().Length, Is.GreaterThan(0));
 
-            Assert.That(new Property.Location("localization",
+            Assert.That(new Property.Location.LatLng("localization",
                 new Location.LatLng(42.0, 19.6, 100)).ValueToString(), Is.StringContaining("42"));
         }
 
         [Test]
         public void LocationChange()
         {
-            var a = new Property.Location("the key is not important", new Location.Equatorial(1, 2, 3));
-            var b = new Property.Location("not the same key", new Location.Equatorial(1, 2, 3));
-            var c = new Property.Location("the key is not important", new Location.LatLng(1, 2, 3));
-            var d = new Property.Location("the key is not important");
+            var a = new Property.Location.Equatorial("the key is not important", new Location.Equatorial(1, 2, 3));
+            var b = new Property.Location.Equatorial("not the same key", new Location.Equatorial(1, 2, 3));
+            var c = new Property.Location.LatLng("the key is not important", new Location.LatLng(1, 2, 3));
+            var d = new Property.Location.LatLng("the key is not important");
 
             Assert.That(a.CompareValue(b), Is.True);
 
