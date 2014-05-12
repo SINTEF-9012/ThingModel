@@ -266,5 +266,29 @@ namespace ThingModel.Specs
         {
             Assert.That(_thing.Compare(null), Is.False);
         }
+
+	    [Test]
+	    public void TestNewSyntax()
+	    {
+		    var thing = new Thing("canard");
+		    thing.String("lapin", "canard")
+			    .LocationEquatorial("location", new Location.Equatorial())
+			    .Boolean("moving", true)
+			    .DateTime("creation", DateTime.Now)
+			    .Int("speed", 132)
+			    .Double("vertical_speed", 145.66);
+
+		    thing.ContainingA.String("name", "Canard2")
+			    .AndA.Boolean("second", false);
+
+			Assert.That(thing.String("lapin"), Is.EqualTo("canard"));
+			Assert.That(thing.LocationEquatorial("location"), Is.EqualTo(new Location.Equatorial()));
+		    Assert.That(thing.Boolean("moving"), Is.EqualTo(true));
+		    Assert.That(thing.DateTime("creation"), Is.LessThanOrEqualTo(DateTime.Now));
+		    Assert.That(thing.Int("speed"), Is.EqualTo(132));
+		    Assert.That(thing.Double("vertical_speed"), Is.EqualTo(145.66));
+		    Assert.That(thing.String("name"), Is.EqualTo("Canard2"));
+		    Assert.That(thing.Boolean("second"), Is.EqualTo(false));
+	    }
     }
 }

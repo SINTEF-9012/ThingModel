@@ -91,9 +91,21 @@ namespace ThingModel.Builders
 				return this;
 			}
 			
-			public ThingTypePropertyBuilder Location(String key, String name = null)
+			public ThingTypePropertyBuilder LocationPoint(String key, String name = null)
 			{
-				_createProperty<Property.Location>(key, name);
+				_createProperty<Property.Location.Point>(key, name);
+				return this;
+			}
+			
+			public ThingTypePropertyBuilder LocationLatLng(String key, String name = null)
+			{
+				_createProperty<Property.Location.LatLng>(key, name);
+				return this;
+			}
+			
+			public ThingTypePropertyBuilder LocationEquatorial(String key, String name = null)
+			{
+				_createProperty<Property.Location.Equatorial>(key, name);
 				return this;
 			}
 

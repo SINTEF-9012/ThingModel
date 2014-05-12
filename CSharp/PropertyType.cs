@@ -68,5 +68,36 @@ namespace ThingModel
 				Description = Description
 			};
 	    }
+
+	    protected bool Equals(PropertyType other)
+	    {
+		    return string.Equals(_key, other._key) &&
+		           string.Equals(Name, other.Name) &&
+		           _type == other._type &&
+		           Required.Equals(other.Required);
+	    }
+
+	    public override bool Equals(object obj)
+	    {
+		    if (ReferenceEquals(null, obj)) return false;
+		    if (ReferenceEquals(this, obj)) return true;
+		    if (obj.GetType() != GetType()) return false;
+		    return Equals((PropertyType) obj);
+	    }
+
+	    public override int GetHashCode()
+	    {
+		    unchecked
+		    { 
+// ReSharper disable NonReadonlyFieldInGetHashCode
+			    int hashCode = (_key != null ? _key.GetHashCode() : 0);
+			    hashCode = (hashCode*397) ^ (Name != null ? Name.GetHashCode() : 0);
+			    hashCode = (hashCode*397) ^ (_type != null ? _type.GetHashCode() : 0);
+			    hashCode = (hashCode*397) ^ Required.GetHashCode();
+			    hashCode = (hashCode*397) ^ (Description != null ? Description.GetHashCode() : 0);
+// ReSharper restore NonReadonlyFieldInGetHashCode
+			    return hashCode;
+		    }
+	    }
     }
 }

@@ -12,7 +12,7 @@ namespace ThingModel.Specs
 			ThingType type = BuildANewThingType.Named("rabbit")
 				.WhichIs("Just a rabbit")
 				.ContainingA.String("name")
-				.AndA.Location("localization")
+				.AndA.LocationLatLng("localization")
 				.AndA.NotRequired.Double("speed")
 				.AndAn.Int("nbChildren", "Number of children")
 					.WhichIs("The number of direct children for the rabbit");

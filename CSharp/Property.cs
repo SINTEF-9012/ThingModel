@@ -35,32 +35,43 @@ namespace ThingModel
 
         public abstract class Location : Property
         {
-            public ThingModel.Location Value;
+            private ThingModel.Location _value;
 
-            private Location(string key, ThingModel.Location value = null) : base(key)
+	        public ThingModel.Location Value
+	        {
+		        get { return _value; }
+	        }
+
+	        private Location(string key, ThingModel.Location value = null) : base(key)
             {
-                Value = value;
+                _value = value;
             }
 
             public override string ValueToString()
             {
                 var sb = new StringBuilder();
-                sb.Append(Value.X);
+                sb.Append(_value.X);
                 sb.Append(" - ");
-                sb.Append(Value.Y);
+                sb.Append(_value.Y);
                 sb.Append(" - ");
-                sb.Append(Value.Z);
+                sb.Append(_value.Z);
                 return sb.ToString();
             }
 
             public override bool CompareValue(Property prop)
             {
                 var other = prop as Location;
-                return other != null && ((Value == null && other.Value == null) || (Value!= null && other.Value != null && Value.GetType() == other.Value.GetType() && Value.Compare(other.Value)));
+                return other != null && ((_value == null && other._value == null) || (_value!= null && other._value != null && _value.GetType() == other._value.GetType() && _value.Compare(other._value)));
             }
 
 	        public class Point : Location
 	        {
+				public new ThingModel.Location.Point Value
+				{
+					get { return (ThingModel.Location.Point) _value; }
+					set { _value = value; }
+				}
+
 		        public Point(string key, ThingModel.Location.Point value = null) : base(key, value)
 		        {
 		        }
@@ -68,6 +79,12 @@ namespace ThingModel
 
 	        public class LatLng : Location
 	        {
+				public new ThingModel.Location.LatLng Value
+				{
+					get { return (ThingModel.Location.LatLng) _value; }
+					set { _value = value; }
+				}
+
 		        public LatLng(string key, ThingModel.Location.LatLng value = null) : base(key, value)
 		        {
 		        }
@@ -75,6 +92,12 @@ namespace ThingModel
 
 	        public class Equatorial : Location
 	        {
+				public new ThingModel.Location.Equatorial Value
+				{
+					get { return (ThingModel.Location.Equatorial) _value; }
+					set { _value = value; }
+				}
+
 		        public Equatorial(string key, ThingModel.Location.Equatorial value = null) : base(key, value)
 		        {
 		        }

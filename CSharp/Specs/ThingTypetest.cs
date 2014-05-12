@@ -2,6 +2,7 @@
 
 using System;
 using NUnit.Framework;
+using ThingModel.Builders;
 
 #endregion
 
@@ -89,5 +90,17 @@ namespace ThingModel.Specs
             plane.SetProperty(new Property.Double("location", 27));
             Assert.That(_type.Check(plane), Is.False);
         }
+
+	    [Test]
+	    public void CheckEqualityComparator()
+	    {
+		    Assert.That(_type, Is.EqualTo(_type));
+		    var newType = BuildANewThingType.Named("Plane");
+		    
+			Assert.That(_type, Is.Not.EqualTo((ThingType) newType));
+
+		    newType.ContainingA.LocationLatLng("location");
+			Assert.That(_type, Is.EqualTo((ThingType) newType));
+	    }
     }
 }

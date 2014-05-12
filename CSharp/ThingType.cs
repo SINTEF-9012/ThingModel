@@ -47,7 +47,7 @@ namespace ThingModel
          */
         public bool Check(Thing thing)
         {
-            return (thing.Type == this ||
+            return (thing.Type.Equals(this) ||
 				(thing.Type != null && thing.Type.Name == Name)) &&
 				Properties.All(propertyType => propertyType.Value.Check(thing.GetProperty<Property>(propertyType.Key)));
         }
@@ -68,5 +68,31 @@ namespace ThingModel
         {
             return new List<PropertyType>(Properties.Values);
         }
+
+	    protected bool Is(ThingType other)
+		{
+		    if (other == null || !string.Equals(_name, other._name))
+		    {
+			    return false;
+		    }
+
+			return Properties.SequenceEqual(other.Properties);
+	    }
+
+	    public override bool Equals(object obj)
+	    {
+		    if (ReferenceEquals(null, obj)) return false;
+		    if (ReferenceEquals(this, obj)) return true;
+		    if (obj.GetType() != GetType()) return false;
+		    return Is((ThingType) obj);
+	    }
+
+	    public override int GetHashCode()
+	    {
+		    unchecked
+		    {
+			    return ((_name != null ? _name.GetHashCode() : 0)*397) ^ (Properties != null ? Properties.GetHashCode() : 0);
+		    }
+	    }
     }
 }

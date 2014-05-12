@@ -123,10 +123,10 @@ namespace ThingModel.Specs
             var newThing = _warehouse.GetThing("earth");
             
             Assert.That(newThing, Is.Not.Null);
-            Assert.That(newThing.GetProperty<Property.Location>("point").Value.X, Is.EqualTo(42));
-            Assert.That(newThing.GetProperty<Property.Location>("latlng").Value.Y, Is.EqualTo(52));
-            Assert.That(newThing.GetProperty<Property.Location>("equatorial").Value.Z, Is.EqualTo(29));
-            Assert.That(newThing.GetProperty<Property.Location>("latlng_system").Value.System, Is.EqualTo("web mercator"));
+            Assert.That(newThing.GetProperty<Property.Location.Point>("point").Value.X, Is.EqualTo(42));
+            Assert.That(newThing.GetProperty<Property.Location.LatLng>("latlng").Value.Y, Is.EqualTo(52));
+            Assert.That(newThing.GetProperty<Property.Location.Equatorial>("equatorial").Value.Z, Is.EqualTo(29));
+            Assert.That(newThing.GetProperty<Property.Location.LatLng>("latlng_system").Value.System, Is.EqualTo("web mercator"));
 
         }
 
@@ -239,7 +239,7 @@ namespace ThingModel.Specs
 
             _fromProtobuf.Convert(_toProtobuf.Convert(new[] { thing }, new Thing[0], new ThingType[0], null));
 
-            var newLocation = _warehouse.GetThing("8712C").GetProperty<Property.Location>("position").Value as Location.LatLng;
+            var newLocation = _warehouse.GetThing("8712C").GetProperty<Property.Location.LatLng>("position").Value as Location.LatLng;
 
             Assert.That(location.Compare(newLocation), Is.True);
 

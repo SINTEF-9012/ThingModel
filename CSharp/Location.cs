@@ -117,5 +117,33 @@
                 set { Z = value; }
             }
         }
+
+
+	    protected bool Equals(Location other)
+	    {
+		    return X.Equals(other.X) && Y.Equals(other.Y) && Z.Equals(other.Z) && string.Equals(System, other.System);
+	    }
+
+	    public override bool Equals(object obj)
+	    {
+		    if (ReferenceEquals(null, obj)) return false;
+		    if (ReferenceEquals(this, obj)) return true;
+		    if (obj.GetType() != GetType()) return false;
+		    return Equals((Location) obj);
+	    }
+
+	    public override int GetHashCode()
+	    {
+		    unchecked
+		    {
+// ReSharper disable NonReadonlyFieldInGetHashCode
+			    int hashCode = X.GetHashCode();
+			    hashCode = (hashCode*397) ^ Y.GetHashCode();
+			    hashCode = (hashCode*397) ^ Z.GetHashCode();
+			    hashCode = (hashCode*397) ^ (System != null ? System.GetHashCode() : 0);
+// ReSharper restore NonReadonlyFieldInGetHashCode
+			    return hashCode;
+		    }
+	    }
     }
 }

@@ -45,7 +45,7 @@ namespace ThingModel.WebSockets
             {
                 _warehouse = warehouse;
 	            _server = server;
-	            _strictServer = _strictServer;
+	            _strictServer = strictServer;
 
 	            _protoModelObserver = observer;
 

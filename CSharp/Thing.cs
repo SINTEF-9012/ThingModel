@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using ThingModel.Builders;
 
 namespace ThingModel
 {
@@ -213,5 +214,113 @@ namespace ThingModel
             // things properties during a loop on this list without exceptions
             return new List<Property>(Properties.Values);
         }
+
+
+	    private BuildANewThing.ThingPropertyBuilder _propertyBuilder;
+	    public BuildANewThing.ThingPropertyBuilder ContainingA
+	    {
+		    get { return _propertyBuilder ?? (_propertyBuilder = new BuildANewThing.ThingPropertyBuilder(this)); }
+	    }
+	    
+		public BuildANewThing.ThingPropertyBuilder ContainingAn
+	    {
+		    get { return _propertyBuilder ?? (_propertyBuilder = new BuildANewThing.ThingPropertyBuilder(this)); }
+	    }
+
+	    public String String(String key)
+	    {
+		    var p = GetProperty<Property.String>(key);
+		    return p != null ? p.Value : string.Empty;
+	    }
+
+	    public Thing String(String key, String value)
+	    {
+		    SetProperty(new Property.String(key, value));
+		    return this;
+	    }
+
+	    public double Double(String key)
+	    {
+		    var p = GetProperty<Property.Double>(key);
+		    return p != null ? p.Value : default(double);
+	    }
+	    
+		public Thing Double(String key, double value)
+	    {
+		    SetProperty(new Property.Double(key, value));
+		    return this;
+	    }
+	    
+		public int Int(String key)
+	    {
+		    var p = GetProperty<Property.Int>(key);
+		    return p != null ? p.Value : default(int);
+	    }
+	    
+		public Thing Int(String key, int value)
+	    {
+		    SetProperty(new Property.Int(key, value));
+		    return this;
+	    }
+		
+		public bool Boolean(String key)
+	    {
+		    var p = GetProperty<Property.Boolean>(key);
+		    return p != null ? p.Value : default(bool);
+	    }
+	    
+		public Thing Boolean(String key, bool value)
+	    {
+		    SetProperty(new Property.Boolean(key, value));
+		    return this;
+	    }
+		
+		public DateTime DateTime(String key)
+	    {
+		    var p = GetProperty<Property.DateTime>(key);
+			return p != null ? p.Value : new DateTime(0);
+	    }
+	    
+		public Thing DateTime(String key, DateTime value)
+	    {
+		    SetProperty(new Property.DateTime(key, value));
+		    return this;
+	    }
+
+	    public Location.Point LocationPoint(String key)
+	    {
+		    var p = GetProperty<Property.Location.Point>(key);
+			return p != null ? p.Value : new Location.Point();
+	    }
+
+	    public Thing LocationPoint(String key, Location.Point value)
+	    {
+		    SetProperty(new Property.Location.Point(key, value));
+		    return this;
+	    }
+	    
+		public Location.LatLng LocationLatLng(String key)
+	    {
+		    var p = GetProperty<Property.Location.LatLng>(key);
+			return p != null ? p.Value : new Location.LatLng();
+	    }
+
+	    public Thing LocationLatLng(String key, Location.LatLng value)
+	    {
+		    SetProperty(new Property.Location.LatLng(key, value));
+		    return this;
+	    }
+		
+		public Location.Equatorial LocationEquatorial(String key)
+	    {
+		    var p = GetProperty<Property.Location.Equatorial>(key);
+			return p != null ? p.Value : new Location.Equatorial();
+	    }
+
+	    public Thing LocationEquatorial(String key, Location.Equatorial value)
+	    {
+		    SetProperty(new Property.Location.Equatorial(key, value));
+		    return this;
+	    }
     }
 }
