@@ -416,5 +416,33 @@ namespace ThingModel.Specs
             // Now, it's OK
             Assert.That(_warehouseWaitB.WaitNew(), Is.True);
         }
+
+	    [Test]
+	    public void TestStressLoop()
+	    {
+		    var canard = Builders.BuildANewThing.As(new ThingType("rabbit"))
+			    .IdentifiedBy("canard")
+			    .ContainingA.String("name", "canard_0");
+
+			_warehouseA.RegisterThing(canard);
+			_clientA.Send();
+
+		    for (var i = 0; i < 50; ++i)
+		    {
+			    canard.String("name", "canard_" + i);
+				_warehouseA.RegisterThing(canard);
+				_clientA.Send();
+			Thread.Sleep(5);
+		    }
+
+		    var j = 0;
+		    _warehouseB.Events.OnReceivedUpdate += (sender, args) =>
+		    {
+			    _warehouseB.RegisterType(Builders.BuildANewThingType.Named("lapin_" + ++j));
+			    _clientB.Send();
+		    };
+
+			Thread.Sleep(500);
+	    }
     }
 }

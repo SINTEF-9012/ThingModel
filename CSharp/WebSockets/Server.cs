@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using ThingModel.Proto;
 using WebSocketSharp;
 using WebSocketSharp.Server;
@@ -14,17 +15,19 @@ namespace ThingModel.WebSockets
 
 	    public event TransactionEventHandler Transaction;
 
+	    private bool _debug = false;
+
 	    public class TransactionEventArgs : EventArgs
 	    {
-			public int Size { private set; get; }
+			public byte[] Message { private set; get; }
 			public string SenderID { private set; get; }
 			public string EndPoint { private set; get; }
 
-		    public TransactionEventArgs(string senderID, string endPoint, int size)
+		    public TransactionEventArgs(string senderID, string endPoint, byte[] message)
 		    {
 			    SenderID = senderID;
 			    EndPoint = endPoint;
-			    Size = size;
+			    Message = message;
 		    }
 	    }
 
@@ -71,13 +74,15 @@ namespace ThingModel.WebSockets
 						if (_server.Transaction != null)
 						{
 							_server.Transaction(this,
-								new TransactionEventArgs(senderID, Context.UserEndPoint.ToString(), e.RawData.Length));
+								new TransactionEventArgs(senderID, Context.UserEndPoint.ToString(), e.RawData));
 						}
 
 						//                    var analyzedTransaction = ProtoModelObserver.GetTransaction(ToProtobuf, senderID);
 						_toProtobuf.ApplyThingsSuppressions(_protoModelObserver.Deletions);
 
 						// Broadcast to other clients
+						Transaction transaction = null;
+						var somethingChanged = false;
 						foreach (var session in Sessions.Sessions)
 						{
 							if (session != this)
@@ -85,14 +90,18 @@ namespace ThingModel.WebSockets
 								var s = session as ServerService;
 								if (s != null)
 								{
-									lock (s._lock)
+									if (transaction == null)
 									{
-										var analyzedTransaction = s._toProtobuf.Convert(
-											new List<Thing>(_protoModelObserver.Updates),
-											new List<Thing>(_protoModelObserver.Deletions),
-											new List<ThingType>(_protoModelObserver.Definitions),
-											senderID);
-										s.Send(analyzedTransaction);
+										transaction = _protoModelObserver.GetTransaction(s._toProtobuf, senderID);
+										somethingChanged = _protoModelObserver.SomethingChanged();
+									}
+
+									if (somethingChanged)
+									{
+										lock (s._lock)
+										{
+											s.Send(s._toProtobuf.Convert(transaction));
+										}
 									}
 								}
 							}
@@ -111,7 +120,7 @@ namespace ThingModel.WebSockets
 					if (_server.Transaction != null)
 					{
 						_server.Transaction(this,
-							new TransactionEventArgs(ServerSenderID, Context.ServerEndPoint.ToString(), protoData.Length));
+							new TransactionEventArgs(ServerSenderID, Context.ServerEndPoint.ToString(), protoData));
 					}
 				}
             }
@@ -119,16 +128,24 @@ namespace ThingModel.WebSockets
 
         private readonly WebSocketServer _ws;
 
-        public Server(string path)
+        public Server(string path, string endpoint = "/")
         {
             var house = new Warehouse();
 
-			Transaction += (sender, args) => 
-				Console.WriteLine("Server | Message from : " + args.SenderID +
-				" | "+ args.Size + " bytes");
+	        Transaction += (sender, args) =>
+	        {
+		        Console.WriteLine(DateTime.Now.ToString(CultureInfo.InvariantCulture) + " | Server | Message from : " +
+		                          args.SenderID +
+		                          " | " + args.EndPoint.ToString(CultureInfo.InvariantCulture) + " | " + args.Message.Length +
+		                          " bytes");
+		        if (_debug)
+		        {
+			        Console.WriteLine("DEBUG: " + Convert.ToBase64String(args.Message));
+		        }
+	        };
 
             _ws = new WebSocketServer(path);
-            _ws.AddWebSocketService("/", () => new ServerService(house, this));
+            _ws.AddWebSocketService(endpoint, () => new ServerService(house, this));
             _ws.Start();
 
 
@@ -141,6 +158,7 @@ namespace ThingModel.WebSockets
 
         public void Debug()
         {
+	        _debug = true;
             _ws.Log.Level = LogLevel.INFO;
         }
     }
