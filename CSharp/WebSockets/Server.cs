@@ -38,27 +38,30 @@ namespace ThingModel.WebSockets
             private readonly Warehouse _warehouse;
             private readonly ProtoModelObserver _protoModelObserver;
 	        private readonly Server _server;
-			private readonly object _lock = new Object();
+	        private readonly object _lock;
+	        private bool _strictServer; 
 
-            public ServerService(Warehouse warehouse, Server server)
+            public ServerService(Warehouse warehouse, ProtoModelObserver observer, object uglyLock, bool strictServer, Server server)
             {
                 _warehouse = warehouse;
 	            _server = server;
+	            _strictServer = _strictServer;
 
-                _protoModelObserver = new ProtoModelObserver();
-                _warehouse.RegisterObserver(_protoModelObserver);
+	            _protoModelObserver = observer;
 
                 _toProtobuf = new ToProtobuf();
                 _fromProtobuf = new FromProtobuf(warehouse);
+	            _lock = uglyLock;
             }
 
             protected override void OnOpen()
             {
+	            Transaction transaction;
 				lock (_lock)
 				{
-					var transaction = _toProtobuf.Convert(_warehouse.Things, new Thing[0], _warehouse.ThingTypes, ServerSenderID);
-					Send(transaction);
+					transaction = _toProtobuf.Convert(_warehouse.Things, new Thing[0], _warehouse.ThingTypes, ServerSenderID);
 				}
+				Send(transaction);
             }
 
             protected override void OnMessage(MessageEventArgs e)
@@ -69,7 +72,7 @@ namespace ThingModel.WebSockets
 					{
 						_protoModelObserver.Reset();
 
-						var senderID = _fromProtobuf.Convert(e.RawData, true);
+						var senderID = _fromProtobuf.Convert(e.RawData, _strictServer);
 
 						if (_server.Transaction != null)
 						{
@@ -81,27 +84,17 @@ namespace ThingModel.WebSockets
 						_toProtobuf.ApplyThingsSuppressions(_protoModelObserver.Deletions);
 
 						// Broadcast to other clients
-						Transaction transaction = null;
-						var somethingChanged = false;
-						foreach (var session in Sessions.Sessions)
+						if (_protoModelObserver.SomethingChanged())
 						{
-							if (session != this)
+							foreach (var session in Sessions.Sessions)
 							{
-								var s = session as ServerService;
-								if (s != null)
+								if (session != this)
 								{
-									if (transaction == null)
+									var s = session as ServerService;
+									if (s != null)
 									{
-										transaction = _protoModelObserver.GetTransaction(s._toProtobuf, senderID);
-										somethingChanged = _protoModelObserver.SomethingChanged();
-									}
-
-									if (somethingChanged)
-									{
-										lock (s._lock)
-										{
-											s.Send(s._toProtobuf.Convert(transaction));
-										}
+										var transaction = _protoModelObserver.GetTransaction(s._toProtobuf, senderID);
+										s.Send(s._toProtobuf.Convert(transaction));
 									}
 								}
 							}
@@ -128,9 +121,12 @@ namespace ThingModel.WebSockets
 
         private readonly WebSocketServer _ws;
 
-        public Server(string path, string endpoint = "/")
+        public Server(string path, string endpoint = "/", bool strictServer = true)
         {
             var house = new Warehouse();
+            var observer = new ProtoModelObserver();
+			house.RegisterObserver(observer);
+			var uglyLock = new object();
 
 	        Transaction += (sender, args) =>
 	        {
@@ -145,7 +141,7 @@ namespace ThingModel.WebSockets
 	        };
 
             _ws = new WebSocketServer(path);
-            _ws.AddWebSocketService(endpoint, () => new ServerService(house, this));
+            _ws.AddWebSocketService(endpoint, () => new ServerService(house, observer, uglyLock, strictServer, this));
             _ws.Start();
 
 
