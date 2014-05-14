@@ -118,19 +118,19 @@ public abstract class Location {
 		}
 		
 		public double getLatitude() {
-			return Y;
-		}
-		
-		public void setLatitude(double latitude) {
-			Y = latitude;
-		}
-		
-		public double getLongitude() {
 			return X;
 		}
 		
+		public void setLatitude(double latitude) {
+			X = latitude;
+		}
+		
+		public double getLongitude() {
+			return Y;
+		}
+		
 		public void setLongitude(double longitude) {
-			X = longitude;
+			Y = longitude;
 		}
 		
 		public Double getAltitude() {

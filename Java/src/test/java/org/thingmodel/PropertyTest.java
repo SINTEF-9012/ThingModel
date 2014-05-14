@@ -20,12 +20,12 @@ public class PropertyTest {
 
         Assert.assertEquals(new Property.String("name", "Alphonse").getValue(), "Alphonse");
 
-        Assert.assertEquals((double) new Property.Double("speed", 12.0).getValue(), 12.0, 0.001);
-        Assert.assertEquals((int) new Property.Integer("speed", 12).getValue(), 12);
+        Assert.assertEquals(new Property.Double("speed", 12.0).getValue(), 12.0, 0.001);
+        Assert.assertEquals((int) new Property.Int("speed", 12).getValue(), 12);
 
-        Assert.assertTrue(new Property.Date("date", new Date()).getValue().getTime() <= new Date().getTime());
+        Assert.assertTrue(new Property.DateTime("date", new Date()).getValue().getTime() <= new Date().getTime());
 
-        Assert.assertNotNull(new Property.Location("location", new Location.LatLng(1.0, 2.0, 3.0)).getValue());
+        Assert.assertNotNull(new Property.Location.LatLng("location", new Location.LatLng(1.0, 2.0, 3.0)).getValue());
     }
 
 
@@ -35,11 +35,11 @@ public class PropertyTest {
 
         Assert.assertTrue(new Property.String("name", "Alphonse").ValueToString().contains("Alphonse"));
         Assert.assertTrue(new Property.Double("speed", 42.0).ValueToString().contains("42"));
-        Assert.assertTrue(new Property.Integer("speed", 42).ValueToString().contains("42"));
+        Assert.assertTrue(new Property.Int("speed", 42).ValueToString().contains("42"));
 
-        Assert.assertFalse(new Property.Date("date", new Date()).ValueToString().isEmpty());
+        Assert.assertFalse(new Property.DateTime("date", new Date()).ValueToString().isEmpty());
 
-        Assert.assertTrue(new Property.Location("location",
+        Assert.assertTrue(new Property.Location.LatLng("location",
                 new Location.LatLng(42.0, 2.0, 3.0)).ValueToString().contains("42"));
 
     }

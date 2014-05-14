@@ -11,7 +11,7 @@ public class ThingTypeTest {
     @Before
     public void setUp() throws Exception {
         _type = new ThingType("plane");
-        _propertyType = new PropertyType("location", Property.Location.class);
+        _propertyType = new PropertyType("location", Property.Location.LatLng.class);
         _type.DefineProperty(_propertyType);
     }
 
@@ -46,7 +46,7 @@ public class ThingTypeTest {
 
         Assert.assertFalse(_type.Check(plane));
 
-        plane.setProperty(new Property.Location("location", new Location.LatLng(49.010852, 2.547398)));
+        plane.setProperty(new Property.Location.LatLng("location", new Location.LatLng(49.010852, 2.547398)));
 
 
         Assert.assertTrue(_type.Check(plane));

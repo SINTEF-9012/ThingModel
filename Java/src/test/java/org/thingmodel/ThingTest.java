@@ -49,7 +49,7 @@ public class ThingTest {
 
     @Test
     public void testSetProperties() throws Exception {
-        _thing.setProperty(new Property.Integer("speed", 15));
+        _thing.setProperty(new Property.Int("speed", 15));
         _thing.setProperty(new Property.Double("speed", 15.0));
         Assert.assertNotNull(_thing.getProperty("speed"));
     }

@@ -35,11 +35,7 @@ public abstract class Property {
 				(_value != null && _value.equals(other._value)));
 	}
 	
-	public static class Location extends Property {
-		
-		public Location(java.lang.String key) {
-			super(key, null);
-		}
+	public static abstract class Location extends Property {
 		
 		public Location(java.lang.String key, org.thingmodel.Location value) {
 			super(key, value);
@@ -49,8 +45,61 @@ public abstract class Property {
 			return (org.thingmodel.Location)_value;
 		}
 		
-		public void setValue(org.thingmodel.Location value) {
-			_value = value;
+		public static class Point extends Location {
+
+			public Point(java.lang.String key) {
+				super(key, null);
+			}
+			
+			public Point(java.lang.String key, org.thingmodel.Location.Point value) {
+				super(key, value);
+			}
+			
+			public org.thingmodel.Location.Point getValue() {
+				return (org.thingmodel.Location.Point)_value;
+			}
+			
+			public void setValue(org.thingmodel.Location.Point value) {
+				_value = value;
+			}
+		}
+
+		public static class LatLng extends Location {
+
+			public LatLng(java.lang.String key) {
+				super(key, null);
+			}
+			
+			public LatLng(java.lang.String key, org.thingmodel.Location.LatLng value) {
+				super(key, value);
+			}
+			
+			public org.thingmodel.Location.LatLng getValue() {
+				return (org.thingmodel.Location.LatLng)_value;
+			}
+			
+			public void setValue(org.thingmodel.Location.LatLng value) {
+				_value = value;
+			}
+		}
+		
+		public static class Equatorial extends Location {
+
+			public Equatorial(java.lang.String key) {
+				super(key, null);
+			}
+			
+			public Equatorial(java.lang.String key, org.thingmodel.Location.Equatorial value) {
+				super(key, value);
+			}
+			
+			public org.thingmodel.Location.Equatorial getValue() {
+				return (org.thingmodel.Location.Equatorial)_value;
+			}
+			
+			public void setValue(org.thingmodel.Location.Equatorial value) {
+				_value = value;
+			}
 		}
 	}
 
@@ -92,13 +141,13 @@ public abstract class Property {
 		}
 	}
 
-	public static class Integer extends Property {
+	public static class Int extends Property {
 		
-		public Integer(java.lang.String key) {
+		public Int(java.lang.String key) {
 			super(key, null);
 		}
 		
-		public Integer(java.lang.String key, java.lang.Integer value) {
+		public Int(java.lang.String key, java.lang.Integer value) {
 			super(key, value);
 		}
 		
@@ -130,13 +179,13 @@ public abstract class Property {
 		}
 	}
 
-	public static class Date extends Property {
+	public static class DateTime extends Property {
 		
-		public Date(java.lang.String key) {
+		public DateTime(java.lang.String key) {
 			super(key, null);
 		}
 		
-		public Date(java.lang.String key, java.util.Date value) {
+		public DateTime(java.lang.String key, java.util.Date value) {
 			super(key, value);
 		}
 		

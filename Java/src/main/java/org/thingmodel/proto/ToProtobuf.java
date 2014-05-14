@@ -28,6 +28,15 @@ public class ToProtobuf {
 	static {
 		_prototypesBindings.put(org.thingmodel.Property.Location.class,
 				org.thingmodel.proto.ProtoPropertyType.PropertyType.Type.LOCATION);
+
+		_prototypesBindings.put(org.thingmodel.Property.Location.Point.class,
+				org.thingmodel.proto.ProtoPropertyType.PropertyType.Type.LOCATION);
+		
+		_prototypesBindings.put(org.thingmodel.Property.Location.LatLng.class,
+				org.thingmodel.proto.ProtoPropertyType.PropertyType.Type.LOCATION);
+		
+		_prototypesBindings.put(org.thingmodel.Property.Location.Equatorial.class,
+				org.thingmodel.proto.ProtoPropertyType.PropertyType.Type.LOCATION);
 		
 		_prototypesBindings.put(org.thingmodel.Property.String.class,
 				org.thingmodel.proto.ProtoPropertyType.PropertyType.Type.STRING);
@@ -35,13 +44,13 @@ public class ToProtobuf {
 		_prototypesBindings.put(org.thingmodel.Property.Double.class,
 				org.thingmodel.proto.ProtoPropertyType.PropertyType.Type.DOUBLE);
 		
-		_prototypesBindings.put(org.thingmodel.Property.Integer.class,
+		_prototypesBindings.put(org.thingmodel.Property.Int.class,
 				org.thingmodel.proto.ProtoPropertyType.PropertyType.Type.INT);
 		
 		_prototypesBindings.put(org.thingmodel.Property.Boolean.class,
 				org.thingmodel.proto.ProtoPropertyType.PropertyType.Type.BOOLEAN);
 		
-		_prototypesBindings.put(org.thingmodel.Property.Date.class,
+		_prototypesBindings.put(org.thingmodel.Property.DateTime.class,
 				org.thingmodel.proto.ProtoPropertyType.PropertyType.Type.DATETIME);
 	}
 	
@@ -183,7 +192,8 @@ public class ToProtobuf {
 				.setStringKey(propertyId);
 		
 			Class<? extends org.thingmodel.Property> c = property.getClass();
-			if (c == org.thingmodel.Property.Location.class) {
+			if (c == org.thingmodel.Property.Location.class || c == Location.LatLng.class ||
+                    c == Location.Point.class || c == Location.Equatorial.class) {
 				ConvertLocationProperty((Location) property, proto);
 			}
 			else if (c == org.thingmodel.Property.String.class)
@@ -195,20 +205,20 @@ public class ToProtobuf {
 				proto.setType(Property.Type.DOUBLE);
 				proto.setDoubleValue(((org.thingmodel.Property.Double) property).getValue());
 			}
-			else if (c == org.thingmodel.Property.Integer.class)
+			else if (c == org.thingmodel.Property.Int.class)
 			{
 				proto.setType(Property.Type.INT);
-				proto.setIntValue(((org.thingmodel.Property.Integer) property).getValue());
+				proto.setIntValue(((org.thingmodel.Property.Int) property).getValue());
 			}
 			else if (c == org.thingmodel.Property.Boolean.class)
 			{
 				proto.setType(Property.Type.BOOLEAN);
 				proto.setBooleanValue(((org.thingmodel.Property.Boolean) property).getValue());
 			}
-			else if (c == org.thingmodel.Property.Date.class)
+			else if (c == org.thingmodel.Property.DateTime.class)
 			{
 				proto.setType(Property.Type.DATETIME);
-				proto.setDatetimeValue(((org.thingmodel.Property.Date) property).getValue().getTime());
+				proto.setDatetimeValue(((org.thingmodel.Property.DateTime) property).getValue().getTime());
 			}
 			
 			PropertyStateKey key = new PropertyStateKey();
@@ -244,7 +254,7 @@ public class ToProtobuf {
 						if ((previousStr == null && str == null) ||
 							(previousStr != null && str != null &&
 								((previousStr.getStringValue() ==  str.getStringValue() &&
-								previousStr.getValue() == str.getValue()) ||
+								previousStr.getValue().equals(str.getValue())) ||
 								(property.ValueToString().equals(previousStr.getValue()))))) {
 							continue;
 						}
@@ -331,7 +341,7 @@ public class ToProtobuf {
 		
 		Property.String.Builder st = Property.String.newBuilder();
 		
-		if (_stringToDeclare.contains(value)) {
+		if (value != null && value.length() > 0 && _stringToDeclare.contains(value)) {
 			st.setStringValue(stringToKey(value));
 		} else {
 			st.setValue(value);

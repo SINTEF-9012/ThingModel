@@ -12,21 +12,21 @@ import java.util.Calendar;
 import java.util.Date;
 
 public class ProtoConversionsTest {
-    private Wharehouse _wharehouseInput;
-    private Wharehouse _wharehouseOutput;
+    private Warehouse _warehouseInput;
+    private Warehouse _warehouseOutput;
     private FromProtobuf _fromProtobuf;
     private ToProtobuf _toProtobuf;
     private ProtoModelObserver _observer;
 
     @Before
     public void setUp() throws Exception {
-        _wharehouseInput = new Wharehouse();
-        _wharehouseOutput = new Wharehouse();
+        _warehouseInput = new Warehouse();
+        _warehouseOutput = new Warehouse();
 
-        _fromProtobuf = new FromProtobuf(_wharehouseInput);
+        _fromProtobuf = new FromProtobuf(_warehouseInput);
 
         _observer = new ProtoModelObserver();
-        _wharehouseOutput.RegisterObserver(_observer);
+        _warehouseOutput.RegisterObserver(_observer);
 
         _toProtobuf = new ToProtobuf();
     }
@@ -36,7 +36,7 @@ public class ProtoConversionsTest {
         Thing message = new Thing("first");
         message.setProperty(new Property.String("content", "Hello World"));
 
-        _wharehouseOutput.RegisterThing(message);
+        _warehouseOutput.RegisterThing(message);
 
         ProtoTransaction.Transaction transaction = _observer.getTransaction(_toProtobuf, "RogerEnterpriseBroadcaster");
 
@@ -44,7 +44,7 @@ public class ProtoConversionsTest {
 
         Assert.assertEquals(senderId, "RogerEnterpriseBroadcaster");
 
-        Thing newMessage = _wharehouseInput.getThing("first");
+        Thing newMessage = _warehouseInput.getThing("first");
 
         Assert.assertNotNull(newMessage);
 
@@ -60,11 +60,11 @@ public class ProtoConversionsTest {
         type.DefineProperty(new PropertyType("content", Property.String.class));
         type.Description = "Just a simple text message";
 
-        _wharehouseOutput.RegisterType(type);
+        _warehouseOutput.RegisterType(type);
 
         _fromProtobuf.Convert(_observer.getTransaction(_toProtobuf, "bob"));
 
-        ThingType newType = _wharehouseInput.getThingType("message");
+        ThingType newType = _warehouseInput.getThingType("message");
 
         Assert.assertNotNull(newType);
 
@@ -88,8 +88,8 @@ public class ProtoConversionsTest {
     @Test
     public void testDeletions() throws Exception {
         Thing duck = new Thing("canard");
-        _wharehouseOutput.RegisterThing(duck);
-        _wharehouseOutput.RemoveThing(duck);
+        _warehouseOutput.RegisterThing(duck);
+        _warehouseOutput.RemoveThing(duck);
 
         ProtoTransaction.Transaction transaction = _observer.getTransaction(_toProtobuf, "bob");
 
@@ -101,23 +101,23 @@ public class ProtoConversionsTest {
     public void CheckLocationProperty() throws Exception
     {
         Thing thing = new Thing("earth");
-        thing.setProperty(new Property.Location("point", new Location.Point(42.0, 43.0, 44.0)));
-        thing.setProperty(new Property.Location("latlng", new Location.LatLng(51.0, 52.0, 53.0)));
-        thing.setProperty(new Property.Location("equatorial", new Location.Equatorial(27, 28, 29)));
+        thing.setProperty(new Property.Location.Point("point", new Location.Point(42.0, 43.0, 44.0)));
+        thing.setProperty(new Property.Location.LatLng("latlng", new Location.LatLng(51.0, 52.0, 53.0)));
+        thing.setProperty(new Property.Location.Equatorial("equatorial", new Location.Equatorial(27, 28, 29)));
 
-        _wharehouseOutput.RegisterThing(thing);
+        _warehouseOutput.RegisterThing(thing);
 
         _fromProtobuf.Convert(_observer.getTransaction(_toProtobuf, "earth"));
 
-        Thing newThing = _wharehouseInput.getThing("earth");
+        Thing newThing = _warehouseInput.getThing("earth");
 
         Assert.assertNotNull(newThing);
         Assert.assertEquals(newThing.getProperty("point",
-                Property.Location.class).getValue().X, 42, 0.0001);
+                Property.Location.Point.class).getValue().X, 42, 0.0001);
         Assert.assertEquals(newThing.getProperty("latlng",
-                Property.Location.class).getValue().Y, 52, 0.0001);
+                Property.Location.LatLng.class).getValue().Y, 52, 0.0001);
         Assert.assertEquals(newThing.getProperty("equatorial",
-                Property.Location.class).getValue().Z, 29, 0.001);
+                Property.Location.Equatorial.class).getValue().Z, 29, 0.001);
 
     }
 
@@ -128,7 +128,7 @@ public class ProtoConversionsTest {
         thing.setProperty(new Property.String("name", "Interstella"));
         thing.setProperty(new Property.String("hostname", "Interstella"));
 
-        _wharehouseOutput.RegisterThing(thing);
+        _warehouseOutput.RegisterThing(thing);
 
         ProtoTransaction.Transaction transaction = _observer.getTransaction(_toProtobuf, "");
 
@@ -138,7 +138,7 @@ public class ProtoConversionsTest {
 
         _fromProtobuf.Convert(transaction);
 
-        Assert.assertEquals(_wharehouseInput.getThing("computer").getProperty("name",
+        Assert.assertEquals(_warehouseInput.getThing("computer").getProperty("name",
                 Property.String.class).getValue(), "Interstella");
     }
 
@@ -148,10 +148,10 @@ public class ProtoConversionsTest {
         Thing thing = new Thing("twingo");
         thing.setProperty(new Property.Double("speed", 45.71));
 
-        _wharehouseOutput.RegisterThing(thing);
+        _warehouseOutput.RegisterThing(thing);
         _fromProtobuf.Convert(_observer.getTransaction(_toProtobuf, null));
 
-        Assert.assertEquals(_wharehouseInput.getThing("twingo").getProperty("speed",
+        Assert.assertEquals(_warehouseInput.getThing("twingo").getProperty("speed",
                 Property.Double.class).getValue(), 45.71, 0.0001);
     }
 
@@ -159,14 +159,14 @@ public class ProtoConversionsTest {
     public void CheckIntProperty() throws Exception
     {
         Thing thing = new Thing("twingo");
-        thing.setProperty(new Property.Integer("doors", 3));
+        thing.setProperty(new Property.Int("doors", 3));
 
-        _wharehouseOutput.RegisterThing(thing);
+        _warehouseOutput.RegisterThing(thing);
 
         _fromProtobuf.Convert(_observer.getTransaction(_toProtobuf, null));
 
-        Assert.assertEquals((int) _wharehouseInput.getThing("twingo").getProperty("doors",
-                Property.Integer.class).getValue(), 3);
+        Assert.assertEquals((int) _warehouseInput.getThing("twingo").getProperty("doors",
+                Property.Int.class).getValue(), 3);
     }
 
     @Test
@@ -175,11 +175,11 @@ public class ProtoConversionsTest {
         Thing thing = new Thing("twingo");
         thing.setProperty(new Property.Boolean("moving", true));
 
-        _wharehouseOutput.RegisterThing(thing);
+        _warehouseOutput.RegisterThing(thing);
 
         _fromProtobuf.Convert(_observer.getTransaction(_toProtobuf, null));
 
-        Assert.assertTrue(_wharehouseInput.getThing("twingo").getProperty("moving",
+        Assert.assertTrue(_warehouseInput.getThing("twingo").getProperty("moving",
                 Property.Boolean.class).getValue());
     }
 
@@ -194,14 +194,14 @@ public class ProtoConversionsTest {
 
         Date birthdate = c.getTime();
 
-        thing.setProperty(new Property.Date("birthdate", birthdate));
+        thing.setProperty(new Property.DateTime("birthdate", birthdate));
 
-        _wharehouseOutput.RegisterThing(thing);
+        _warehouseOutput.RegisterThing(thing);
 
         _fromProtobuf.Convert(_observer.getTransaction(_toProtobuf, null));
 
-        Assert.assertEquals(_wharehouseInput.getThing("twingo").getProperty("birthdate",
-                Property.Date.class).getValue(), birthdate);
+        Assert.assertEquals(_warehouseInput.getThing("twingo").getProperty("birthdate",
+                Property.DateTime.class).getValue(), birthdate);
     }
 
     @Test
@@ -214,28 +214,29 @@ public class ProtoConversionsTest {
         group.Connect(roger);
         group.Connect(alain);
 
-        _wharehouseOutput.RegisterThing(group);
-        _wharehouseOutput.RegisterThing(roger);
-        _wharehouseOutput.RegisterThing(alain);
+        _warehouseOutput.RegisterThing(group);
+        _warehouseOutput.RegisterThing(roger);
+        _warehouseOutput.RegisterThing(alain);
 
         _fromProtobuf.Convert(_observer.getTransaction(_toProtobuf, null));
 
-        Assert.assertEquals(_wharehouseInput.getThing("family").getConnectedThingsCount(), 2);
-        Assert.assertEquals(_wharehouseInput.getThing("family").getConnectedThings().size(), 2);
+        Assert.assertEquals(_warehouseInput.getThing("family").getConnectedThingsCount(), 2);
+        Assert.assertEquals(_warehouseInput.getThing("family").getConnectedThings().size(), 2);
     }
 
     @Test
     public void IndependentInstances() throws Exception
     {
-        Location location = new Location.LatLng(25, 2);
+        Location.LatLng location = new Location.LatLng(25, 2);
 
         Thing thing = new Thing("8712C");
-        thing.setProperty(new Property.Location("position", location));
+        thing.setProperty(new Property.Location.LatLng("position", location));
 
-        _wharehouseOutput.RegisterThing(thing);
+        _warehouseOutput.RegisterThing(thing);
         _fromProtobuf.Convert(_observer.getTransaction(_toProtobuf, null));
 
-        Location newLocation = _wharehouseInput.getThing("8712C").getProperty("position", Property.Location.class).getValue();
+        Location newLocation = _warehouseInput.getThing("8712C").getProperty("position",
+                Property.Location.LatLng.class).getValue();
 
         Assert.assertEquals(location, newLocation);
 
@@ -252,17 +253,17 @@ public class ProtoConversionsTest {
         thing.setProperty(new Property.Double("speed", 1500.0));
         thing.setProperty(new Property.String("name", "Ariane"));
 
-        _wharehouseOutput.RegisterThing(thing);
+        _warehouseOutput.RegisterThing(thing);
         _fromProtobuf.Convert(_observer.getTransaction(_toProtobuf, null));
 
         thing = new Thing("rocket");
         thing.setProperty(new Property.Double("speed", 1200.0));
         thing.setProperty(new Property.Boolean("space", true));
 
-        _wharehouseOutput.NotifyThingUpdate(thing);
+        _warehouseOutput.NotifyThingUpdate(thing);
         _fromProtobuf.Convert(_observer.getTransaction(_toProtobuf, null));
 
-        Thing newThing = _wharehouseInput.getThing("rocket");
+        Thing newThing = _warehouseInput.getThing("rocket");
 
         Assert.assertEquals(newThing.getProperty("name", Property.String.class).getValue(), "Ariane");
         Assert.assertEquals(newThing.getProperty("speed", Property.Double.class).getValue(), 1200.0, 0.0001);
@@ -280,17 +281,17 @@ public class ProtoConversionsTest {
         couple.Connect(a);
         couple.Connect(b);
 
-        _wharehouseOutput.RegisterThing(couple, true, true);
+        _warehouseOutput.RegisterThing(couple, true, true, null);
         _fromProtobuf.Convert(_observer.getTransaction(_toProtobuf, null));
 
-        Assert.assertEquals(_wharehouseInput.getThing("couple").getConnectedThings().size(),2);
+        Assert.assertEquals(_warehouseInput.getThing("couple").getConnectedThings().size(),2);
 
         // Germaine doesn't want to live with James anymore
         couple.Disconnect(b);
-        _wharehouseOutput.RegisterThing(couple);
+        _warehouseOutput.RegisterThing(couple);
         _fromProtobuf.Convert(_observer.getTransaction(_toProtobuf, null));
 
-        Assert.assertEquals(_wharehouseInput.getThing("couple").getConnectedThings().size(),1);
+        Assert.assertEquals(_warehouseInput.getThing("couple").getConnectedThings().size(),1);
 
 
     }
@@ -300,9 +301,9 @@ public class ProtoConversionsTest {
     {
         Thing thing = new Thing("café");
         thing.setProperty(new Property.Double("temperature", 40.0));
-        thing.setProperty(new Property.Location("location", new Location.Equatorial(48, 454, 2)));
+        thing.setProperty(new Property.Location.Equatorial("location", new Location.Equatorial(48, 454, 2)));
 
-        _wharehouseOutput.RegisterThing(thing);
+        _warehouseOutput.RegisterThing(thing);
 
         ProtoTransaction.Transaction transaction = _observer.getTransaction(_toProtobuf, null);
 

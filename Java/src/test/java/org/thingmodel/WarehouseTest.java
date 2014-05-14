@@ -6,16 +6,15 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-public class WharehouseTest {
+public class WarehouseTest {
 
     private ThingType _type;
     private Thing _thing;
-    private Wharehouse _wharehouse;
+    private Warehouse _warehouse;
 
-    private class WharehouseChangeObserver implements IWharehouseObserver {
+    private class WarehouseChangeObserver implements IWarehouseObserver {
 
         public boolean NewThing;
         public boolean UpdatedThing;
@@ -30,27 +29,27 @@ public class WharehouseTest {
         }
 
         @Override
-        public void New(Thing thing) {
+        public void New(Thing thing, String sender) {
             NewThing = true;
         }
 
         @Override
-        public void Deleted(Thing thing) {
+        public void Deleted(Thing thing, String sender) {
             DeletedThing = true;
         }
 
         @Override
-        public void Updated(Thing thing) {
+        public void Updated(Thing thing, String sender) {
             UpdatedThing = true;
         }
 
         @Override
-        public void Define(ThingType thingType) {
+        public void Define(ThingType thingType, String sender) {
             DefinedType = true;
         }
     }
 
-    private WharehouseChangeObserver _wharehouseChangeObserver;
+    private WarehouseChangeObserver _warehouseChangeObserver;
 
     @Before
     public void setUp() throws Exception {
@@ -61,110 +60,110 @@ public class WharehouseTest {
         _thing = new Thing("871", _type);
         _thing.setProperty(new Property.String("name", "Maurice"));
         _thing.setProperty(new Property.Double("age", 18.0));
-        _thing.setProperty(new Property.Location("localization", new Location.Point(10,44)));
+        _thing.setProperty(new Property.Location.Point("localization", new Location.Point(10,44)));
 
-        _wharehouse = new Wharehouse();
+        _warehouse = new Warehouse();
 
-        _wharehouseChangeObserver = new WharehouseChangeObserver();
+        _warehouseChangeObserver = new WarehouseChangeObserver();
 
-        _wharehouse.RegisterObserver(_wharehouseChangeObserver);
+        _warehouse.RegisterObserver(_warehouseChangeObserver);
     }
 
     @Test
     public void testRegisterType() throws Exception {
-        _wharehouse.RegisterType(_type);
-        Assert.assertTrue(_wharehouseChangeObserver.DefinedType);
+        _warehouse.RegisterType(_type);
+        Assert.assertTrue(_warehouseChangeObserver.DefinedType);
 
-        _wharehouseChangeObserver.Reset();
+        _warehouseChangeObserver.Reset();
 
         try {
-            _wharehouse.RegisterType(null);
+            _warehouse.RegisterType(null);
             Assert.fail();
         } catch (Exception e) {}
 
-        Assert.assertFalse(_wharehouseChangeObserver.DefinedType);
+        Assert.assertFalse(_warehouseChangeObserver.DefinedType);
     }
 
     @Test
     public void testRegisterThing() throws Exception {
-        _wharehouse.RegisterThing(_thing);
-        Assert.assertTrue(_wharehouseChangeObserver.NewThing);
+        _warehouse.RegisterThing(_thing);
+        Assert.assertTrue(_warehouseChangeObserver.NewThing);
 
-        _wharehouseChangeObserver.Reset();
+        _warehouseChangeObserver.Reset();
 
         try {
-            _wharehouse.RegisterThing(null);
+            _warehouse.RegisterThing(null);
             Assert.fail();
         } catch (Exception e) {}
 
-        Assert.assertFalse(_wharehouseChangeObserver.NewThing);
+        Assert.assertFalse(_warehouseChangeObserver.NewThing);
 
     }
 
     @Test
     public void testRegisterThingWithType() throws Exception {
-        _wharehouse.RegisterThing(_thing, true, true);
+        _warehouse.RegisterThing(_thing, true, true, null);
 
-        Assert.assertTrue(_wharehouseChangeObserver.DefinedType);
+        Assert.assertTrue(_warehouseChangeObserver.DefinedType);
 
-        _wharehouseChangeObserver.Reset();
+        _warehouseChangeObserver.Reset();
 
-        _wharehouse.RegisterThing(new Thing("without type"), true, true);
+        _warehouse.RegisterThing(new Thing("without type"), true, true, null);
 
-        Assert.assertFalse(_wharehouseChangeObserver.DefinedType);
+        Assert.assertFalse(_warehouseChangeObserver.DefinedType);
     }
 
     @Test
     public void testThingUpdateCallback() throws Exception {
-        _wharehouse.RegisterThing(_thing);
+        _warehouse.RegisterThing(_thing);
 
-        Assert.assertFalse(_wharehouseChangeObserver.UpdatedThing);
+        Assert.assertFalse(_warehouseChangeObserver.UpdatedThing);
 
-        _wharehouse.RegisterThing(_thing);
+        _warehouse.RegisterThing(_thing);
 
-        Assert.assertTrue(_wharehouseChangeObserver.UpdatedThing);
+        Assert.assertTrue(_warehouseChangeObserver.UpdatedThing);
 
     }
 
     @Test
     public void testUnregisterObservers() throws Exception {
-        _wharehouse.UnregisterObserver(_wharehouseChangeObserver);
+        _warehouse.UnregisterObserver(_warehouseChangeObserver);
 
-        _wharehouse.RegisterType(_type);
-        _wharehouse.RegisterThing(_thing);
+        _warehouse.RegisterType(_type);
+        _warehouse.RegisterThing(_thing);
 
-        Assert.assertFalse(_wharehouseChangeObserver.NewThing);
-        Assert.assertFalse(_wharehouseChangeObserver.DefinedType);
+        Assert.assertFalse(_warehouseChangeObserver.NewThing);
+        Assert.assertFalse(_warehouseChangeObserver.DefinedType);
 
     }
 
     @Test
     public void testDeleteCallback() throws Exception {
-        _wharehouse.RegisterThing(_thing);
-        _wharehouse.RemoveThing(_thing);
+        _warehouse.RegisterThing(_thing);
+        _warehouse.RemoveThing(_thing);
 
-        Assert.assertTrue(_wharehouseChangeObserver.DeletedThing);
+        Assert.assertTrue(_warehouseChangeObserver.DeletedThing);
 
-        _wharehouseChangeObserver.Reset();
+        _warehouseChangeObserver.Reset();
 
-        _wharehouse.RemoveThing(null);
+        _warehouse.RemoveThing(null);
 
-        Assert.assertFalse(_wharehouseChangeObserver.DeletedThing);
+        Assert.assertFalse(_warehouseChangeObserver.DeletedThing);
     }
 
     @Test
     public void testDeleteAndCreateAgain() throws Exception {
-        _wharehouse.RegisterThing(_thing);
-        _wharehouse.RemoveThing(_thing);
-        _wharehouseChangeObserver.Reset();
-        _wharehouse.RegisterThing(_thing);
-        Assert.assertTrue(_wharehouseChangeObserver.NewThing);
+        _warehouse.RegisterThing(_thing);
+        _warehouse.RemoveThing(_thing);
+        _warehouseChangeObserver.Reset();
+        _warehouse.RegisterThing(_thing);
+        Assert.assertTrue(_warehouseChangeObserver.NewThing);
     }
 
     @Test
     public void testRecursiveRegistration() throws Exception {
-        _wharehouse.RegisterThing(_thing);
-        _wharehouseChangeObserver.Reset();
+        _warehouse.RegisterThing(_thing);
+        _warehouseChangeObserver.Reset();
 
         Thing newThing = new Thing("test");
         newThing.Connect(_thing);
@@ -172,10 +171,10 @@ public class WharehouseTest {
         _thing.Connect(new Thing("blabla"));
         _thing.Connect(new Thing("blabla2"));
 
-        _wharehouse.RegisterThing(newThing);
+        _warehouse.RegisterThing(newThing);
 
-        Assert.assertTrue(_wharehouseChangeObserver.NewThing);
-        Assert.assertTrue(_wharehouseChangeObserver.UpdatedThing);
+        Assert.assertTrue(_warehouseChangeObserver.NewThing);
+        Assert.assertTrue(_warehouseChangeObserver.UpdatedThing);
     }
 
     @Test
@@ -184,10 +183,10 @@ public class WharehouseTest {
         newThing.Connect(_thing);
         _thing.Connect(newThing);
 
-        _wharehouse.RegisterThing(newThing);
-        _wharehouse.RegisterThing(_thing);
+        _warehouse.RegisterThing(newThing);
+        _warehouse.RegisterThing(_thing);
 
-        Assert.assertTrue(_wharehouseChangeObserver.NewThing);
+        Assert.assertTrue(_warehouseChangeObserver.NewThing);
     }
 
     @Test
@@ -200,9 +199,9 @@ public class WharehouseTest {
         collection.add(newThing);
         collection.add(_thing);
 
-        _wharehouse.RegisterCollection(collection);
+        _warehouse.RegisterCollection(collection);
 
-        Assert.assertTrue(_wharehouseChangeObserver.NewThing);
+        Assert.assertTrue(_warehouseChangeObserver.NewThing);
     }
 
     @Test
@@ -210,12 +209,12 @@ public class WharehouseTest {
         Thing otherThing = new Thing("lapin");
         otherThing.Connect(_thing);
 
-        _wharehouse.RegisterThing(otherThing);
-        _wharehouseChangeObserver.Reset();
-        _wharehouse.RemoveThing(_thing);
+        _warehouse.RegisterThing(otherThing);
+        _warehouseChangeObserver.Reset();
+        _warehouse.RemoveThing(_thing);
 
-        Assert.assertTrue(_wharehouseChangeObserver.DeletedThing);
-        Assert.assertTrue(_wharehouseChangeObserver.UpdatedThing);
+        Assert.assertTrue(_warehouseChangeObserver.DeletedThing);
+        Assert.assertTrue(_warehouseChangeObserver.UpdatedThing);
     }
 
     @Test
@@ -228,7 +227,7 @@ public class WharehouseTest {
             @Override
             public void run() {
                 for (int i = 0; i < 1000; ++i) {
-                    _wharehouse.RegisterThing(new Thing("banana_"+i));
+                    _warehouse.RegisterThing(new Thing("banana_"+i));
                 }
                 a.countDown();
             }
@@ -238,7 +237,7 @@ public class WharehouseTest {
             @Override
             public void run() {
                 for (int i = 0; i < 1000; ++i) {
-                    _wharehouse.RegisterThing(new Thing("lapin_"+i));
+                    _warehouse.RegisterThing(new Thing("lapin_"+i));
                 }
                 b.countDown();
             }
@@ -248,7 +247,7 @@ public class WharehouseTest {
             @Override
             public void run() {
                 for (int i = 0; i < 1000; ++i) {
-                    _wharehouse.RegisterThing(new Thing("lapin_"+i));
+                    _warehouse.RegisterThing(new Thing("lapin_"+i));
                 }
                 c.countDown();
             }

@@ -3,12 +3,13 @@ package org.thingmodel.proto;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 import org.thingmodel.Location;
 import org.thingmodel.Property;
 import org.thingmodel.Thing;
-import org.thingmodel.Wharehouse;
+import org.thingmodel.Warehouse;
 import org.thingmodel.proto.ProtoPropertyType.PropertyType;
 import org.thingmodel.proto.ProtoStringDeclaration.StringDeclaration;
 import org.thingmodel.proto.ProtoThingType.ThingType;
@@ -21,9 +22,9 @@ public class FromProtobuf {
 		_prototypesBinding.put(PropertyType.Type.LOCATION, Property.Location.class);
 		_prototypesBinding.put(PropertyType.Type.STRING, Property.String.class);
 		_prototypesBinding.put(PropertyType.Type.DOUBLE, Property.Double.class);
-		_prototypesBinding.put(PropertyType.Type.INT, Property.Integer.class);
+		_prototypesBinding.put(PropertyType.Type.INT, Property.Int.class);
 		_prototypesBinding.put(PropertyType.Type.BOOLEAN, Property.Boolean.class);
-		_prototypesBinding.put(PropertyType.Type.DATETIME, Property.Date.class);
+		_prototypesBinding.put(PropertyType.Type.DATETIME, Property.DateTime.class);
 	}
 	 
 	
@@ -39,10 +40,10 @@ public class FromProtobuf {
 		return value != null ? value : "undefined";
 	}
 
-	private Wharehouse _wharehouse;
+	private Warehouse _warehouse;
 	
-	public FromProtobuf(Wharehouse wharehouse) {
-		_wharehouse = wharehouse;
+	public FromProtobuf(Warehouse warehouse) {
+		_warehouse = warehouse;
 	}
 	
 	public String Convert(Transaction transaction) {
@@ -55,12 +56,19 @@ public class FromProtobuf {
 			ConvertStringDeclaration(transaction.getStringDeclarations(i));
 		}
 		
+		String senderId = keyToString(transaction.getStringSenderId());
+		
+		HashSet<Thing> thingsToDelete = new HashSet<>();
+		
 		for (int i = 0, l = transaction.getThingsRemoveListCount(); i < l; ++i) {
-			ConvertDelete(transaction.getThingsRemoveList(i));
+			int key = transaction.getThingsRemoveList(i);
+			thingsToDelete.add(_warehouse.getThing(keyToString(key)));
 		}
+		_warehouse.RemoveCollection(thingsToDelete, senderId);
+		
 		
 		for (int i = 0, l = transaction.getThingtypesDeclarationListCount(); i < l; ++i) {
-			ConvertThingTypeDeclaration(transaction.getThingtypesDeclarationList(i));
+			ConvertThingTypeDeclaration(transaction.getThingtypesDeclarationList(i), senderId);
 		}
 		
 		class Tuple {
@@ -72,7 +80,7 @@ public class FromProtobuf {
 		
 		for (int i = 0, l = transaction.getThingsPublishListCount(); i < l; ++i) {
 			org.thingmodel.proto.ProtoThing.Thing protoThing = transaction.getThingsPublishList(i);
-			Thing modelThing = ConvertThingPublication(protoThing, check);
+			Thing modelThing = ConvertThingPublication(protoThing, check, senderId);
 			
 			if (protoThing.getConnectionsChange()) {
 				Tuple t = new Tuple();
@@ -86,17 +94,15 @@ public class FromProtobuf {
 			tuple.model.DisconnectAll();
 			
 			for (int i = 0, l = tuple.proto.getConnectionsCount(); i < l; ++i) {
-				Thing t = _wharehouse.getThing(keyToString(tuple.proto.getConnections(i)));
+				Thing t = _warehouse.getThing(keyToString(tuple.proto.getConnections(i)));
 				
 				if (t != null) {
 					tuple.model.Connect(t);
 				}
 			}
 			
-			_wharehouse.RegisterThing(tuple.model, false, false);
+			_warehouse.RegisterThing(tuple.model, false, false, senderId);
 		}
-	
-		String senderId = keyToString(transaction.getStringSenderId());
 		
 		return senderId;
 	}
@@ -104,12 +110,8 @@ public class FromProtobuf {
 	protected void ConvertStringDeclaration(StringDeclaration declaration) {
 		_stringDeclarations.put(declaration.getKey(), declaration.getValue());
 	}
-	
-	protected void ConvertDelete(int thinkKey) {
-		_wharehouse.RemoveThing(_wharehouse.getThing(keyToString(thinkKey)));
-	}
 
-	protected void ConvertThingTypeDeclaration(ThingType thingType) {
+	protected void ConvertThingTypeDeclaration(ThingType thingType, String senderId) {
 		org.thingmodel.ThingType modelType = new org.thingmodel.ThingType(
 				keyToString(thingType.getStringName()));
 		modelType.Description = keyToString(thingType.getStringDescription());
@@ -128,21 +130,21 @@ public class FromProtobuf {
 			modelType.DefineProperty(modelProperty);
 		}
 		
-		_wharehouse.RegisterType(modelType);
+		_warehouse.RegisterType(modelType, true, senderId);
 		
 	}
 
 	private Thing ConvertThingPublication(
-			org.thingmodel.proto.ProtoThing.Thing thing, boolean check) {
+			org.thingmodel.proto.ProtoThing.Thing thing, boolean check, String senderId) {
 		org.thingmodel.ThingType type = null;
 	
 		if (thing.getStringTypeName() != 0) {
-			type = _wharehouse.getThingType(keyToString(thing.getStringTypeName()));
+			type = _warehouse.getThingType(keyToString(thing.getStringTypeName()));
 		}
 		
 		String id = keyToString(thing.getStringId());
 		
-		Thing modelThing = _wharehouse.getThing(id);
+		Thing modelThing = _warehouse.getThing(id);
 		
 		if (modelThing == null || (
 			modelThing.getType() == null && type != null ||
@@ -163,17 +165,21 @@ public class FromProtobuf {
 			switch (property.getType()) {
 			case LOCATION_POINT:
 				location = new Location.Point();
+				modelProperty = new Property.Location.Point(key, (Location.Point) location);
 			case LOCATION_LATLNG:
 				if (location == null) {
 					location = new Location.LatLng();
+					modelProperty = new Property.Location.LatLng(key, (Location.LatLng) location);
 				}
 			case LOCATION_EQUATORIAL:
 				if (location == null) {
 					location = new Location.Equatorial();
+					modelProperty = new Property.Location.Equatorial(key, (Location.Equatorial) location);
 				}
 			
 				org.thingmodel.proto.ProtoProperty.Property.Location loc =
 						property.getLocationValue();
+				
 				if (loc != null) {
 					location.X = loc.getX();
 					location.Y = loc.getY();
@@ -181,9 +187,11 @@ public class FromProtobuf {
 					if (!loc.getZNull()) {
 						location.Z = loc.getZ();
 					}
+					if (loc.getStringSystem() != 0) {
+						location.System = keyToString(loc.getStringSystem());
+					}
 				}
 				
-				modelProperty = new Property.Location(key, location);
 				break;
 			case STRING:
 				org.thingmodel.proto.ProtoProperty.Property.String sv = property.getStringValue();
@@ -207,13 +215,13 @@ public class FromProtobuf {
 				modelProperty = new Property.Boolean(key, property.getBooleanValue());
 				break;
 			case DATETIME:
-				modelProperty = new Property.Date(key, new Date(property.getDatetimeValue()));
+				modelProperty = new Property.DateTime(key, new Date(property.getDatetimeValue()));
 				break;
 			case DOUBLE:
 				modelProperty = new Property.Double(key, property.getDoubleValue());
 				break;
 			case INT:
-				modelProperty = new Property.Integer(key, property.getIntValue());
+				modelProperty = new Property.Int(key, property.getIntValue());
 				break;
 			}
 			
@@ -222,9 +230,9 @@ public class FromProtobuf {
 		}
 	
 		if (check && type != null && !type.Check(modelThing)) {
-			System.out.println("Object "+id+" not valid, ignored");
+			System.out.println("Object «"+id+"» from «"+senderId+"» is not valid, ignored");
 		} else if (!thing.getConnectionsChange()) {
-			_wharehouse.RegisterThing(modelThing, false, false);
+			_warehouse.RegisterThing(modelThing, false, false, senderId);
 		}
 		
 		return modelThing;
