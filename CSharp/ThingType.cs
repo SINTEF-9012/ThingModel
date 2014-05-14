@@ -69,7 +69,7 @@ namespace ThingModel
             return new List<PropertyType>(Properties.Values);
         }
 
-	    protected bool Is(ThingType other)
+	    public bool Is(ThingType other)
 		{
 		    if (other == null || !string.Equals(_name, other._name))
 		    {

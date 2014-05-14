@@ -101,14 +101,14 @@
 
             public double RightAscension
             {
-                get { return Y; }
-                set { Y = value; }
+                get { return X; }
+                set { X = value; }
             }
 
             public double Declination
             {
-                get { return X; }
-                set { X = value; }
+                get { return Y; }
+                set { Y = value; }
             }
 
             public double HourAngle

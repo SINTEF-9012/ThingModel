@@ -15,7 +15,6 @@ namespace ThingModel.Builders
 		public class ThingTypePropertyBuilder {
 			private readonly ThingType _type;
 			private bool _nextPropertyIsNotRequired;
-			private bool _lastPropertyAdded;
 			private PropertyType _lastProperty;
 
 			internal ThingTypePropertyBuilder(ThingType type)
@@ -67,10 +66,9 @@ namespace ThingModel.Builders
 
 			private void _createProperty<T>(String key, String name) where T : Property
 			{
-				if (!_lastPropertyAdded && _lastProperty != null)
+				if (_lastProperty != null)
 				{
 					_type.DefineProperty(_lastProperty);
-					_lastPropertyAdded = false;
 				}
 
 				var property = PropertyType.Create<T>(key);
@@ -91,19 +89,19 @@ namespace ThingModel.Builders
 				return this;
 			}
 			
-			public ThingTypePropertyBuilder LocationPoint(String key, String name = null)
+			public ThingTypePropertyBuilder LocationPoint(String key = "location", String name = null)
 			{
 				_createProperty<Property.Location.Point>(key, name);
 				return this;
 			}
 			
-			public ThingTypePropertyBuilder LocationLatLng(String key, String name = null)
+			public ThingTypePropertyBuilder LocationLatLng(String key = "location", String name = null)
 			{
 				_createProperty<Property.Location.LatLng>(key, name);
 				return this;
 			}
 			
-			public ThingTypePropertyBuilder LocationEquatorial(String key, String name = null)
+			public ThingTypePropertyBuilder LocationEquatorial(String key = "location", String name = null)
 			{
 				_createProperty<Property.Location.Equatorial>(key, name);
 				return this;
@@ -144,7 +142,7 @@ namespace ThingModel.Builders
 
 			public static implicit operator ThingType(ThingTypePropertyBuilder b)
 			{
-				if (!b._lastPropertyAdded && b._lastProperty != null)
+				if (b._lastProperty != null)
 				{
 					b._type.DefineProperty(b._lastProperty);
 				}
