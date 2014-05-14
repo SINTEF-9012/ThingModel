@@ -72,14 +72,14 @@
 
             public double Latitude
             {
-                get { return Y; }
-                set { Y = value; }
+                get { return X; }
+                set { X = value; }
             }
 
             public double Longitude
             {
-                get { return X; }
-                set { X = value; }
+                get { return Y; }
+                set { Y = value; }
             }
 
             public double? Altitude
