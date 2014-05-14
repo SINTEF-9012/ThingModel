@@ -24,6 +24,9 @@ namespace ThingModel.Proto
             <Type, PropertyType.Type>
             {
                 {typeof (ThingModel.Property.Location), PropertyType.Type.LOCATION},
+                {typeof (ThingModel.Property.Location.LatLng), PropertyType.Type.LOCATION},
+                {typeof (ThingModel.Property.Location.Equatorial), PropertyType.Type.LOCATION},
+                {typeof (ThingModel.Property.Location.Point), PropertyType.Type.LOCATION},
                 {typeof (ThingModel.Property.String), PropertyType.Type.STRING},
                 {typeof (ThingModel.Property.Double), PropertyType.Type.DOUBLE},
                 {typeof (ThingModel.Property.Int), PropertyType.Type.INT},
