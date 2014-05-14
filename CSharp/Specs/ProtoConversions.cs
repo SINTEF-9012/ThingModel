@@ -124,7 +124,7 @@ namespace ThingModel.Specs
             
             Assert.That(newThing, Is.Not.Null);
             Assert.That(newThing.GetProperty<Property.Location.Point>("point").Value.X, Is.EqualTo(42));
-            Assert.That(newThing.GetProperty<Property.Location.LatLng>("latlng").Value.Y, Is.EqualTo(52));
+            Assert.That(newThing.GetProperty<Property.Location.LatLng>("latlng").Value.Longitude, Is.EqualTo(52));
             Assert.That(newThing.GetProperty<Property.Location.Equatorial>("equatorial").Value.Z, Is.EqualTo(29));
             Assert.That(newThing.GetProperty<Property.Location.LatLng>("latlng_system").Value.System, Is.EqualTo("web mercator"));
 

@@ -209,7 +209,7 @@ namespace ThingModel
 	        }
         }
         
-        public void NotifyThingTypeDefine(ThingType type, string sender)
+        public void NotifyThingTypeDefine(ThingType type, string sender = null)
         {
 
 	        IList<IWarehouseObserver> observers = null;
@@ -223,7 +223,7 @@ namespace ThingModel
             }
         }
 
-        public void NotifyThingUpdate(Thing thing, string sender)
+        public void NotifyThingUpdate(Thing thing, string sender = null)
         {
 	        IList<IWarehouseObserver> observers = null;
 			lock (_lockHashSetObservers)
@@ -236,7 +236,7 @@ namespace ThingModel
             }
         }
 
-        public void NotifyThingCreation(Thing thing, string sender)
+        public void NotifyThingCreation(Thing thing, string sender = null)
         {
 	        IList<IWarehouseObserver> observers = null;
 			lock (_lockHashSetObservers)
@@ -249,7 +249,7 @@ namespace ThingModel
             }
         }
 
-        public void NotifyThingDeleted(Thing thing, string sender)
+        public void NotifyThingDeleted(Thing thing, string sender = null)
         {
 	        IList<IWarehouseObserver> observers = null;
 			lock (_lockHashSetObservers)

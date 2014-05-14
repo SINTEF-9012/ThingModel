@@ -74,13 +74,6 @@ namespace ThingModel.WebSockets
 
 						var senderID = _fromProtobuf.Convert(e.RawData, _strictServer);
 
-						if (_server.Transaction != null)
-						{
-							_server.Transaction(this,
-								new TransactionEventArgs(senderID, Context.UserEndPoint.ToString(), e.RawData));
-						}
-
-						//                    var analyzedTransaction = ProtoModelObserver.GetTransaction(ToProtobuf, senderID);
 						_toProtobuf.ApplyThingsSuppressions(_protoModelObserver.Deletions);
 
 						// Broadcast to other clients
@@ -98,6 +91,17 @@ namespace ThingModel.WebSockets
 									}
 								}
 							}
+						}
+
+						if (_server.Transaction != null)
+						{
+							try
+							{
+								_server.Transaction(this,
+									new TransactionEventArgs(senderID, Context.UserEndPoint.ToString(), e.RawData));
+							}
+							catch (Exception)
+							{ }
 						}
 					}
 				}
