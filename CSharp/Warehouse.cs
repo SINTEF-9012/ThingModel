@@ -10,6 +10,9 @@ namespace ThingModel
         private readonly Dictionary<string, Thing> _things = new Dictionary<string, Thing>();
 
         private readonly HashSet<IWarehouseObserver> _observers = new HashSet<IWarehouseObserver>();
+        private bool _observersLocked = false;
+        private readonly List<IWarehouseObserver> _registerObserversWaitingList = new List<IWarehouseObserver>(); 
+        private readonly List<IWarehouseObserver> _unregisterObserversWaitingList = new List<IWarehouseObserver>(); 
 
 		private readonly Object _lockDictionaryThingTypes = new object();
 		private readonly Object _lockDictionaryThings = new object();
@@ -196,7 +199,14 @@ namespace ThingModel
         {
 	        lock (_lockHashSetObservers)
 	        {
-			    _observers.Add(modelObserver);    
+	            if (_observersLocked)
+	            {
+	                _registerObserversWaitingList.Add(modelObserver);
+	            }
+	            else
+	            {
+    			    _observers.Add(modelObserver);    
+	            }
 	        }
             
         }
@@ -205,60 +215,124 @@ namespace ThingModel
         {
 	        lock (_lockHashSetObservers)
 	        {
-		        _observers.Remove(modelObserver);
+	            if (_observersLocked)
+	            {
+	                _unregisterObserversWaitingList.Add(modelObserver);
+	            }
+	            else
+	            {
+    			    _observers.Remove(modelObserver);    
+	            }
 	        }
+        }
+
+        private void ManageObserversWaitingLists()
+        {
+            lock (_lockHashSetObservers)
+            {
+                _observersLocked = false;
+                if (_registerObserversWaitingList.Count > 0)
+                {
+                    foreach (var observer in _registerObserversWaitingList)
+                    {
+                        _observers.Add(observer);
+                    }
+                    _registerObserversWaitingList.Clear();
+                }
+
+                if (_unregisterObserversWaitingList.Count > 0)
+                {
+                    foreach (var observer in _unregisterObserversWaitingList)
+                    {
+                        _observers.Remove(observer);
+                    }
+                    _unregisterObserversWaitingList.Clear();
+                }
+            }
         }
         
         public void NotifyThingTypeDefine(ThingType type, string sender = null)
         {
 
-	        IList<IWarehouseObserver> observers = null;
-			lock (_lockHashSetObservers)
-			{
-				observers = new List<IWarehouseObserver>(_observers);
-			}
-            foreach (var observer in observers)
+            lock (_lockHashSetObservers)
             {
-                observer.Define(type, sender);
+                _observersLocked = true;
+                foreach (var observer in _observers)
+                {
+                    try
+                    {
+                        observer.Define(type, sender);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e.Message);
+                    }
+                }
+
+                ManageObserversWaitingLists();
             }
         }
 
         public void NotifyThingUpdate(Thing thing, string sender = null)
         {
-	        IList<IWarehouseObserver> observers = null;
-			lock (_lockHashSetObservers)
-			{
-				observers = new List<IWarehouseObserver>(_observers);
-			}
-            foreach (var observer in observers)
+            lock (_lockHashSetObservers)
             {
-                observer.Updated(thing, sender);
+                _observersLocked = true;
+                foreach (var observer in _observers)
+                {
+                    try
+                    {
+                        observer.Updated(thing, sender);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e.Message);
+                    }
+                }
+
+                ManageObserversWaitingLists();
             }
         }
 
         public void NotifyThingCreation(Thing thing, string sender = null)
         {
-	        IList<IWarehouseObserver> observers = null;
-			lock (_lockHashSetObservers)
-			{
-				observers = new List<IWarehouseObserver>(_observers);
-			}
-            foreach (var observer in observers)
+            lock (_lockHashSetObservers)
             {
-                observer.New(thing, sender);
+                _observersLocked = true;
+                foreach (var observer in _observers)
+                {
+                    try
+                    {
+                        observer.New(thing, sender);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e.Message);
+                    }
+                }
+
+                ManageObserversWaitingLists();
             }
         }
 
         public void NotifyThingDeleted(Thing thing, string sender = null)
         {
-	        IList<IWarehouseObserver> observers = null;
-			lock (_lockHashSetObservers)
-			{
-				observers = new List<IWarehouseObserver>(_observers);
-			}
-            foreach (var observer in observers)
+            lock (_lockHashSetObservers)
             {
-                observer.Deleted(thing, sender);
+                _observersLocked = true;
+                foreach (var observer in _observers)
+                {
+                    try
+                    {
+                        observer.Deleted(thing, sender);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e.Message);
+                    }
+                }
+
+                ManageObserversWaitingLists();
             }
         }
 

@@ -10,11 +10,16 @@ public class Warehouse {
 
 	private final HashMap<String, ThingType> _thingTypes = new HashMap<>();
 	private final HashMap<String, Thing> _things = new HashMap<>();
-	private final HashSet<IWarehouseObserver> _observers = new HashSet<>();
+
+    private final HashSet<IWarehouseObserver> _observers = new HashSet<>();
+    private boolean _observersLocked = false;
+    private final List<IWarehouseObserver> _registerObserversWaitingList = new ArrayList<>();
+    private final List<IWarehouseObserver> _unregisterObserversWaitingList = new ArrayList<>();
 
 	private final Object _lockThingTypes = new Object();
 	private final Object _lockThings = new Object();
 	private final Object _lockObservers = new Object();
+
 
 	public void RegisterType(ThingType type) {
 		RegisterType(type, true, null);
@@ -194,15 +199,42 @@ public class Warehouse {
 
 	public void RegisterObserver(IWarehouseObserver observer) {
 		synchronized (_lockObservers) {
-			_observers.add(observer);
+            if (_observersLocked) {
+                _registerObserversWaitingList.add(observer);
+            } else {
+                _observers.add(observer);
+            }
 		}
 	}
 
 	public void UnregisterObserver(IWarehouseObserver observer) {
 		synchronized (_lockObservers) {
-			_observers.remove(observer);
+            if (_observersLocked) {
+                _unregisterObserversWaitingList.add(observer);
+            } else {
+                _observers.remove(observer);
+            }
 		}
 	}
+
+    private void ManageObserversWaitingLists() {
+        synchronized (_lockObservers) {
+            _observersLocked = false;
+            if (_registerObserversWaitingList.size() > 0) {
+                for (IWarehouseObserver observer : _registerObserversWaitingList) {
+                    _observers.add(observer);
+                }
+                _registerObserversWaitingList.clear();
+            }
+
+            if (_unregisterObserversWaitingList.size() > 0) {
+                for (IWarehouseObserver observer : _unregisterObserversWaitingList) {
+                    _observers.remove(observer);
+                }
+                _registerObserversWaitingList.clear();
+            }
+        }
+    }
 
 	public void NotifyThingTypeDefine(ThingType type) {
 		NotifyThingTypeDefine(type, null);
@@ -210,6 +242,7 @@ public class Warehouse {
 	
 	public void NotifyThingTypeDefine(ThingType type, String sender) {
 		synchronized (_lockObservers) {
+            _observersLocked = true;
 			for (IWarehouseObserver observer : _observers) {
 				try {
 					observer.Define(type, sender);
@@ -217,6 +250,7 @@ public class Warehouse {
 					System.err.println(e.getLocalizedMessage());
 				}
 			}
+            ManageObserversWaitingLists();
 		}
 	}
 
@@ -226,6 +260,7 @@ public class Warehouse {
 	
 	public void NotifyThingCreation(Thing thing, String sender) {
 		synchronized (_lockObservers) {
+            _observersLocked = true;
 			for (IWarehouseObserver observer : _observers) {
 				try {
 					observer.New(thing, sender);
@@ -233,6 +268,7 @@ public class Warehouse {
 					System.err.println(e.getLocalizedMessage());
 				}
 			}
+            ManageObserversWaitingLists();
 		}
 	}
 
@@ -242,6 +278,7 @@ public class Warehouse {
 	
 	public void NotifyThingUpdate(Thing thing, String sender) {
 		synchronized (_lockObservers) {
+            _observersLocked = true;
 			for (IWarehouseObserver observer : _observers) {
 				try {
 					observer.Updated(thing, sender);
@@ -249,6 +286,7 @@ public class Warehouse {
 					System.err.println(e.getLocalizedMessage());
 				}
 			}
+            ManageObserversWaitingLists();
 		}
 	}
 
@@ -259,6 +297,7 @@ public class Warehouse {
 	public void NotifyThingDeleted(Thing thing, String sender) {
 		
 		synchronized (_lockObservers) {
+            _observersLocked = true;
 			for (IWarehouseObserver observer : _observers) {
 				try {
 					observer.Deleted(thing, sender);
@@ -266,6 +305,7 @@ public class Warehouse {
 					System.err.println(e.getLocalizedMessage());
 				}
 			}
+            ManageObserversWaitingLists();
 		}
 		
 	}
