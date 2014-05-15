@@ -12,8 +12,8 @@ namespace ThingModel.WebSockets
 		
 		// ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable
         private readonly Warehouse _warehouse;
-        private readonly ToProtobuf _toProtobuf;
-        private readonly FromProtobuf _fromProtobuf;
+        private ToProtobuf _toProtobuf;
+        private FromProtobuf _fromProtobuf;
         private bool _closed = true;
         private int _reconnectionDelay = 1;
 	    private bool _reconnection = false;
@@ -44,6 +44,9 @@ namespace ThingModel.WebSockets
 
 	    private void WsOnOpen(object sender, EventArgs eventArgs)
 	    {
+            _fromProtobuf = new FromProtobuf(_warehouse);
+            _toProtobuf = new ToProtobuf();
+
 		    _reconnectionDelay = 1;
 		    Send();
 	    }

@@ -23,8 +23,8 @@ public class Client extends WebSocketClient {
 	public String senderID;
 
 	private final Warehouse _warehouse;
-	private final ToProtobuf _toProtobuf;
-	private final FromProtobuf _fromProtobuf;
+	private ToProtobuf _toProtobuf;
+	private FromProtobuf _fromProtobuf;
 
 	private boolean _closed = true;
 	private int _reconnectionDelay = 1;
@@ -50,10 +50,8 @@ public class Client extends WebSocketClient {
 
 	public void connect() {
 		if (_closed) {
-			_closed = false;
-
-			super.connect();
-		}
+            super.connect();
+        }
 	}
 
 	public void close() {
@@ -92,16 +90,14 @@ public class Client extends WebSocketClient {
 			timer.schedule(new TimerTask() {
 				@Override
 				public void run() {
-					if (client.getReadyState() == READYSTATE.CLOSED) {
-						client.connect();
-					}
-					
+					client.connect();
+
 					if (_reconnectionDelay < 16) {
 						_reconnectionDelay *= 2;
 					}
 					
 				}
-			}, _reconnectionDelay * 1000);
+			}, _reconnectionDelay*100);
 		}
 	}
 
@@ -135,7 +131,10 @@ public class Client extends WebSocketClient {
 
 	@Override
 	public void onOpen(ServerHandshake arg0) {
+        _fromProtobuf = new FromProtobuf(_warehouse);
+        _toProtobuf = new ToProtobuf();
 		_reconnectionDelay = 1;
+        _closed = false;
 		Send();
 	}
 }
