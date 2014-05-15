@@ -335,6 +335,14 @@ namespace ThingModel.Specs
 			_warehouse.RegisterThing(_thing, true, true, "testSender");
 			_warehouse.RemoveThing(_thing, true, "testSender");
 	    }
+
+        [Test]
+        public void CheckObserverEdittingObserver()
+        {
+            _warehouse.Events.OnDefine += (sender, args) => _warehouse.RegisterObserver(new WarehouseEvents());
+
+            Assert.DoesNotThrow(() => _warehouse.RegisterType(_type, true, "testSender"));
+        }
     }
 
 }

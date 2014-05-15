@@ -287,7 +287,7 @@ namespace ThingModel
 		    return this;
 	    }
 
-	    public Location.Point LocationPoint(String key)
+	    public Location.Point LocationPoint(String key = "location")
 	    {
 		    var p = GetProperty<Property.Location.Point>(key);
 			return p != null ? p.Value : new Location.Point();
@@ -299,7 +299,7 @@ namespace ThingModel
 		    return this;
 	    }
 	    
-		public Location.LatLng LocationLatLng(String key)
+		public Location.LatLng LocationLatLng(String key = "location")
 	    {
 		    var p = GetProperty<Property.Location.LatLng>(key);
 			return p != null ? p.Value : new Location.LatLng();
@@ -311,7 +311,7 @@ namespace ThingModel
 		    return this;
 	    }
 		
-		public Location.Equatorial LocationEquatorial(String key)
+		public Location.Equatorial LocationEquatorial(String key = "location")
 	    {
 		    var p = GetProperty<Property.Location.Equatorial>(key);
 			return p != null ? p.Value : new Location.Equatorial();
