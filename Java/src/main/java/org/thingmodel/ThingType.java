@@ -50,10 +50,13 @@ public class ThingType {
 		if (thingType.equals(this)
 				|| (thingType != null && thingType._name.equals(_name))) {
 			for (PropertyType propertyType : Properties.values()) {
-				if (!propertyType.Check(thing.getProperty(
-						propertyType.getKey(), propertyType.getType()))) {
-					return false;
-				}
+                Property prop = thing.getProperty(
+                        propertyType.getKey(), propertyType.getType());
+
+                if ((prop == null && thing.hasProperty(propertyType.getKey())) ||
+                        !propertyType.Check(prop)) {
+                    return false;
+                }
 			}
 			return true;
 		}

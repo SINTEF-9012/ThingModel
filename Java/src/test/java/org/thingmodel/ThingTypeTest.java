@@ -3,6 +3,8 @@ package org.thingmodel;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.thingmodel.builders.BuildANewThing;
+import org.thingmodel.builders.BuildANewThingType;
 
 public class ThingTypeTest {
     private ThingType _type;
@@ -69,5 +71,54 @@ public class ThingTypeTest {
         }
 
         Assert.assertTrue(visited);
+    }
+
+    @Test
+    public void CheckRequiredProperties() throws Exception {
+        Thing plane = new Thing("A380", _type);
+        Assert.assertFalse(_type.Check(plane));
+
+        plane.setProperty(new Property.Location.LatLng("location",
+                new Location.LatLng(49.010852, 2.547398)));
+
+        Assert.assertTrue(_type.Check(plane));
+    }
+
+    @Test
+    public void CheckNotRequiredProperties() throws Exception {
+        Thing plane = new Thing("A380", _type);
+        _propertyType.Required = false;
+
+        Assert.assertTrue(_type.Check(plane));
+
+        plane.setProperty(new Property.Double("location", 27.0));
+        Assert.assertFalse(_type.Check(plane));
+    }
+
+    @Test
+    public void CheckEqualityComparator() throws Exception {
+        Assert.assertEquals(_type, _type);
+
+        ThingType newType = BuildANewThingType.Named("plane").Build();
+
+        Assert.assertFalse(_type.equals(newType));
+
+        newType = BuildANewThingType.Named("plane")
+                .ContainingA.LocationLatLng().Build();
+
+        Assert.assertEquals(_type, newType);
+    }
+
+    @Test
+    public void CheckEqualityComparatorWithOrder() throws Exception {
+        ThingType typeA = BuildANewThingType.Named("aircraft")
+                .ContainingA.LocationLatLng()
+                .AndA.String("name").Build();
+
+        ThingType typeB = BuildANewThingType.Named("aircraft")
+                .ContainingA.String("name")
+                .AndA.LocationLatLng().Build();
+
+        Assert.assertEquals(typeA, typeB);
     }
 }
