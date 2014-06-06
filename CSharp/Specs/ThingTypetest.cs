@@ -102,5 +102,20 @@ namespace ThingModel.Specs
 		    newType.ContainingA.LocationLatLng("location");
 			Assert.That(_type, Is.EqualTo((ThingType) newType));
 	    }
+
+        [Test]
+        public void CheckEqualityComparatorWithOrder()
+        {
+            ThingType typeA = BuildANewThingType.Named("aircraft")
+                .ContainingA.LocationLatLng()
+                .AndA.String("name");
+
+            ThingType typeB = BuildANewThingType.Named("aircraft")
+                .ContainingA.String("name")
+                .AndA.LocationLatLng();
+
+            Assert.That(typeA, Is.EqualTo(typeB));
+            Assert.That(typeB, Is.EqualTo(typeA));
+        }
     }
 }

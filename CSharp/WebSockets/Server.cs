@@ -93,6 +93,7 @@ namespace ThingModel.WebSockets
 							}
 						}
 
+                        // Send the events
 						if (_server.Transaction != null)
 						{
 							try

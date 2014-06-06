@@ -76,8 +76,27 @@ namespace ThingModel
 			    return false;
 		    }
 
-			return Properties.SequenceEqual(other.Properties);
-	    }
+	        if (Properties.Count != other.Properties.Count)
+	        {
+	            return false;
+	        }
+
+	        foreach (var propertyType in Properties)
+	        {
+	            PropertyType otherPropertyType;
+	            if (!other.Properties.TryGetValue(propertyType.Key, out otherPropertyType))
+	            {
+	                return false;
+	            }
+
+	            if (!propertyType.Value.Equals(otherPropertyType))
+	            {
+	                return false;
+	            }
+	        }
+
+	        return true;
+		}
 
 	    public override bool Equals(object obj)
 	    {
