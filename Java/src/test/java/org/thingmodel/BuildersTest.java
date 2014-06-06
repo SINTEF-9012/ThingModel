@@ -2,6 +2,7 @@ package org.thingmodel;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.thingmodel.builders.BuildANewThing;
 import org.thingmodel.builders.BuildANewThingType;
 
 public class BuildersTest {
@@ -41,5 +42,23 @@ public class BuildersTest {
         superRabbit.getPropertyDefinition("name").Name = "Name of super children";
 
         Assert.assertNull(type.getPropertyDefinition("name").Name);
+    }
+
+    @Test
+    public void TestThingBuilder() {
+        ThingType duckType = BuildANewThingType.Named("duck")
+                .ContainingA.LocationLatLng()
+                .AndA.String("name").Build();
+
+        Thing duck = BuildANewThing.As(duckType)
+                .IdentifiedBy("ab548")
+                .ContainingA.String("name", "Roger")
+                .AndA.Location(new Location.LatLng())
+                .AndAn.Int("nbChildren", 12).Build();
+
+        Assert.assertEquals(duck.getId(), "ab548");
+        Assert.assertNotNull(duck.getType());
+        Assert.assertEquals(duck.getType().getName(), "duck");
+        Assert.assertEquals(duck.getProperty("nbChildren", Property.Int.class).getValue().longValue(), 12);
     }
 }

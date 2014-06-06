@@ -51,7 +51,7 @@ public class Warehouse {
 	}
 
 	public void RegisterThing(Thing thing) {
-		RegisterThing(thing, true, false, null);
+		RegisterThing(thing, true, true, null);
 	}
 
 	public void RegisterThing(Thing thing, boolean alsoRegisterConnections,
