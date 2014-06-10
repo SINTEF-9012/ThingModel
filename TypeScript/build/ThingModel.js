@@ -36,11 +36,6 @@
             return this;
         };
 
-        ThingPropertyBuilder.prototype.Location = function (key, value) {
-            this.thing.SetProperty(new ThingModel.Property.Location(key, value));
-            return this;
-        };
-
         ThingPropertyBuilder.prototype.Double = function (key, value) {
             this.thing.SetProperty(new ThingModel.Property.Double(key, value));
             return this;
@@ -58,6 +53,30 @@
 
         ThingPropertyBuilder.prototype.DateTime = function (key, value) {
             this.thing.SetProperty(new ThingModel.Property.DateTime(key, value));
+            return this;
+        };
+
+        ThingPropertyBuilder.prototype.Location = function (mixed, value) {
+            var key;
+            if (value) {
+                key = mixed;
+            } else {
+                key = "location";
+                value = mixed;
+            }
+
+            switch (value.type) {
+                case "equatorial":
+                    this.thing.SetProperty(new ThingModel.Property.Location.Equatorial(key, value));
+                    break;
+                case "latlng":
+                    this.thing.SetProperty(new ThingModel.Property.Location.LatLng(key, value));
+                    break;
+                case "point":
+                default:
+                    this.thing.SetProperty(new ThingModel.Property.Location.Point(key, value));
+                    break;
+            }
             return this;
         };
 
@@ -126,32 +145,45 @@ var ThingModel;
         };
 
         ThingTypePropertyBuilder.prototype.String = function (key, name) {
-            this._createProperty(key, name, 2 /* String */);
+            this._createProperty(key, name, 5 /* String */);
             return this;
         };
 
-        ThingTypePropertyBuilder.prototype.Location = function (key, name) {
-            this._createProperty(key, name, 1 /* Location */);
+        ThingTypePropertyBuilder.prototype.LocationPoint = function (key, name) {
+            if (typeof key === "undefined") { key = "location"; }
+            this._createProperty(key, name, 2 /* LocationPoint */);
+            return this;
+        };
+
+        ThingTypePropertyBuilder.prototype.LocationLatLng = function (key, name) {
+            if (typeof key === "undefined") { key = "location"; }
+            this._createProperty(key, name, 3 /* LocationLatLng */);
+            return this;
+        };
+
+        ThingTypePropertyBuilder.prototype.LocationEquatorial = function (key, name) {
+            if (typeof key === "undefined") { key = "location"; }
+            this._createProperty(key, name, 4 /* LocationEquatorial */);
             return this;
         };
 
         ThingTypePropertyBuilder.prototype.Double = function (key, name) {
-            this._createProperty(key, name, 3 /* Double */);
+            this._createProperty(key, name, 6 /* Double */);
             return this;
         };
 
         ThingTypePropertyBuilder.prototype.Int = function (key, name) {
-            this._createProperty(key, name, 4 /* Int */);
+            this._createProperty(key, name, 7 /* Int */);
             return this;
         };
 
         ThingTypePropertyBuilder.prototype.Boolean = function (key, name) {
-            this._createProperty(key, name, 5 /* Boolean */);
+            this._createProperty(key, name, 8 /* Boolean */);
             return this;
         };
 
         ThingTypePropertyBuilder.prototype.DateTime = function (key, name) {
-            this._createProperty(key, name, 6 /* DateTime */);
+            this._createProperty(key, name, 9 /* DateTime */);
             return this;
         };
 
@@ -371,19 +403,19 @@ var ThingModel;
                             type = 1 /* Location */;
                             break;
                         case 1 /* STRING */:
-                            type = 2 /* String */;
+                            type = 5 /* String */;
                             break;
                         case 2 /* DOUBLE */:
-                            type = 3 /* Double */;
+                            type = 6 /* Double */;
                             break;
                         case 3 /* INT */:
-                            type = 4 /* Int */;
+                            type = 7 /* Int */;
                             break;
                         case 4 /* BOOLEAN */:
-                            type = 5 /* Boolean */;
+                            type = 8 /* Boolean */;
                             break;
                         case 5 /* DATETIME */:
-                            type = 6 /* DateTime */;
+                            type = 9 /* DateTime */;
                             break;
                     }
 
@@ -427,35 +459,38 @@ var ThingModel;
                 return modelThing;
             };
 
+            FromProtobuf.prototype.ConvertLocationProperty = function (location, property) {
+                if (property.location_value != null) {
+                    location.X = property.location_value.x;
+                    location.Y = property.location_value.y;
+
+                    if (!property.location_value.z_null) {
+                        location.Z = property.location_value.z;
+                    }
+                }
+            };
+
             FromProtobuf.prototype.ConvertThingProperty = function (property, modelThing) {
                 var modelProperty = null;
 
                 var key = this.KeyToString(property.string_key);
 
-                var location = null;
-
                 switch (property.type) {
                     case 2 /* LOCATION_EQUATORIAL */:
-                        location = new ThingModel.Location.Equatorial();
+                        var locEquatorial = new ThingModel.Location.Equatorial();
+                        this.ConvertLocationProperty(locEquatorial, property);
+                        modelProperty = new ThingModel.Property.Location.Equatorial(key, locEquatorial);
+                        break;
+
                     case 0 /* LOCATION_POINT */:
-                        if (!location) {
-                            location = new ThingModel.Location.Point();
-                        }
+                        var locPoint = new ThingModel.Location.Point();
+                        this.ConvertLocationProperty(locPoint, property);
+                        modelProperty = new ThingModel.Property.Location.Point(key, locPoint);
+                        break;
                     case 1 /* LOCATION_LATLNG */:
-                        if (!location) {
-                            location = new ThingModel.Location.LatLng();
-                        }
-
-                        if (property.location_value != null) {
-                            location.X = property.location_value.x;
-                            location.Y = property.location_value.y;
-
-                            if (!property.location_value.z_null) {
-                                location.Z = property.location_value.z;
-                            }
-                        }
-
-                        modelProperty = new ThingModel.Property.Location(key, location);
+                        var locLatLng = new ThingModel.Location.LatLng();
+                        this.ConvertLocationProperty(locLatLng, property);
+                        modelProperty = new ThingModel.Property.Location.LatLng(key, locLatLng);
                         break;
 
                     case 3 /* STRING */:
@@ -679,25 +714,27 @@ var ThingModel;
                     proto.setStringKey(propertyId);
 
                     switch (property.Type) {
-                        case 1 /* Location */:
+                        case 3 /* LocationLatLng */:
+                        case 2 /* LocationPoint */:
+                        case 4 /* LocationEquatorial */:
                             _this.ConvertLocationProperty(property, proto);
                             break;
-                        case 2 /* String */:
+                        case 5 /* String */:
                             _this.ConvertStringProperty(property, proto);
                             break;
-                        case 3 /* Double */:
+                        case 6 /* Double */:
                             proto.setType(4 /* DOUBLE */);
                             proto.setDoubleValue(property.Value);
                             break;
-                        case 4 /* Int */:
+                        case 7 /* Int */:
                             proto.setType(5 /* INT */);
                             proto.setIntValue(property.Value);
                             break;
-                        case 5 /* Boolean */:
+                        case 8 /* Boolean */:
                             proto.setType(6 /* BOOLEAN */);
                             proto.setBooleanValue(property.Value);
                             break;
-                        case 6 /* DateTime */:
+                        case 9 /* DateTime */:
                             proto.setType(7 /* DATETIME */);
                             proto.setDatetimeValue(property.Value.getTime());
                             break;
@@ -760,22 +797,25 @@ var ThingModel;
                         prop.setRequired(propertyType.Required);
 
                         switch (propertyType.Type) {
+                            case 3 /* LocationLatLng */:
+                            case 4 /* LocationEquatorial */:
+                            case 2 /* LocationPoint */:
                             case 1 /* Location */:
                                 prop.setType(0 /* LOCATION */);
                                 break;
-                            case 2 /* String */:
+                            case 5 /* String */:
                                 prop.setType(1 /* STRING */);
                                 break;
-                            case 3 /* Double */:
+                            case 6 /* Double */:
                                 prop.setType(2 /* DOUBLE */);
                                 break;
-                            case 4 /* Int */:
+                            case 7 /* Int */:
                                 prop.setType(3 /* INT */);
                                 break;
-                            case 5 /* Boolean */:
+                            case 8 /* Boolean */:
                                 prop.setType(4 /* BOOLEAN */);
                                 break;
-                            case 6 /* DateTime */:
+                            case 9 /* DateTime */:
                                 prop.setType(5 /* DATETIME */);
                                 break;
                         }
@@ -1053,33 +1093,92 @@ var ThingModel;
     ThingModel.Property = Property;
 
     (function (Property) {
-        var Location = (function (_super) {
-            __extends(Location, _super);
-            function Location(key, value) {
-                _super.call(this, key, value);
-            }
-            Object.defineProperty(Location.prototype, "Value", {
-                get: function () {
-                    return this._value;
-                },
-                set: function (value) {
-                    this._value = value;
-                },
-                enumerable: true,
-                configurable: true
-            });
+        (function (Location) {
+            var Point = (function (_super) {
+                __extends(Point, _super);
+                function Point(key, value) {
+                    _super.call(this, key, value);
+                }
+                Object.defineProperty(Point.prototype, "Value", {
+                    get: function () {
+                        return this._value;
+                    },
+                    set: function (value) {
+                        this._value = value;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
 
 
-            Object.defineProperty(Location.prototype, "Type", {
-                get: function () {
-                    return 1 /* Location */;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            return Location;
-        })(Property);
-        Property.Location = Location;
+                Object.defineProperty(Point.prototype, "Type", {
+                    get: function () {
+                        return 2 /* LocationPoint */;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                return Point;
+            })(Property);
+            Location.Point = Point;
+
+            var LatLng = (function (_super) {
+                __extends(LatLng, _super);
+                function LatLng(key, value) {
+                    _super.call(this, key, value);
+                }
+                Object.defineProperty(LatLng.prototype, "Value", {
+                    get: function () {
+                        return this._value;
+                    },
+                    set: function (value) {
+                        this._value = value;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+
+
+                Object.defineProperty(LatLng.prototype, "Type", {
+                    get: function () {
+                        return 3 /* LocationLatLng */;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                return LatLng;
+            })(Property);
+            Location.LatLng = LatLng;
+
+            var Equatorial = (function (_super) {
+                __extends(Equatorial, _super);
+                function Equatorial(key, value) {
+                    _super.call(this, key, value);
+                }
+                Object.defineProperty(Equatorial.prototype, "Value", {
+                    get: function () {
+                        return this._value;
+                    },
+                    set: function (value) {
+                        this._value = value;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+
+
+                Object.defineProperty(Equatorial.prototype, "Type", {
+                    get: function () {
+                        return 4 /* LocationEquatorial */;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                return Equatorial;
+            })(Property);
+            Location.Equatorial = Equatorial;
+        })(Property.Location || (Property.Location = {}));
+        var Location = Property.Location;
 
         var String = (function (_super) {
             __extends(String, _super);
@@ -1100,7 +1199,7 @@ var ThingModel;
 
             Object.defineProperty(String.prototype, "Type", {
                 get: function () {
-                    return 2 /* String */;
+                    return 5 /* String */;
                 },
                 enumerable: true,
                 configurable: true
@@ -1128,7 +1227,7 @@ var ThingModel;
 
             Object.defineProperty(Double.prototype, "Type", {
                 get: function () {
-                    return 3 /* Double */;
+                    return 6 /* Double */;
                 },
                 enumerable: true,
                 configurable: true
@@ -1156,7 +1255,7 @@ var ThingModel;
 
             Object.defineProperty(Int.prototype, "Type", {
                 get: function () {
-                    return 4 /* Int */;
+                    return 7 /* Int */;
                 },
                 enumerable: true,
                 configurable: true
@@ -1184,7 +1283,7 @@ var ThingModel;
 
             Object.defineProperty(Boolean.prototype, "Type", {
                 get: function () {
-                    return 5 /* Boolean */;
+                    return 8 /* Boolean */;
                 },
                 enumerable: true,
                 configurable: true
@@ -1212,7 +1311,7 @@ var ThingModel;
 
             Object.defineProperty(DateTime.prototype, "Type", {
                 get: function () {
-                    return 6 /* DateTime */;
+                    return 9 /* DateTime */;
                 },
                 enumerable: true,
                 configurable: true
@@ -1320,7 +1419,7 @@ var ThingModel;
         };
 
         Thing.prototype.GetString = function (key) {
-            var prop = this.GetProperty(key, 2 /* String */);
+            var prop = this.GetProperty(key, 5 /* String */);
 
             if (!prop) {
                 return null;
@@ -1437,6 +1536,129 @@ var ThingModel;
                 return !connectedThing.RecursiveCompare(otherThing, alreadyVisitedObjets);
             });
         };
+
+        Object.defineProperty(Thing.prototype, "ContainingA", {
+            get: function () {
+                if (!this._propertyBuilder) {
+                    this._propertyBuilder = new ThingModel.ThingPropertyBuilder(this);
+                }
+                return this._propertyBuilder;
+            },
+            enumerable: true,
+            configurable: true
+        });
+
+        Object.defineProperty(Thing.prototype, "ContainingAn", {
+            get: function () {
+                return this.ContainingA;
+            },
+            enumerable: true,
+            configurable: true
+        });
+
+        Thing.prototype.String = function (key, value) {
+            if (value) {
+                this.SetProperty(new ThingModel.Property.String(key, value));
+                return this;
+            } else {
+                var p = this.GetProperty(key, 5 /* String */);
+                if (!p) {
+                    return null;
+                }
+                return p.Value;
+            }
+        };
+
+        Thing.prototype.Double = function (key, value) {
+            if (value) {
+                this.SetProperty(new ThingModel.Property.Double(key, value));
+                return this;
+            } else {
+                var p = this.GetProperty(key, 6 /* Double */);
+                if (!p) {
+                    return null;
+                }
+                return p.Value;
+            }
+        };
+
+        Thing.prototype.Int = function (key, value) {
+            if (value) {
+                this.SetProperty(new ThingModel.Property.Int(key, value));
+                return this;
+            } else {
+                var p = this.GetProperty(key, 7 /* Int */);
+                if (!p) {
+                    return null;
+                }
+                return p.Value;
+            }
+        };
+
+        Thing.prototype.Boolean = function (key, value) {
+            if (value) {
+                this.SetProperty(new ThingModel.Property.Boolean(key, value));
+                return this;
+            } else {
+                var p = this.GetProperty(key, 8 /* Boolean */);
+                if (!p) {
+                    return null;
+                }
+                return p.Value;
+            }
+        };
+
+        Thing.prototype.DateTime = function (key, value) {
+            if (value) {
+                this.SetProperty(new ThingModel.Property.DateTime(key, value));
+                return this;
+            } else {
+                var p = this.GetProperty(key, 9 /* DateTime */);
+                if (!p) {
+                    return null;
+                }
+                return p.Value;
+            }
+        };
+
+        Thing.prototype.LocationPoint = function (key, value) {
+            if (value) {
+                this.SetProperty(new ThingModel.Property.Location.Point(key, value));
+                return this;
+            } else {
+                var p = this.GetProperty(key, 2 /* LocationPoint */);
+                if (!p) {
+                    return null;
+                }
+                return p.Value;
+            }
+        };
+
+        Thing.prototype.LocationLatLng = function (key, value) {
+            if (value) {
+                this.SetProperty(new ThingModel.Property.Location.LatLng(key, value));
+                return this;
+            } else {
+                var p = this.GetProperty(key, 3 /* LocationLatLng */);
+                if (!p) {
+                    return null;
+                }
+                return p.Value;
+            }
+        };
+
+        Thing.prototype.LocationEquatorial = function (key, value) {
+            if (value) {
+                this.SetProperty(new ThingModel.Property.Location.Equatorial(key, value));
+                return this;
+            } else {
+                var p = this.GetProperty(key, 4 /* LocationEquatorial */);
+                if (!p) {
+                    return null;
+                }
+                return p.Value;
+            }
+        };
         return Thing;
     })();
     ThingModel.Thing = Thing;
@@ -1489,11 +1711,14 @@ var ThingModel;
     (function (Type) {
         Type[Type["Unknown"] = 0] = "Unknown";
         Type[Type["Location"] = 1] = "Location";
-        Type[Type["String"] = 2] = "String";
-        Type[Type["Double"] = 3] = "Double";
-        Type[Type["Int"] = 4] = "Int";
-        Type[Type["Boolean"] = 5] = "Boolean";
-        Type[Type["DateTime"] = 6] = "DateTime";
+        Type[Type["LocationPoint"] = 2] = "LocationPoint";
+        Type[Type["LocationLatLng"] = 3] = "LocationLatLng";
+        Type[Type["LocationEquatorial"] = 4] = "LocationEquatorial";
+        Type[Type["String"] = 5] = "String";
+        Type[Type["Double"] = 6] = "Double";
+        Type[Type["Int"] = 7] = "Int";
+        Type[Type["Boolean"] = 8] = "Boolean";
+        Type[Type["DateTime"] = 9] = "DateTime";
     })(ThingModel.Type || (ThingModel.Type = {}));
     var Type = ThingModel.Type;
 })(ThingModel || (ThingModel = {}));
