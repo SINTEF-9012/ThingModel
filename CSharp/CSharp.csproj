@@ -64,6 +64,7 @@
     <Compile Include="Proto\Thing.cs" />
     <Compile Include="Proto\ThingType.cs" />
     <Compile Include="Proto\Transaction.cs" />
+    <Compile Include="Specs\Bootstrap.cs" />
     <Compile Include="Specs\BuildersTest.cs" />
     <Compile Include="Specs\PropertyTest.cs" />
     <Compile Include="Specs\ProtoConversions.cs" />
