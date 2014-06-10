@@ -952,10 +952,10 @@ var ThingModel;
             }
             Object.defineProperty(LatLng.prototype, "Latitude", {
                 get: function () {
-                    return this.Y;
+                    return this.X;
                 },
                 set: function (latitude) {
-                    this.Y = latitude;
+                    this.X = latitude;
                 },
                 enumerable: true,
                 configurable: true
@@ -964,10 +964,10 @@ var ThingModel;
 
             Object.defineProperty(LatLng.prototype, "Longitude", {
                 get: function () {
-                    return this.X;
+                    return this.Y;
                 },
                 set: function (longitude) {
-                    this.X = longitude;
+                    this.Y = longitude;
                 },
                 enumerable: true,
                 configurable: true

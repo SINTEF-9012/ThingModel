@@ -76,19 +76,19 @@ module ThingModel {
 			}
 
 			public get Latitude() {
-				return this.Y;
-			}
-
-			public set Latitude(latitude: number) {
-				this.Y = latitude;
-			}
-
-			public get Longitude() {
 				return this.X;
 			}
 
+			public set Latitude(latitude: number) {
+				this.X = latitude;
+			}
+
+			public get Longitude() {
+				return this.Y;
+			}
+
 			public set Longitude(longitude: number) {
-				this.X = longitude;
+				this.Y = longitude;
 			}
 
 			public get Altitude() {
