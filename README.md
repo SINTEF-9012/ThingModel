@@ -72,7 +72,7 @@ Otherwise: [__Download__](https://github.com/SINTEF-9012/ThingModel/archive/mast
 var typeRabbit = BuildANewThingType.Named("rabbit")
 				.WhichIs("Just a rabbit")
 				.ContainingA.String("name")
-				.AndA.Location("localization")
+				.AndA.LocationLatLng()
 				.AndA.NotRequired.Double("speed")
 				.AndAn.Int("nbChildren", "Number of children");
 				
@@ -80,7 +80,7 @@ var typeRabbit = BuildANewThingType.Named("rabbit")
 var rabbit = BuildANewThing.As(typeRabbit)
 				.IdentifiedBy("ab548")
 				.ContainingA.String("name", "Roger")
-				.AndA.Location("localization", new Location.Point(42,51))
+				.AndA.LocationLatLng(new Location.LatLng(60,10))
 				.AndAn.Int("nbChildren", 12);
 
 // The warehouse stores the objects
@@ -101,7 +101,6 @@ var warehouse = new Warehouse();
 var client = new Client("Receiver", "ws://localhost:1234", warehouse);
 
 warehouse.Events.OnNew += (sender, args) => {
-    // The GetProperty call is a bit ugly, it will change
-    Console.WriteLine(args.Thing.GetProperty<Property.String>("name").Value);
+    Console.WriteLine(args.Thing.String("name"));
 };
 ```
