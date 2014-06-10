@@ -1621,7 +1621,16 @@ var ThingModel;
             }
         };
 
-        Thing.prototype.LocationPoint = function (key, value) {
+        Thing.prototype.LocationPoint = function (mixed, value) {
+            var key;
+
+            if (typeof mixed === 'string' || mixed instanceof String) {
+                key = mixed;
+            } else {
+                key = "location";
+                value = mixed;
+            }
+
             if (value) {
                 this.SetProperty(new ThingModel.Property.Location.Point(key, value));
                 return this;
@@ -1634,7 +1643,16 @@ var ThingModel;
             }
         };
 
-        Thing.prototype.LocationLatLng = function (key, value) {
+        Thing.prototype.LocationLatLng = function (mixed, value) {
+            var key;
+
+            if (typeof mixed === 'string' || mixed instanceof String) {
+                key = mixed;
+            } else {
+                key = "location";
+                value = mixed;
+            }
+
             if (value) {
                 this.SetProperty(new ThingModel.Property.Location.LatLng(key, value));
                 return this;
@@ -1647,7 +1665,16 @@ var ThingModel;
             }
         };
 
-        Thing.prototype.LocationEquatorial = function (key, value) {
+        Thing.prototype.LocationEquatorial = function (mixed, value) {
+            var key;
+
+            if (typeof mixed === 'string' || mixed instanceof String) {
+                key = mixed;
+            } else {
+                key = "location";
+                value = mixed;
+            }
+
             if (value) {
                 this.SetProperty(new ThingModel.Property.Location.Equatorial(key, value));
                 return this;

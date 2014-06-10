@@ -257,5 +257,27 @@ describe("Thing test", ()=> {
 	});
 
 
+	describe("Test getter/setters", () => {
+		var thing = new ThingModel.Thing("abcde");
+		thing.String("name", "bob")
+			.Int("age", 25)
+			.Double("weight", 8785.57)
+			.DateTime("last_update", new Date())
+			.Boolean("nice", true)
+			.LocationLatLng(new ThingModel.Location.LatLng())
+			.LocationEquatorial("pos_equatorial", new ThingModel.Location.Equatorial(54, 4, 6))
+			.LocationPoint("margin", new ThingModel.Location.Point(10, 10));
+
+		it('should contains the same values', () => {
+			thing.String("name").should.be.equal("bob");
+			thing.Int("age").should.be.equal(25);
+			thing.Double("weight").should.be.equal(8785.57);
+			thing.DateTime("last_update").getDay().should.be.equal(new Date().getDay());
+			thing.Boolean("nice").should.be.true;
+			thing.LocationLatLng("location").should.be.equal(thing.LocationLatLng());
+			thing.LocationEquatorial("pos_equatorial").RightAscension.should.be.equal(54);
+			thing.LocationPoint("margin").X.should.be.equal(10);
+		});
+	});
 // ReSharper restore WrongExpressionStatement
 });

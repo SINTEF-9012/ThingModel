@@ -290,10 +290,22 @@ module ThingModel {
 			}
 		}
 
+		public LocationPoint(): Location.Point;
 		public LocationPoint(key: string): Location.Point;
+		public LocationPoint(value: Location.Point): Thing;
 		public LocationPoint(key: string, value: Location.Point): Thing;
-		public LocationPoint(key: string, value?: Location.Point): any {
-			if (value) {
+
+		public LocationPoint(mixed?: any, value?: Location.Point): any {
+			var key: string;
+
+			if (typeof mixed === 'string' || mixed instanceof String) {
+				key = mixed;
+			} else {
+				key = "location";
+				value = mixed;
+			}
+
+			if (value) {	
 				this.SetProperty(new Property.Location.Point(key, value));
 				return this;
 			} else {
@@ -305,10 +317,22 @@ module ThingModel {
 			}
 		}
 
+		public LocationLatLng(): Location.LatLng;
 		public LocationLatLng(key: string): Location.LatLng;
+		public LocationLatLng(value: Location.LatLng): Thing;
 		public LocationLatLng(key: string, value: Location.LatLng): Thing;
-		public LocationLatLng(key: string, value?: Location.LatLng): any {
-			if (value) {
+
+		public LocationLatLng(mixed?: any, value?: Location.LatLng): any {
+			var key: string;
+
+			if (typeof mixed === 'string' || mixed instanceof String) {
+				key = mixed;
+			} else {
+				key = "location";
+				value = mixed;
+			}
+
+			if (value) {	
 				this.SetProperty(new Property.Location.LatLng(key, value));
 				return this;
 			} else {
@@ -320,10 +344,22 @@ module ThingModel {
 			}
 		}
 
+		public LocationEquatorial(): Location.Equatorial;
 		public LocationEquatorial(key: string): Location.Equatorial;
+		public LocationEquatorial(value: Location.Equatorial): Thing;
 		public LocationEquatorial(key: string, value: Location.Equatorial): Thing;
-		public LocationEquatorial(key: string, value?: Location.Equatorial): any {
-			if (value) {
+
+		public LocationEquatorial(mixed?: any, value?: Location.Equatorial): any {
+			var key: string;
+
+			if (typeof mixed === 'string' || mixed instanceof String) {
+				key = mixed;
+			} else {
+				key = "location";
+				value = mixed;
+			}
+
+			if (value) {	
 				this.SetProperty(new Property.Location.Equatorial(key, value));
 				return this;
 			} else {
