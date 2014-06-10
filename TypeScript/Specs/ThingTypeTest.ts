@@ -7,7 +7,7 @@ describe("ThingType Test", () => {
 
 	beforeEach(()=> {
 		type = new ThingModel.ThingType("plane");
-		propertyType = new ThingModel.PropertyType("location", ThingModel.Type.Location);
+		propertyType = new ThingModel.PropertyType("location", ThingModel.Type.LocationLatLng);
 
 		type.DefineProperty(propertyType);
 	});
@@ -57,7 +57,7 @@ describe("ThingType Test", () => {
 		plane.SetProperty(new ThingModel.Property.String("location", "CDG"));
 		type.Check(plane).should.be.false;
 
-		plane.SetProperty(new ThingModel.Property.Location("location",
+		plane.SetProperty(new ThingModel.Property.Location.LatLng("location",
 			new ThingModel.Location.LatLng(49.010852, 2.547398)));
 
 		type.Check(plane).should.be.true;

@@ -129,9 +129,10 @@ module ThingModel.Proto {
 				proto.setStringKey(propertyId);
 
 				switch (property.Type) {
-				case Type.Location:
-					this.ConvertLocationProperty(
-						<ThingModel.Property.Location> property, proto);
+				case Type.LocationLatLng:
+				case Type.LocationPoint:
+				case Type.LocationEquatorial:
+					this.ConvertLocationProperty(property, proto);
 					break;
 				case Type.String:
 					this.ConvertStringProperty(
@@ -231,6 +232,9 @@ module ThingModel.Proto {
 					prop.setRequired(propertyType.Required);
 
 					switch (propertyType.Type) {
+					case Type.LocationLatLng:
+					case Type.LocationEquatorial:
+					case Type.LocationPoint:
 					case Type.Location:
 						prop.setType(PropertyType.Type.LOCATION);
 						break;
@@ -258,10 +262,10 @@ module ThingModel.Proto {
 			});
 		}
 
-		private ConvertLocationProperty(property: ThingModel.Property.Location,
+		private ConvertLocationProperty(property: ThingModel.Property,
 			proto: Property) {
 
-			var value = property.Value;
+			var value = (<any>property).Value;
 
 			switch (value.type) {
 			case "latlng":

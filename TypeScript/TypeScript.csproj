@@ -9,7 +9,6 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
-    <TypeScriptToolsVersion>0.9</TypeScriptToolsVersion>
     <UseIISExpress>true</UseIISExpress>
     <IISExpressSSLPort />
     <IISExpressAnonymousAuthentication />
@@ -32,6 +31,7 @@
     <TypeScriptCompile Include="Proto\ProtoModelObserver.ts" />
     <TypeScriptCompile Include="Proto\ProtoTools.ts" />
     <TypeScriptCompile Include="Proto\ToProtobuf.ts" />
+    <TypeScriptCompile Include="Specs\BuildersTest.ts" />
     <TypeScriptCompile Include="Specs\PropertyTest.ts" />
     <TypeScriptCompile Include="Specs\ProtoConversionsTest.ts" />
     <TypeScriptCompile Include="Specs\ThingTest.ts" />

@@ -108,9 +108,9 @@ describe("ProtoConversions Test", ()=> {
 
 		(newThing == null).should.be.false;
 
-		newThing.GetProperty<ThingModel.Property.Location>("point").Value.X.should.be.equal(42);
-		newThing.GetProperty<ThingModel.Property.Location>("latlng").Value.Y.should.be.equal(-52);
-		newThing.GetProperty<ThingModel.Property.Location>("equatorial").Value.Z.should.be.equal(29);
+		newThing.GetProperty<ThingModel.Property.Location.Point>("point").Value.X.should.be.equal(42);
+		newThing.GetProperty<ThingModel.Property.Location.LatLng>("latlng").Value.Y.should.be.equal(-52);
+		newThing.GetProperty<ThingModel.Property.Location.Equatorial>("equatorial").Value.Z.should.be.equal(29);
 	});
 
 	it("should has efficient string properties", () => {
@@ -201,12 +201,12 @@ describe("ProtoConversions Test", ()=> {
 		var location = new ThingModel.Location.LatLng(25, 2);
 
 		var thing = new ThingModel.Thing("8712C");
-		thing.SetProperty(new ThingModel.Property.Location("position", location));
+		thing.SetProperty(new ThingModel.Property.Location.LatLng("position", location));
 
 		warehouseOutput.RegisterThing(thing);
 		fromProtobuf.Convert(observer.GetTransaction(toProtobuf, null).toArrayBuffer());
 
-		var newLocation = warehouseInput.GetThing("8712C").GetProperty<ThingModel.Property.Location>("position").Value;
+		var newLocation = warehouseInput.GetThing("8712C").GetProperty<ThingModel.Property.Location.LatLng>("position").Value;
 
 		location.Compare(newLocation).should.be.true;
 

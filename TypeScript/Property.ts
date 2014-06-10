@@ -49,21 +49,60 @@ module ThingModel {
 
 	export module Property {
 
-		export class Location extends Property {
-			constructor(key: string, value?: ThingModel.Location) {
-				super(key, value);
+		export module Location {
+		
+			export class Point extends Property {
+				constructor(key: string, value?: ThingModel.Location.Point) {
+					super(key, value);
+				}
+
+				public get Value(): ThingModel.Location.Point {
+					return this._value;
+				}
+
+				public set Value(value: ThingModel.Location.Point) {
+					this._value = value;
+				}
+
+				public get Type(): Type {
+					return Type.LocationPoint;
+				}
 			}
 
-			public get Value(): ThingModel.Location {
-				return this._value;
+			export class LatLng extends Property {
+				constructor(key: string, value?: ThingModel.Location.LatLng) {
+					super(key, value);
+				}
+
+				public get Value(): ThingModel.Location.LatLng {
+					return this._value;
+				}
+
+				public set Value(value: ThingModel.Location.LatLng) {
+					this._value = value;
+				}
+
+				public get Type(): Type {
+					return Type.LocationLatLng;
+				}
 			}
 
-			public set Value(value: ThingModel.Location) {
-				this._value = value;
-			}
+			export class Equatorial extends Property {
+				constructor(key: string, value?: ThingModel.Location.Equatorial) {
+					super(key, value);
+				}
 
-			public get Type(): Type {
-				return Type.Location;
+				public get Value(): ThingModel.Location.Equatorial {
+					return this._value;
+				}
+
+				public set Value(value: ThingModel.Location.Equatorial) {
+					this._value = value;
+				}
+
+				public get Type(): Type {
+					return Type.LocationEquatorial;
+				}
 			}
 		}
 

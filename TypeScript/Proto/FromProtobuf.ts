@@ -154,35 +154,38 @@
 			return modelThing;
 		}
 
+		private ConvertLocationProperty(location: Location, property: Property) {
+			if (property.location_value != null) {
+				location.X = property.location_value.x;
+				location.Y = property.location_value.y;
+
+				if (!property.location_value.z_null) {
+					location.Z = property.location_value.z;
+				}
+			}
+		}
+
 		private ConvertThingProperty(property: Property, modelThing: ThingModel.Thing) : void{
 			var modelProperty: ThingModel.Property = null;
 
 			var key = this.KeyToString(property.string_key);
 
-			var location: ThingModel.Location = null;
-
 			switch (property.type) {
 				case Property.Type.LOCATION_EQUATORIAL:
-					location = new ThingModel.Location.Equatorial();
+					var locEquatorial = new ThingModel.Location.Equatorial();
+					this.ConvertLocationProperty(locEquatorial, property);
+					modelProperty = new ThingModel.Property.Location.Equatorial(key, locEquatorial);
+					break;
+
 				case Property.Type.LOCATION_POINT:
-					if (!location) {
-						location = new ThingModel.Location.Point();
-					}
+					var locPoint = new ThingModel.Location.Point();
+					this.ConvertLocationProperty(locPoint, property);
+					modelProperty = new ThingModel.Property.Location.Point(key, locPoint);
+					break;
 				case Property.Type.LOCATION_LATLNG:
-					if (!location) {
-						location = new ThingModel.Location.LatLng();
-					}
-
-					if (property.location_value != null) {
-						location.X = property.location_value.x;
-						location.Y = property.location_value.y;
-
-						if (!property.location_value.z_null) {
-							location.Z = property.location_value.z;
-						}
-					}
-
-					modelProperty = new ThingModel.Property.Location(key, location);
+					var locLatLng = new ThingModel.Location.LatLng();
+					this.ConvertLocationProperty(locLatLng, property);
+					modelProperty = new ThingModel.Property.Location.LatLng(key, locLatLng);
 					break;
 
 				case Property.Type.STRING:

@@ -63,8 +63,21 @@
 			 return this;
 		 }
 
-		 public Location(key: string, name?: string): ThingTypePropertyBuilder {
-			 this._createProperty(key, name, Type.Location);
+		 public LocationPoint(key: string = "location", name?: string):
+			 ThingTypePropertyBuilder {
+			 this._createProperty(key, name, Type.LocationPoint);
+			 return this;
+		 }
+
+		 public LocationLatLng(key: string = "location", name?: string):
+			 ThingTypePropertyBuilder {
+			 this._createProperty(key, name, Type.LocationLatLng);
+			 return this;
+		 }
+
+		 public LocationEquatorial(key: string = "location", name?: string):
+			 ThingTypePropertyBuilder {
+			 this._createProperty(key, name, Type.LocationEquatorial);
 			 return this;
 		 }
 

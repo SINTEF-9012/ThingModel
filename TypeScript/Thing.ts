@@ -203,5 +203,136 @@ module ThingModel {
 			});
 		}
 
+		private _propertyBuilder: ThingPropertyBuilder;
+		public get ContainingA(): ThingPropertyBuilder {
+			if (!this._propertyBuilder) {
+				this._propertyBuilder = new ThingPropertyBuilder(this);
+			}
+			return this._propertyBuilder;
+		}
+
+		public get ContainingAn(): ThingPropertyBuilder {
+			return this.ContainingA;
+		}
+
+		public String(key: string): string;
+		public String(key: string, value: string): Thing;
+		public String(key: string, value?: string): any {
+			if (value) {
+				this.SetProperty(new Property.String(key, value));
+				return this;
+			} else {
+				var p = this.GetProperty(key, Type.String);
+				if (!p) {
+					return null;
+				}
+				return (<Property.String>p).Value;
+			}
+		}
+
+		public Double(key: string): number;
+		public Double(key: string, value: number): Thing;
+		public Double(key: string, value?: number): any {
+			if (value) {
+				this.SetProperty(new Property.Double(key, value));
+				return this;
+			} else {
+				var p = this.GetProperty(key, Type.Double);
+				if (!p) {
+					return null;
+				}
+				return (<Property.Double>p).Value;
+			}
+		}
+
+		public Int(key: string): number;
+		public Int(key: string, value: number): Thing;
+		public Int(key: string, value?: number): any {
+			if (value) {
+				this.SetProperty(new Property.Int(key, value));
+				return this;
+			} else {
+				var p = this.GetProperty(key, Type.Int);
+				if (!p) {
+					return null;
+				}
+				return (<Property.Int>p).Value;
+			}
+		}
+
+		public Boolean(key: string): boolean;
+		public Boolean(key: string, value: boolean): Thing;
+		public Boolean(key: string, value?: boolean): any {
+			if (value) {
+				this.SetProperty(new Property.Boolean(key, value));
+				return this;
+			} else {
+				var p = this.GetProperty(key, Type.Boolean);
+				if (!p) {
+					return null;
+				}
+				return (<Property.Boolean>p).Value;
+			}
+		}
+
+		public DateTime(key: string): Date;
+		public DateTime(key: string, value: Date): Thing;
+		public DateTime(key: string, value?: Date): any {
+			if (value) {
+				this.SetProperty(new Property.DateTime(key, value));
+				return this;
+			} else {
+				var p = this.GetProperty(key, Type.DateTime);
+				if (!p) {
+					return null;
+				}
+				return (<Property.DateTime>p).Value;
+			}
+		}
+
+		public LocationPoint(key: string): Location.Point;
+		public LocationPoint(key: string, value: Location.Point): Thing;
+		public LocationPoint(key: string, value?: Location.Point): any {
+			if (value) {
+				this.SetProperty(new Property.Location.Point(key, value));
+				return this;
+			} else {
+				var p = this.GetProperty(key, Type.LocationPoint);
+				if (!p) {
+					return null;
+				}
+				return (<Property.Location.Point>p).Value;
+			}
+		}
+
+		public LocationLatLng(key: string): Location.LatLng;
+		public LocationLatLng(key: string, value: Location.LatLng): Thing;
+		public LocationLatLng(key: string, value?: Location.LatLng): any {
+			if (value) {
+				this.SetProperty(new Property.Location.LatLng(key, value));
+				return this;
+			} else {
+				var p = this.GetProperty(key, Type.LocationLatLng);
+				if (!p) {
+					return null;
+				}
+				return (<Property.Location.LatLng>p).Value;
+			}
+		}
+
+		public LocationEquatorial(key: string): Location.Equatorial;
+		public LocationEquatorial(key: string, value: Location.Equatorial): Thing;
+		public LocationEquatorial(key: string, value?: Location.Equatorial): any {
+			if (value) {
+				this.SetProperty(new Property.Location.Equatorial(key, value));
+				return this;
+			} else {
+				var p = this.GetProperty(key, Type.LocationEquatorial);
+				if (!p) {
+					return null;
+				}
+				return (<Property.Location.Equatorial>p).Value;
+			}
+		}
 	}	
 }

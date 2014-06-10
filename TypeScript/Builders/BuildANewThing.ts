@@ -39,11 +39,6 @@
 			 return this;
 		 }
 
-		 public Location(key: string, value: Location): ThingPropertyBuilder {
-			 this.thing.SetProperty(new Property.Location(key, value));
-			 return this;
-		 }
-
 		 public Double(key: string, value: number): ThingPropertyBuilder {
 			 this.thing.SetProperty(new Property.Double(key, value));
 			 return this;
@@ -61,6 +56,34 @@
 
 		 public DateTime(key: string, value: Date): ThingPropertyBuilder {
 			 this.thing.SetProperty(new Property.DateTime(key, value));
+			 return this;
+		 }
+
+		 public Location(value: Location):	 ThingPropertyBuilder;
+		 public Location(key: string, value: Location): ThingPropertyBuilder;
+		 public Location(mixed: any, value?: Location): ThingPropertyBuilder {
+
+			 var key;
+			 if (value) {
+				 key = mixed;
+			 } else {
+				 key = "location";
+				 value = mixed;
+			 }
+
+			 switch(value.type) {
+				 case "equatorial":
+					this.thing.SetProperty(new Property.Location.Equatorial(key, <Location.Equatorial>value));
+					break;
+				 case "latlng":
+					this.thing.SetProperty(new Property.Location.LatLng(key,<Location.LatLng>value));
+					 break;
+				 case "point":
+				default :
+					this.thing.SetProperty(new Property.Location.Point(key, <Location.Point>value));
+					break;
+
+			 }
 			 return this;
 		 }
 

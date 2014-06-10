@@ -45,7 +45,7 @@ describe("Warehouse Test", () => {
 		thing = new ThingModel.Thing("871", type);
 		thing.SetProperty(new ThingModel.Property.String("name", "Maurice"));
 		thing.SetProperty(new ThingModel.Property.Double("age", 18.0));
-		thing.SetProperty(new ThingModel.Property.Location("localization",
+		thing.SetProperty(new ThingModel.Property.Location.Point("localization",
 			new ThingModel.Location.Point(10, 44)));
 
 		warehouse = new ThingModel.Warehouse();

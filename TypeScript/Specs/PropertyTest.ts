@@ -32,8 +32,14 @@ describe("Property Test", ()=> {
 		});
 
 		it("should work with a location", () => {
-			new ThingModel.Property.Location("location",
+			new ThingModel.Property.Location.Point("location",
+				new ThingModel.Location.Point(1.0, 2.0, 3.0)).Value
+					.should.be.ok;
+			new ThingModel.Property.Location.LatLng("location",
 				new ThingModel.Location.LatLng(1.0, 2.0, 3.0)).Value
+					.should.be.ok;
+			new ThingModel.Property.Location.Equatorial("location",
+				new ThingModel.Location.Equatorial(1.0, 2.0, 3.0)).Value
 					.should.be.ok;
 		});
 	});
@@ -66,7 +72,7 @@ describe("Property Test", ()=> {
 		});
 
 		it("should work with a location", () => {
-			new ThingModel.Property.Location("location",
+			new ThingModel.Property.Location.LatLng("location",
 				new ThingModel.Location.LatLng(1.0, 2.0, 3.0)).ValueToString()
 					.should.match(/2/);
 		});
