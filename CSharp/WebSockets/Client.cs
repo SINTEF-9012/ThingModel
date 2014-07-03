@@ -103,7 +103,7 @@ namespace ThingModel.WebSockets
         {
 			lock (_lock)
 			{
-				if (args.Type == Opcode.BINARY)
+				if (args.Type == Opcode.Binary)
 				{
 					try
 					{
@@ -150,7 +150,7 @@ namespace ThingModel.WebSockets
 
         public void Debug()
         {
-            _ws.Log.Level = LogLevel.INFO;
+            _ws.Log.Level = LogLevel.Info;
         }
     }
 }

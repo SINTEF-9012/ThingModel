@@ -68,7 +68,7 @@ namespace ThingModel.WebSockets
             {
 				lock (_lock)
 				{
-					if (e.Type == Opcode.BINARY)
+					if (e.Type == Opcode.Binary)
 					{
 						_protoModelObserver.Reset();
 
@@ -175,7 +175,7 @@ namespace ThingModel.WebSockets
         public void Debug()
         {
 	        _debug = true;
-            _ws.Log.Level = LogLevel.INFO;
+            _ws.Log.Level = LogLevel.Info;
         }
     }
 }
