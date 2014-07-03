@@ -108,9 +108,16 @@ namespace ThingModel.WebSockets
 					try
 					{
 						var senderName = _fromProtobuf.Convert(args.RawData);
-						_toProtobuf.ApplyThingsSuppressions(_thingModelObserver.Deletions);
+						if (senderName == "undefined")
+						{
+							Console.WriteLine("Something went wrong : received a undefined senderID");
+						}
+						else
+						{
+							_toProtobuf.ApplyThingsSuppressions(_thingModelObserver.Deletions);
+							Console.WriteLine(SenderID + " | Binary message from : " + senderName);
+						}
 						_thingModelObserver.Reset();
-						Console.WriteLine(SenderID + " | Binary message from : " + senderName);
 					}
 					catch (Exception e)
 					{

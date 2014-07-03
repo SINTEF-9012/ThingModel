@@ -72,7 +72,22 @@ namespace ThingModel.WebSockets
 					{
 						_protoModelObserver.Reset();
 
-						var senderID = _fromProtobuf.Convert(e.RawData, _strictServer);
+						string senderID;
+						try
+						{
+							senderID = _fromProtobuf.Convert(e.RawData, _strictServer);
+						}
+						catch (Exception ex)
+						{
+							Console.WriteLine(ex.Message);
+							return;
+						}
+
+						if (senderID == "undefined")
+						{
+							Console.WriteLine("Undefined senderIDs are not allowed");
+							return;
+						}
 
 						_toProtobuf.ApplyThingsSuppressions(_protoModelObserver.Deletions);
 
