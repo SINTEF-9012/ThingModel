@@ -343,6 +343,120 @@ namespace ThingModel.Specs
 
             Assert.DoesNotThrow(() => _warehouse.RegisterType(_type, true, "testSender"));
         }
+
+	    [Test]
+	    public void CheckOnReceivedObservers()
+	    {
+		    var sem = false;
+		    _warehouse.Events.OnReceivedDefine += (sender, args) => sem = true;
+
+		    _warehouse.Events.OnReceivedUpdate += (sender, args) => sem = true;
+
+		    _warehouse.Events.OnReceivedDelete += (sender, args) => sem = true;
+
+		    _warehouse.Events.OnReceivedNew += (sender, args) => sem = true;
+		    
+			_warehouse.RegisterType(_type, true, "testSender");
+			Assert.That(sem, Is.True);
+		    sem = false;
+
+			_warehouse.RegisterThing(_thing, true, true, "testSender");
+			Assert.That(sem, Is.True);
+		    sem = false;
+
+			_warehouse.RegisterThing(_thing, true, true, "testSender");
+			Assert.That(sem, Is.True);
+		    sem = false;
+
+			_warehouse.RemoveThing(_thing, true, "testSender");
+			Assert.That(sem, Is.True);
+		    sem = false;
+
+			_warehouse.RegisterType(_type);
+			Assert.That(sem, Is.False);
+		    sem = false;
+
+		    _warehouse.RegisterThing(_thing);
+			Assert.That(sem, Is.False);
+		    sem = false;
+
+		    _warehouse.RegisterThing(_thing);
+			Assert.That(sem, Is.False);
+		    sem = false;
+
+		    _warehouse.RemoveThing(_thing);
+			Assert.That(sem, Is.False);
+		    sem = false;
+	    }
+
+	    [Test]
+	    public void CheckMutationsObservation()
+	    {
+			var newThing = false;
+		    var updatedThing = false;
+		    var deletedThing = false;
+
+		    _warehouse.Events.OnNew += (sender, args) => newThing = true;
+		    _warehouse.Events.OnUpdate += (sender, args) => updatedThing = true;
+		    _warehouse.Events.OnDelete += (sender, args) => deletedThing = true;
+
+		    _warehouse.Events.EnableMutationsObservation();
+
+		    newThing = false;
+		    _warehouse.RegisterThing(_thing);
+			Assert.That(newThing, Is.True);
+
+		    newThing = false;
+		    updatedThing = false;
+		    _warehouse.RegisterThing(_thing);
+			Assert.That(newThing, Is.False);
+            Assert.That(updatedThing, Is.False);
+
+		    _thing.String("name", "-");
+		    
+			updatedThing = false;
+		    _warehouse.RegisterThing(_thing);
+            Assert.That(updatedThing, Is.True);
+		    
+		    _thing.String("name", "-");
+
+			updatedThing = false;
+		    _warehouse.RegisterThing(_thing);
+            Assert.That(updatedThing, Is.False);
+		    
+			_thing.Connect(new Thing("nothing"));
+		    
+			updatedThing = false;
+		    _warehouse.RegisterThing(_thing);
+            Assert.That(updatedThing, Is.True);
+		    
+			updatedThing = false;
+		    _warehouse.RegisterThing(_thing);
+            Assert.That(updatedThing, Is.False);
+
+            var copyThing = new Thing("871", _type);
+		    copyThing.String("name", "-")
+				.Double("age", 18)
+				.LocationPoint("localization", new Location.Point(10,44));
+			copyThing.Connect(new Thing("nothing"));
+			
+			updatedThing = false;
+		    _warehouse.RegisterThing(copyThing);
+            Assert.That(updatedThing, Is.False);
+
+			copyThing.Detach();
+			updatedThing = false;
+		    _warehouse.RegisterThing(copyThing);
+            Assert.That(updatedThing, Is.True);
+
+		    _warehouse.Events.DisableMutationsObservation();
+		    
+			newThing = false;
+		    updatedThing = false;
+			_warehouse.RegisterThing(_thing);
+			Assert.That(newThing, Is.False);
+            Assert.That(updatedThing, Is.True);
+	    }
     }
 
 }

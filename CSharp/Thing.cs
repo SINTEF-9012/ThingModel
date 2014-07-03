@@ -215,6 +215,32 @@ namespace ThingModel
             return new List<Property>(Properties.Values);
         }
 
+		// Create a semi-deep copy of the thing
+		// The connected things are not cloned,
+		// they can be attached or the list can just contains the ids
+	    public Thing Clone(bool attachConnections = false)
+	    {
+		    var copy = new Thing(_id, _type);
+		    foreach (var property in Properties)
+		    {
+			    copy.Properties[property.Key] = property.Value.Clone();
+		    }
+
+		    if (attachConnections)
+		    {
+				// Create a shallow copy
+				copy.Connections = new Dictionary<string, Thing>(Connections);
+		    }
+		    else
+		    {
+			    foreach (var connection in Connections)
+			    {
+					// Just copy the keys
+				    copy.Connections[connection.Key] = null;
+			    }
+		    }
+		    return copy;
+	    }
 
 	    private BuildANewThing.ThingPropertyBuilder _propertyBuilder;
 	    public BuildANewThing.ThingPropertyBuilder ContainingA

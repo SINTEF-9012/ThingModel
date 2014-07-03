@@ -33,6 +33,9 @@ namespace ThingModel
         // After some tests, a generic version is complex and not very performant
         public abstract bool CompareValue(Property other);
 
+		// This is clonable
+	    public abstract Property Clone();
+
         public abstract class Location : Property
         {
             private ThingModel.Location _value;
@@ -58,7 +61,8 @@ namespace ThingModel
                 return sb.ToString();
             }
 
-            public override bool CompareValue(Property prop)
+
+	        public override bool CompareValue(Property prop)
             {
                 var other = prop as Location;
                 return other != null && ((_value == null && other._value == null) || (_value!= null && other._value != null && _value.GetType() == other._value.GetType() && _value.Compare(other._value)));
@@ -75,6 +79,11 @@ namespace ThingModel
 		        public Point(string key, ThingModel.Location.Point value = null) : base(key, value)
 		        {
 		        }
+
+				public override Property Clone()
+				{
+					return new Point(_key, Value);
+				}
 	        }
 
 	        public class LatLng : Location
@@ -88,6 +97,11 @@ namespace ThingModel
 		        public LatLng(string key, ThingModel.Location.LatLng value = null) : base(key, value)
 		        {
 		        }
+				
+				public override Property Clone()
+				{
+					return new LatLng(_key, Value);
+				}
 	        }
 
 	        public class Equatorial : Location
@@ -101,6 +115,11 @@ namespace ThingModel
 		        public Equatorial(string key, ThingModel.Location.Equatorial value = null) : base(key, value)
 		        {
 		        }
+				
+				public override Property Clone()
+				{
+					return new Equatorial(_key, Value);
+				}
 	        }
         }
 
@@ -124,6 +143,11 @@ namespace ThingModel
                 var other = prop as String;
                 return other != null && ((Value == null && other.Value == null) || (Value != null && Value.Equals(other.Value)));
             }
+				
+			public override Property Clone()
+			{
+				return new String(_key, Value);
+			}
         }
 
         public class Double : Property
@@ -147,6 +171,11 @@ namespace ThingModel
                 return other != null && Value == other.Value;
                 // ReSharper restore CompareOfFloatsByEqualityOperator
             }
+			
+			public override Property Clone()
+			{
+				return new Double(_key, Value);
+			}
         }
 
         public class Int : Property
@@ -169,6 +198,11 @@ namespace ThingModel
                 var other = prop as Int;
                 return other != null && Value == other.Value;
             }
+			
+			public override Property Clone()
+			{
+				return new Int(_key, Value);
+			}
         }
 
         public class Boolean : Property
@@ -190,6 +224,11 @@ namespace ThingModel
                 var other = prop as Boolean;
                 return other != null && Value == other.Value;
             }
+			
+			public override Property Clone()
+			{
+				return new Boolean(_key, Value);
+			}
         }
 
         public class DateTime : Property
@@ -211,6 +250,11 @@ namespace ThingModel
                 var other = prop as DateTime;
                 return other != null && Value == other.Value;
             }
+			
+			public override Property Clone()
+			{
+				return new DateTime(_key, Value);
+			}
         }
     }
 }

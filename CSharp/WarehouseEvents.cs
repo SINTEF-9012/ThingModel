@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace ThingModel
 {
@@ -28,6 +29,18 @@ namespace ThingModel
 			}
 		}
 
+		private IDictionary<string, Thing> _previousThings = null;
+
+		public void EnableMutationsObservation()
+		{
+			_previousThings = new Dictionary<string, Thing>();
+		}
+
+		public void DisableMutationsObservation()
+		{
+			_previousThings = null;
+		}
+
 		public delegate void ThingEventHandler(object sender, ThingEventArgs e);
 		public delegate void ThingTypeEventHandler(object sender, ThingTypeEventArgs e);
 
@@ -43,6 +56,11 @@ namespace ThingModel
 
 		public void New(Thing thing, string sender)
 		{
+			if (_previousThings != null)
+			{
+				_previousThings[thing.ID] = thing.Clone();	
+			}
+
 			ThingEventArgs args = null;
 			if (OnNew != null)
 			{
@@ -61,6 +79,11 @@ namespace ThingModel
 
 		public void Deleted(Thing thing, string sender)
 		{
+			if (_previousThings != null)
+			{
+				_previousThings.Remove(thing.ID);
+			}
+
 			ThingEventArgs args = null;
 			if (OnDelete != null)
 			{
@@ -80,6 +103,17 @@ namespace ThingModel
 
 		public void Updated(Thing thing, string sender)
 		{
+			if (_previousThings != null)
+			{
+				Thing previousThing;
+				if (_previousThings.TryGetValue(thing.ID, out previousThing) &&
+					previousThing.Compare(thing, false/*, false*/)) {
+					return;
+				}
+
+				_previousThings[thing.ID] = thing.Clone();	
+			}
+
 			ThingEventArgs args = null;
 			if (OnUpdate != null)
 			{
