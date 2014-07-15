@@ -2,6 +2,7 @@
 /// <reference path="../Builders/BuildANewThing.ts" />
 /// <reference path="../Builders/BuildANewThingType.ts" />
 /// <reference path="../WebSockets/Client.ts" />
+/// <reference path="../WebSockets/IClientObserver.ts" />
 /// <reference path="../Proto/FromProtobuf.ts" />
 /// <reference path="../Proto/Proto.d.ts" />
 /// <reference path="../Proto/ProtoModelObserver.ts" />

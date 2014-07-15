@@ -225,6 +225,9 @@ var ThingModel;
 
                 this._closed = true;
                 this._reconnection = false;
+
+                this._observers = null;
+
                 this.Connect();
             }
             Client.prototype.Connect = function () {
@@ -242,13 +245,29 @@ var ThingModel;
                     _this._toProtobuf = new ThingModel.Proto.ToProtobuf();
                     _this._connexionDelay = 2000;
 
+                    var firstOpen = !_this._reconnection;
+
                     _this.Send();
+
+                    if (firstOpen) {
+                        _this.NotifyObservers(function (obs) {
+                            return obs.OnFirstOpen();
+                        });
+                    }
+
+                    _this.NotifyObservers(function (obs) {
+                        return obs.OnOpen();
+                    });
                 };
 
                 this._ws.onclose = function () {
                     if (!_this._closed) {
                         _this._closed = true;
                         console.info("ThingModel: Connection lost");
+
+                        _this.NotifyObservers(function (obs) {
+                            return obs.OnClose();
+                        });
                     }
                     _this._reconnection = true;
 
@@ -282,6 +301,10 @@ var ThingModel;
 
                 this._toProtobuf.ApplyThingsSuppressions(_.values(this._thingModelObserver.Deletions));
                 this._thingModelObserver.Reset();
+
+                this.NotifyObservers(function (obs) {
+                    return obs.OnTransaction(senderName);
+                });
             };
 
             Client.prototype.Send = function () {
@@ -296,6 +319,10 @@ var ThingModel;
                     this._thingModelObserver.Reset();
                     this._reconnection = false;
                     console.debug("ThingModel: transaction sent");
+
+                    this.NotifyObservers(function (obs) {
+                        return obs.OnSend();
+                    });
                 }
             };
 
@@ -308,6 +335,26 @@ var ThingModel;
 
             Client.prototype.IsConnected = function () {
                 return this._closed;
+            };
+
+            Client.prototype.RegisterObserver = function (observer) {
+                if (this._observers === null) {
+                    this._observers = [observer];
+                } else {
+                    this._observers.push(observer);
+                }
+            };
+
+            Client.prototype.UnregisterObserver = function (observer) {
+                if (this._observers !== null) {
+                    this._observers.splice(_.indexOf(this._observers, observer), 1);
+                }
+            };
+
+            Client.prototype.NotifyObservers = function (callback) {
+                if (this._observers !== null) {
+                    _.each(this._observers, callback);
+                }
             };
             return Client;
         })();

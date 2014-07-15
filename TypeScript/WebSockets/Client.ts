@@ -12,6 +12,8 @@
 		 private _thingModelObserver: Proto.ProtoModelObserver;
 		 private _connexionDelay = 2000;
 
+		 private _observers: IClientObserver[];
+
 		 constructor(senderID: string, path: string, warehouse: Warehouse) {
 			 this.SenderID = senderID;
 			 this._path = path;
@@ -23,9 +25,12 @@
 
 			 this._fromProtobuf = new Proto.FromProtobuf(this._warehouse);
 			 this._toProtobuf = new Proto.ToProtobuf();
-
+             
 			 this._closed = true;
 			 this._reconnection = false;
+
+			 this._observers = null;
+
 			 this.Connect();
 		 }
 
@@ -43,14 +48,24 @@
 				 this._toProtobuf = new Proto.ToProtobuf();
 				 this._connexionDelay = 2000;
 
+				 var firstOpen = !this._reconnection;
+
 				 // Send changes
 				 this.Send();
+
+				 if (firstOpen) {
+					 this.NotifyObservers((obs) => obs.OnFirstOpen());
+				 }
+
+				 this.NotifyObservers((obs) => obs.OnOpen());
 			 };
 
 			 this._ws.onclose = () => {
 				 if (!this._closed) {
 					 this._closed = true;
 					 console.info("ThingModel: Connection lost");
+
+					 this.NotifyObservers((obs) => obs.OnClose());
 				 }
 				this._reconnection = true;
 
@@ -83,6 +98,8 @@
 
 			 this._toProtobuf.ApplyThingsSuppressions(_.values(this._thingModelObserver.Deletions));
 			 this._thingModelObserver.Reset();
+
+			 this.NotifyObservers((obs) => obs.OnTransaction(senderName));
 		 }
 
 		 public Send(): void {
@@ -98,6 +115,8 @@
 				 this._thingModelObserver.Reset();
 				 this._reconnection = false;
 				 console.debug("ThingModel: transaction sent");
+
+				 this.NotifyObservers((obs) => obs.OnSend());
 			 }
 		 }
 
@@ -111,5 +130,26 @@
 		 public IsConnected(): boolean {
 			 return this._closed;
 		 }
+
+		 public RegisterObserver(observer: IClientObserver): void {
+			if (this._observers === null) {
+				this._observers = [observer];
+			} else {
+				this._observers.push(observer);
+			}
+		}
+
+		public UnregisterObserver(observer: IClientObserver): void {
+			if (this._observers !== null) {
+				// Array remove
+				this._observers.splice(_.indexOf(this._observers, observer), 1);
+			}
+		}
+
+		private NotifyObservers(callback: (observer: IClientObserver) => void): void {
+			if (this._observers !== null) {
+				_.each(this._observers, callback);
+			}	
+		}
 	 }
  }
