@@ -9,9 +9,9 @@ module ThingModel {
 		 *	It can't be null.
 		 *	Two things objets with the same ID represent the same thing.
 		 */
-		private _id : string;
+		private _id: string;
 
-		public get ID() : string {
+		public get ID(): string {
 			return this._id;
 		}
 
@@ -21,9 +21,9 @@ module ThingModel {
 		 *
 		 *	The type is null by default, and the default type is applied.
 		 */
-		private _type : ThingType = null;
+		private _type: ThingType = null;
 
-		public get Type() : ThingType {
+		public get Type(): ThingType {
 			return this._type;
 		}
 
@@ -43,7 +43,7 @@ module ThingModel {
 		private _connections: { [key: string]: Thing };
 		private _connectionsCount: number;
 
-		constructor(id : string, type : ThingType = null) {
+		constructor(id: string, type: ThingType = null) {
 			if (!id) {
 				throw new Error("The thing ID should not be null or empty");
 			}
@@ -64,7 +64,7 @@ module ThingModel {
 			this._properties[property.Key] = property;
 		}
 
-		public HasProperty(key : string) : boolean {
+		public HasProperty(key: string): boolean {
 			return _.has(this._properties, key);
 		}
 
@@ -103,14 +103,14 @@ module ThingModel {
 
 		public Disconnect(thing: Thing): boolean {
 			if (this.IsConnectedTo(thing)) {
-				--this._connectionsCount;	
+				--this._connectionsCount;
 				delete this._connections[thing._id];
 				return true;
 			}
 			return false;
 		}
 
-		public DisconnectAll() : void {
+		public DisconnectAll(): void {
 			this._connections = {};
 			this._connectionsCount = 0;
 		}
@@ -142,8 +142,8 @@ module ThingModel {
 			// If the types are not the same
 			if (!other || (this._type != null && other._type != null &&
 				this._type.Name != other._type.Name) ||
-				(this._type == null && other._type != null) ||
-				(this._type != null && other._type == null)) {
+			(this._type == null && other._type != null) ||
+			(this._type != null && other._type == null)) {
 				return false;
 			}
 
@@ -153,8 +153,8 @@ module ThingModel {
 			}
 
 			// Check if the connections are the same
-			if (this._connectionsCount !== other._connectionsCount || 
-				_.any(this._connections, (connectedThing:Thing)=> {
+			if (this._connectionsCount !== other._connectionsCount ||
+				_.any(this._connections, (connectedThing: Thing) => {
 					return !_.has(other._connections, connectedThing._id);
 				})) {
 				return false;
@@ -196,7 +196,7 @@ module ThingModel {
 			// Register the thing now, prevent infinite recursions
 			alreadyVisitedObjets[this._id] = true;
 
-			return !_.any(this._connections, (connectedThing: Thing)=> {
+			return !_.any(this._connections, (connectedThing: Thing) => {
 				var otherThing = other._connections[connectedThing._id];
 
 				return !connectedThing.RecursiveCompare(otherThing, alreadyVisitedObjets);
@@ -204,6 +204,7 @@ module ThingModel {
 		}
 
 		private _propertyBuilder: ThingPropertyBuilder;
+
 		public get ContainingA(): ThingPropertyBuilder {
 			if (!this._propertyBuilder) {
 				this._propertyBuilder = new ThingPropertyBuilder(this);
@@ -294,7 +295,6 @@ module ThingModel {
 		public LocationPoint(key: string): Location.Point;
 		public LocationPoint(value: Location.Point): Thing;
 		public LocationPoint(key: string, value: Location.Point): Thing;
-
 		public LocationPoint(mixed?: any, value?: Location.Point): any {
 			var key: string;
 
@@ -305,7 +305,7 @@ module ThingModel {
 				value = mixed;
 			}
 
-			if (value) {	
+			if (value) {
 				this.SetProperty(new Property.Location.Point(key, value));
 				return this;
 			} else {
@@ -321,7 +321,6 @@ module ThingModel {
 		public LocationLatLng(key: string): Location.LatLng;
 		public LocationLatLng(value: Location.LatLng): Thing;
 		public LocationLatLng(key: string, value: Location.LatLng): Thing;
-
 		public LocationLatLng(mixed?: any, value?: Location.LatLng): any {
 			var key: string;
 
@@ -332,7 +331,7 @@ module ThingModel {
 				value = mixed;
 			}
 
-			if (value) {	
+			if (value) {
 				this.SetProperty(new Property.Location.LatLng(key, value));
 				return this;
 			} else {
@@ -348,7 +347,6 @@ module ThingModel {
 		public LocationEquatorial(key: string): Location.Equatorial;
 		public LocationEquatorial(value: Location.Equatorial): Thing;
 		public LocationEquatorial(key: string, value: Location.Equatorial): Thing;
-
 		public LocationEquatorial(mixed?: any, value?: Location.Equatorial): any {
 			var key: string;
 
@@ -359,7 +357,7 @@ module ThingModel {
 				value = mixed;
 			}
 
-			if (value) {	
+			if (value) {
 				this.SetProperty(new Property.Location.Equatorial(key, value));
 				return this;
 			} else {
@@ -370,5 +368,5 @@ module ThingModel {
 				return (<Property.Location.Equatorial>p).Value;
 			}
 		}
-	}	
+	}
 }

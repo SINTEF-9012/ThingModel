@@ -1,4 +1,4 @@
-module ThingModel {
+﻿module ThingModel {
 	export interface Location {
 		X: number;
 		Y: number;
@@ -18,7 +18,7 @@ module ThingModel {
 
 		toString(): string;
 
-		type:string;
+		type: string;
 	}
 
 	export module Location {
@@ -31,7 +31,7 @@ module ThingModel {
 			public Y: number;
 			public Z: number;
 			public System: string;
-			public type:string;
+			public type: string;
 
 			// The last argument can be null, it's a feature
 			constructor(x: number = 0.0, y: number = 0.0, z: number = null) {
@@ -63,7 +63,7 @@ module ThingModel {
 				return s;
 			}
 		}
-		
+
 		/**
 		 *	Latitude longitude representation, often used for WGS 84 GPS localizations.
 		 *	And if the System property is null, it's considered by default as a WGS 84 LatLng system.

@@ -1,119 +1,119 @@
- module ThingModel {
-	 export class BuildANewThingType {
-		 public static Named(name: string): ThingTypePropertyBuilder {
-			 return new ThingTypePropertyBuilder(new ThingType(name));
-		 }
-	 }
+module ThingModel {
+	export class BuildANewThingType {
+		public static Named(name: string): ThingTypePropertyBuilder {
+			return new ThingTypePropertyBuilder(new ThingType(name));
+		}
+	}
 
-	 export class ThingTypePropertyBuilder {
-		 private type: ThingType;
-		 private nextPropertyIsNotRequired: boolean;
-		 private lastPropertyAdded: boolean;
-		 private lastProperty: PropertyType;
+	export class ThingTypePropertyBuilder {
+		private type: ThingType;
+		private nextPropertyIsNotRequired: boolean;
+		private lastPropertyAdded: boolean;
+		private lastProperty: PropertyType;
 
-		 public ContainingA : ThingTypePropertyBuilder;
-		 public ContainingAn : ThingTypePropertyBuilder;
-		 public AndA : ThingTypePropertyBuilder;
-		 public AndAn : ThingTypePropertyBuilder;
-		 
-		 constructor(type: ThingType) {
-			 this.type = type;
+		public ContainingA: ThingTypePropertyBuilder;
+		public ContainingAn: ThingTypePropertyBuilder;
+		public AndA: ThingTypePropertyBuilder;
+		public AndAn: ThingTypePropertyBuilder;
 
-			 this.ContainingA = this;
-			 this.ContainingAn = this;
-			 this.AndA = this;
-			 this.AndAn = this;
-		 }
+		constructor(type: ThingType) {
+			this.type = type;
 
-		 public get NotRequired(): ThingTypePropertyBuilder {
-			 this.nextPropertyIsNotRequired = true;
-			 return this;
-		 }
+			this.ContainingA = this;
+			this.ContainingAn = this;
+			this.AndA = this;
+			this.AndAn = this;
+		}
 
-		 public WhichIs(description: string) : ThingTypePropertyBuilder {
-			 if (!this.lastProperty) {
-				 this.type.Description = description;
-			 } else {
-				 this.lastProperty.Description = description;
-			 }
+		public get NotRequired(): ThingTypePropertyBuilder {
+			this.nextPropertyIsNotRequired = true;
+			return this;
+		}
 
-			 return this;
-		 }
+		public WhichIs(description: string): ThingTypePropertyBuilder {
+			if (!this.lastProperty) {
+				this.type.Description = description;
+			} else {
+				this.lastProperty.Description = description;
+			}
 
-		 private _createProperty(key: string, name: string, type: Type): void {
+			return this;
+		}
 
-			 if (!this.lastPropertyAdded && this.lastProperty != null) {
-				 this.type.DefineProperty(this.lastProperty);
-				 this.lastPropertyAdded = false;
-			 }
+		private _createProperty(key: string, name: string, type: Type): void {
 
-			 var prop = new PropertyType(key, type, true);
-			 prop.Name = name;
+			if (!this.lastPropertyAdded && this.lastProperty != null) {
+				this.type.DefineProperty(this.lastProperty);
+				this.lastPropertyAdded = false;
+			}
 
-			 if (this.nextPropertyIsNotRequired) {
-				 this.nextPropertyIsNotRequired = false;
-				 prop.Required = false;
-			 }
+			var prop = new PropertyType(key, type, true);
+			prop.Name = name;
 
-			 this.lastProperty = prop;
-		 }
+			if (this.nextPropertyIsNotRequired) {
+				this.nextPropertyIsNotRequired = false;
+				prop.Required = false;
+			}
 
-		 public String(key: string, name?: string): ThingTypePropertyBuilder {
-			 this._createProperty(key, name, Type.String);
-			 return this;
-		 }
+			this.lastProperty = prop;
+		}
 
-		 public LocationPoint(key: string = "location", name?: string):
-			 ThingTypePropertyBuilder {
-			 this._createProperty(key, name, Type.LocationPoint);
-			 return this;
-		 }
+		public String(key: string, name?: string): ThingTypePropertyBuilder {
+			this._createProperty(key, name, Type.String);
+			return this;
+		}
 
-		 public LocationLatLng(key: string = "location", name?: string):
-			 ThingTypePropertyBuilder {
-			 this._createProperty(key, name, Type.LocationLatLng);
-			 return this;
-		 }
+		public LocationPoint(key: string = "location", name?: string):
+		ThingTypePropertyBuilder {
+			this._createProperty(key, name, Type.LocationPoint);
+			return this;
+		}
 
-		 public LocationEquatorial(key: string = "location", name?: string):
-			 ThingTypePropertyBuilder {
-			 this._createProperty(key, name, Type.LocationEquatorial);
-			 return this;
-		 }
+		public LocationLatLng(key: string = "location", name?: string):
+		ThingTypePropertyBuilder {
+			this._createProperty(key, name, Type.LocationLatLng);
+			return this;
+		}
 
-		 public Double(key: string, name?: string): ThingTypePropertyBuilder {
-			 this._createProperty(key, name, Type.Double);
-			 return this;
-		 }
+		public LocationEquatorial(key: string = "location", name?: string):
+		ThingTypePropertyBuilder {
+			this._createProperty(key, name, Type.LocationEquatorial);
+			return this;
+		}
 
-		 public Int(key: string, name?: string): ThingTypePropertyBuilder {
-			 this._createProperty(key, name, Type.Int);
-			 return this;
-		 }
+		public Double(key: string, name?: string): ThingTypePropertyBuilder {
+			this._createProperty(key, name, Type.Double);
+			return this;
+		}
 
-		 public Boolean(key: string, name?: string): ThingTypePropertyBuilder {
-			 this._createProperty(key, name, Type.Boolean);
-			 return this;
-		 }
+		public Int(key: string, name?: string): ThingTypePropertyBuilder {
+			this._createProperty(key, name, Type.Int);
+			return this;
+		}
 
-		 public DateTime(key: string, name?: string): ThingTypePropertyBuilder {
-			 this._createProperty(key, name, Type.DateTime);
-			 return this;
-		 }
+		public Boolean(key: string, name?: string): ThingTypePropertyBuilder {
+			this._createProperty(key, name, Type.Boolean);
+			return this;
+		}
 
-		 public CopyOf(otherType: ThingType): ThingTypePropertyBuilder {
-			 _.each(otherType.Properties, (propertyType : PropertyType)=> {
-				 this.type.DefineProperty(propertyType.Clone());
-			 });
-			 return this;
-		 }
+		public DateTime(key: string, name?: string): ThingTypePropertyBuilder {
+			this._createProperty(key, name, Type.DateTime);
+			return this;
+		}
 
-		 public Build(): ThingType {
-			 if (!this.lastPropertyAdded && this.lastProperty != null) {
-				 this.type.DefineProperty(this.lastProperty);
-			 }
+		public CopyOf(otherType: ThingType): ThingTypePropertyBuilder {
+			_.each(otherType.Properties, (propertyType: PropertyType) => {
+				this.type.DefineProperty(propertyType.Clone());
+			});
+			return this;
+		}
 
-			 return this.type;
-		 }
-	 }
- }
+		public Build(): ThingType {
+			if (!this.lastPropertyAdded && this.lastProperty != null) {
+				this.type.DefineProperty(this.lastProperty);
+			}
+
+			return this.type;
+		}
+	}
+}

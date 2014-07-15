@@ -36,7 +36,7 @@ module ThingModel {
 			return this._properties[key];
 		}
 
-		public get Properties(): PropertyType[]{
+		public get Properties(): PropertyType[] {
 			return _.values(this._properties);
 		}
 	}

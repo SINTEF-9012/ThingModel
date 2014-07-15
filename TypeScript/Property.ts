@@ -4,7 +4,8 @@ module ThingModel {
 
 		private _key: string;
 
-		/* protected */ _value: any;
+		/* protected */
+		_value: any;
 
 		public get Key(): string {
 			return this._key;
@@ -41,7 +42,7 @@ module ThingModel {
 				} else {
 					return this._value === other._value;
 				}
-			}	
+			}
 
 			return false;
 		}
@@ -50,7 +51,7 @@ module ThingModel {
 	export module Property {
 
 		export module Location {
-		
+
 			export class Point extends Property {
 				constructor(key: string, value?: ThingModel.Location.Point) {
 					super(key, value);
@@ -115,7 +116,7 @@ module ThingModel {
 			public get Value(): string {
 				return this._value;
 			}
-	
+
 			public set Value(value: string) {
 				this._value = value;
 			}
@@ -133,7 +134,7 @@ module ThingModel {
 			public get Value(): number {
 				return this._value;
 			}
-	
+
 			public set Value(value: number) {
 				this._value = value;
 			}
@@ -151,7 +152,7 @@ module ThingModel {
 			public get Value(): number {
 				return this._value;
 			}
-	
+
 			public set Value(value: number) {
 				this._value = Math.round(value);
 			}
@@ -169,7 +170,7 @@ module ThingModel {
 			public get Value(): boolean {
 				return this._value;
 			}
-	
+
 			public set Value(value: boolean) {
 				this._value = value;
 			}
@@ -188,7 +189,7 @@ module ThingModel {
 			public get Value(): Date {
 				return this._value;
 			}
-	
+
 			public set Value(value: Date) {
 				this._value = value;
 			}

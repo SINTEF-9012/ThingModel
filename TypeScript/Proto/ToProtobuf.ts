@@ -56,7 +56,7 @@ module ThingModel.Proto {
 
 			this._transaction.setStringSenderId(this.StringToKey(senderID));
 
-			_.each(publish, (thing)=> {
+			_.each(publish, (thing) => {
 				this.ConvertThing(thing);
 			});
 
@@ -67,7 +67,7 @@ module ThingModel.Proto {
 
 		}
 
-		public ConvertTransaction(transaction: Transaction) : ArrayBuffer {
+		public ConvertTransaction(transaction: Transaction): ArrayBuffer {
 			return transaction.toArrayBuffer();
 		}
 
@@ -98,7 +98,7 @@ module ThingModel.Proto {
 			} else {
 				connectedThingsCache = thing.ConnectedThings;
 
-				_.any(connectedThingsCache, (connectedThing: ThingModel.Thing)=> {
+				_.any(connectedThingsCache, (connectedThing: ThingModel.Thing) => {
 					var connectionKey = this.StringToKey(connectedThing.ID);
 
 					if (previousThing == null || !_.contains(previousThing.getConnections(), connectionKey)) {
@@ -116,13 +116,13 @@ module ThingModel.Proto {
 					connectedThingsCache = thing.ConnectedThings;
 				}
 
-				_.each(connectedThingsCache, (connectedThing: ThingModel.Thing)=> {
+				_.each(connectedThingsCache, (connectedThing: ThingModel.Thing) => {
 					var connectionKey = this.StringToKey(connectedThing.ID);
 					publication.connections.push(connectionKey);
 				});
 			}
 
-			_.each(thing.Properties, (property: ThingModel.Property)=> {
+			_.each(thing.Properties, (property: ThingModel.Property) => {
 				var propertyId = this.StringToKey(property.Key);
 
 				var proto = new ProtoTools.Builder.Property();
@@ -156,7 +156,7 @@ module ThingModel.Proto {
 				case Type.DateTime:
 					proto.setType(Property.Type.DATETIME);
 					proto.setDatetimeValue(
-						(<ThingModel.Property.DateTime> property).Value.getTime());
+					(<ThingModel.Property.DateTime> property).Value.getTime());
 					break;
 				}
 
@@ -209,7 +209,7 @@ module ThingModel.Proto {
 		}
 
 		private ConvertDeleteList(list: ThingModel.Thing[]): void {
-			_.each(list, (thing: ThingModel.Thing)=> {
+			_.each(list, (thing: ThingModel.Thing) => {
 				var key = this.StringToKey(thing.ID);
 				this._transaction.things_remove_list.push(key);
 
@@ -218,13 +218,13 @@ module ThingModel.Proto {
 		}
 
 		private ConvertDeclarationList(list: ThingModel.ThingType[]): void {
-			_.each(list, (thingType: ThingModel.ThingType)=> {
+			_.each(list, (thingType: ThingModel.ThingType) => {
 				var declaration = new ProtoTools.Builder.ThingType();
 
 				declaration.setStringName(this.StringToKey(thingType.Name));
 				declaration.setStringDescription(this.StringToKey(thingType.Description));
 
-				_.each(thingType.Properties, (propertyType: ThingModel.PropertyType)=> {
+				_.each(thingType.Properties, (propertyType: ThingModel.PropertyType) => {
 					var prop = new ProtoTools.Builder.PropertyType();
 					prop.setStringKey(this.StringToKey(propertyType.Key));
 					prop.setStringName(this.StringToKey(propertyType.Name));
@@ -318,7 +318,7 @@ module ThingModel.Proto {
 
 			var stringId = thingId + ":";
 
-			_.each(this._propertiesState, (value, key)=> {
+			_.each(this._propertiesState, (value, key) => {
 				if (key.indexOf(stringId) === 0) {
 					delete this._propertiesState[key];
 				}
@@ -326,7 +326,7 @@ module ThingModel.Proto {
 		}
 
 		public ApplyThingsSuppressions(things: ThingModel.Thing[]): void {
-			_.each(things, (thing: ThingModel.Thing)=> {
+			_.each(things, (thing: ThingModel.Thing) => {
 				var key = this._stringDeclarations[thing.ID];
 
 				if (key) {

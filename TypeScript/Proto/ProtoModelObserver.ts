@@ -1,13 +1,13 @@
- module ThingModel.Proto {
+module ThingModel.Proto {
 	export class ProtoModelObserver implements IWarehouseObserver {
-		
-		public Updates : {[id:string] : ThingModel.Thing} = {};
-		public Deletions : {[id:string] : ThingModel.Thing} = {};
+
+		public Updates: { [id: string]: ThingModel.Thing } = {};
+		public Deletions: { [id: string]: ThingModel.Thing } = {};
 		public Definitions: { [name: string]: ThingModel.ThingType } = {};
 		public PermanentDefinitions: { [name: string]: ThingModel.ThingType } = {};
 		private somethingChanged = false;
 
-		public Reset() : void {
+		public Reset(): void {
 			this.Updates = {};
 			this.Deletions = {};
 			this.Definitions = {};
@@ -28,7 +28,7 @@
 		public Updated(thing: ThingModel.Thing): void {
 			this.Updates[thing.ID] = thing;
 			this.somethingChanged = true;
-		}	
+		}
 
 		public Define(thingType: ThingModel.ThingType): void {
 			this.Definitions[thingType.Name] = thingType;
@@ -41,7 +41,7 @@
 		}
 
 		public GetTransaction(toProtobuf: ToProtobuf, senderID: string,
-			allDefinitions:boolean = false): Transaction {
+			allDefinitions: boolean = false): Transaction {
 			return toProtobuf.Convert(
 				_.values(this.Updates),
 				_.values(this.Deletions),
@@ -49,4 +49,4 @@
 				senderID);
 		}
 	}
- }
+}
