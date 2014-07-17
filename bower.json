@@ -7,12 +7,12 @@
     "CSharp/*"
   ],
   "dependencies": {
-    "underscore": "~1.5.2",
-    "DefinitelyTyped": "*",
-    "protobuf": "~2.0.5"
+    "protobuf": "~2.0.5",
+    "lodash": "~2.4.1",
+    "DefinitelyTyped": "*"
   },
   "devDependencies": {
-    "mocha": "~1.17.1",
-    "should": "~3.1.2"
+    "mocha": "~1.20.1",
+    "should": "~3.3.1"
   }
 }
