@@ -2,10 +2,10 @@
 /// <reference path="../bower_components/DefinitelyTyped/should/should.d.ts" />
 
 describe("ThingType Test", () => {
-	var type : ThingModel.ThingType;
+	var type: ThingModel.ThingType;
 	var propertyType: ThingModel.PropertyType;
 
-	beforeEach(()=> {
+	beforeEach(() => {
 		type = new ThingModel.ThingType("plane");
 		propertyType = new ThingModel.PropertyType("location", ThingModel.Type.LocationLatLng);
 
@@ -13,10 +13,10 @@ describe("ThingType Test", () => {
 	});
 
 // ReSharper disable WrongExpressionStatement
-	it("should handle names correctly", ()=> {
+	it("should handle names correctly", () => {
 		type.Name.should.equal("plane");
 
-		(()=> {
+		(() => {
 			new ThingModel.ThingType("");
 		}).should.throw(/empty/);
 
@@ -25,7 +25,7 @@ describe("ThingType Test", () => {
 		}).should.throw(/null/);
 	});
 
-	it("should return the properties", ()=> {
+	it("should return the properties", () => {
 		type.GetPropertyDefinition("location").should.equal(propertyType);
 		(type.GetPropertyDefinition("canard") == null).should.be.ok;
 	});
@@ -44,7 +44,7 @@ describe("ThingType Test", () => {
 		visited.should.be.true;
 	});
 
-	it("should check the values correctly", ()=> {
+	it("should check the values correctly", () => {
 		var plane = new ThingModel.Thing("A380", type);
 
 		type.Check(plane).should.be.false;

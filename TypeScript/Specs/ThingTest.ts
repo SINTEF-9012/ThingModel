@@ -3,11 +3,11 @@
 
 import should = require('should');
 
-describe("Thing test", ()=> {
-	var thing : ThingModel.Thing;
-	var type : ThingModel.ThingType;
-	var otherThing : ThingModel.Thing;
-	var name : ThingModel.Property;
+describe("Thing test", () => {
+	var thing: ThingModel.Thing;
+	var type: ThingModel.ThingType;
+	var otherThing: ThingModel.Thing;
+	var name: ThingModel.Property;
 
 	beforeEach(() => {
 		type = new ThingModel.ThingType("Person");
@@ -26,7 +26,7 @@ describe("Thing test", ()=> {
 
 // ReSharper disable WrongExpressionStatement
 	describe("testWrongID", () => {
-		it("should fail with a null", ()=> {
+		it("should fail with a null", () => {
 			(() => { thing = new ThingModel.Thing(null); }).should.throw(/null/);
 		});
 
@@ -35,8 +35,8 @@ describe("Thing test", ()=> {
 		});
 	});
 
-	describe("Test set properties", ()=> {
-		it("should contains the saved value", ()=> {
+	describe("Test set properties", () => {
+		it("should contains the saved value", () => {
 			thing.SetProperty(new ThingModel.Property.Int("speed", 12));
 			thing.SetProperty(new ThingModel.Property.Double("speed", 12.5));
 
@@ -45,7 +45,7 @@ describe("Thing test", ()=> {
 		});
 	});
 
-	describe("Test get property", ()=> {
+	describe("Test get property", () => {
 		it("is not null", () => {
 			(thing.GetProperty<ThingModel.Property>("name", ThingModel.Type.String) !== null).should.be.ok;
 			(thing.GetProperty<ThingModel.Property>("name") !== null).should.be.ok;
@@ -56,27 +56,27 @@ describe("Thing test", ()=> {
 		});
 	});
 
-	describe("Test has property", ()=> {
-		it("just few checks", ()=> {
+	describe("Test has property", () => {
+		it("just few checks", () => {
 			thing.HasProperty("name").should.be.true;
 			thing.HasProperty("name2").should.be.false;
 		});
 	});
 
-	describe("Test connections", ()=> {
-		it("should be connected to connected things", ()=> {
+	describe("Test connections", () => {
+		it("should be connected to connected things", () => {
 			thing.IsConnectedTo(otherThing).should.be.true;
 			otherThing.IsConnectedTo(thing).should.be.false;
 		});
 
-		it("should handle null values", ()=> {
+		it("should handle null values", () => {
 			thing.Connect(null);
 			thing.IsConnectedTo(null).should.be.false;
 			thing.Disconnect(null);
 		});
 
-		it("should not be connected to itself", ()=> {
-			(()=> {
+		it("should not be connected to itself", () => {
+			(() => {
 				thing.Connect(thing);
 			}).should.throw(/itself/);
 
@@ -85,12 +85,12 @@ describe("Thing test", ()=> {
 			}).should.throw(/itself/);
 		});
 
-		it("should disconnect a thing properly", ()=> {
+		it("should disconnect a thing properly", () => {
 			thing.Disconnect(otherThing);
 			thing.IsConnectedTo(otherThing).should.be.false;
 		});
 
-		it("should disconnect all things if needed", ()=> {
+		it("should disconnect all things if needed", () => {
 			thing.DisconnectAll();
 			thing.IsConnectedTo(otherThing).should.be.false;
 		});
@@ -103,14 +103,14 @@ describe("Thing test", ()=> {
 			thing.IsConnectedTo(otherThing).should.be.false;
 		});
 
-		it("should count connected things correctly", ()=> {
+		it("should count connected things correctly", () => {
 			thing.ConnectedThingsCount.should.be.equal(1);
 			thing.Disconnect(otherThing);
 			thing.ConnectedThingsCount.should.be.equal(0);
 		});
 	});
 
-	describe("Test properties", ()=> {
+	describe("Test properties", () => {
 		it("should contains the name property", () => {
 			_.each(thing.Properties, (p: ThingModel.Property) => {
 				p.Key.should.be.equal("name");
@@ -127,7 +127,7 @@ describe("Thing test", ()=> {
 			thing.Compare(thing).should.be.true;
 		});
 
-		it("should be different when the type is different", ()=> {
+		it("should be different when the type is different", () => {
 			var newThing = new ThingModel.Thing(thing.ID); // default type
 
 			newThing.SetProperty(new ThingModel.Property.String("name", "Pierre"));
@@ -137,7 +137,7 @@ describe("Thing test", ()=> {
 			thing.Compare(newThing).should.be.false;
 		});
 
-		it("should be different when the connections are different", ()=> {
+		it("should be different when the connections are different", () => {
 			var newThing = new ThingModel.Thing(thing.ID, type);
 			newThing.SetProperty(new ThingModel.Property.String("name", "Pierre"));
 
@@ -145,7 +145,7 @@ describe("Thing test", ()=> {
 			thing.Compare(newThing).should.be.false;
 		});
 
-		it("should handle differents ids correctly", ()=> {
+		it("should handle differents ids correctly", () => {
 			var newThing = new ThingModel.Thing("banana", type);
 			newThing.SetProperty(new ThingModel.Property.String("name", "Pierre"));
 			newThing.Connect(otherThing);
@@ -183,7 +183,7 @@ describe("Thing test", ()=> {
 				thing.Compare(newThing).should.be.false;
 			});
 
-			it("should be different if the properties value are different", ()=> {
+			it("should be different if the properties value are different", () => {
 
 				var newThing = new ThingModel.Thing(thing.ID, type);
 				newThing.SetProperty(new ThingModel.Property.String("name", "Bob"));
@@ -204,7 +204,7 @@ describe("Thing test", ()=> {
 			});
 		});
 
-		it("should handle deep comparisons", ()=> {
+		it("should handle deep comparisons", () => {
 			var aThingForTheRoad = new ThingModel.Thing("rabbit");
 			aThingForTheRoad.SetProperty(new ThingModel.Property.Double("speed", 12));
 			thing.Connect(aThingForTheRoad);
@@ -231,7 +231,7 @@ describe("Thing test", ()=> {
 			newThing.Compare(thing, true, true).should.be.false;
 		});
 
-		it("should handle infinite loop connections", ()=> {
+		it("should handle infinite loop connections", () => {
 
 			var newThing = new ThingModel.Thing(thing.ID, type);
 			newThing.SetProperty(new ThingModel.Property.String("name", "Pierre"));

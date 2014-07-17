@@ -42,6 +42,7 @@
     <TypeScriptCompile Include="Type.ts" />
     <TypeScriptCompile Include="WebSockets\Client.ts" />
     <TypeScriptCompile Include="Warehouse.ts" />
+    <TypeScriptCompile Include="WebSockets\IClientObserver.ts" />
   </ItemGroup>
   <ItemGroup>
     <None Include="web.Debug.config">

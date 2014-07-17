@@ -11,3 +11,5 @@ packages
 # IDE
 *.sublime-workspace
 *.userprefs
+
+*.tscache

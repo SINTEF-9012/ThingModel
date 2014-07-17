@@ -1,13 +1,13 @@
 /// <reference path="../bower_components/DefinitelyTyped/mocha/mocha.d.ts" />
 /// <reference path="../bower_components/DefinitelyTyped/should/should.d.ts" />
 
-describe("Property Test", ()=> {
+describe("Property Test", () => {
 
 // ReSharper disable WrongExpressionStatement
-	describe("Test values", ()=> {
+	describe("Test values", () => {
 		it("should work with a boolean", () => {
 			new ThingModel.Property.Boolean("good", true).Value
-			.should.be.true;
+				.should.be.true;
 		});
 
 		it("should work with a string", () => {
@@ -33,18 +33,18 @@ describe("Property Test", ()=> {
 
 		it("should work with a location", () => {
 			new ThingModel.Property.Location.Point("location",
-				new ThingModel.Location.Point(1.0, 2.0, 3.0)).Value
-					.should.be.ok;
+					new ThingModel.Location.Point(1.0, 2.0, 3.0)).Value
+				.should.be.ok;
 			new ThingModel.Property.Location.LatLng("location",
-				new ThingModel.Location.LatLng(1.0, 2.0, 3.0)).Value
-					.should.be.ok;
+					new ThingModel.Location.LatLng(1.0, 2.0, 3.0)).Value
+				.should.be.ok;
 			new ThingModel.Property.Location.Equatorial("location",
-				new ThingModel.Location.Equatorial(1.0, 2.0, 3.0)).Value
-					.should.be.ok;
+					new ThingModel.Location.Equatorial(1.0, 2.0, 3.0)).Value
+				.should.be.ok;
 		});
 	});
 
-	describe("Test ValueToString()", ()=> {
+	describe("Test ValueToString()", () => {
 		it("should work with a boolean", () => {
 			new ThingModel.Property.Boolean("good", true).ValueToString()
 				.should.not.be.empty;
@@ -73,29 +73,29 @@ describe("Property Test", ()=> {
 
 		it("should work with a location", () => {
 			new ThingModel.Property.Location.LatLng("location",
-				new ThingModel.Location.LatLng(1.0, 2.0, 3.0)).ValueToString()
-					.should.match(/2/);
+					new ThingModel.Location.LatLng(1.0, 2.0, 3.0)).ValueToString()
+				.should.match(/2/);
 		});
 	});
 
-	describe("Properties comparison", ()=> {
+	describe("Properties comparison", () => {
 
 		var property: ThingModel.Property;
 
-		beforeEach(()=> {
+		beforeEach(() => {
 			property = new ThingModel.Property.Double("speed");
 		});
 
-		it("should handle null", ()=> {
+		it("should handle null", () => {
 			property.CompareValue(null).should.be.false;
 		});
 
 		it("should return false when the property is totally different", () => {
 			property.CompareValue(new ThingModel.Property.String("poisson", "roger"))
-			.should.be.false;
+				.should.be.false;
 		});
 
-		it("should return false if the value is different", ()=> {
+		it("should return false if the value is different", () => {
 			property.CompareValue(new ThingModel.Property.Double("speed2", 45.0))
 				.should.be.false;
 		});

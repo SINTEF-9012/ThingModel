@@ -1,7 +1,7 @@
-﻿/// <reference path="../bower_components/DefinitelyTyped/mocha/mocha.d.ts" />
+/// <reference path="../bower_components/DefinitelyTyped/mocha/mocha.d.ts" />
 /// <reference path="../bower_components/DefinitelyTyped/should/should.d.ts" />
 
-describe("ProtoConversions Test", ()=> {
+describe("ProtoConversions Test", () => {
 	var warehouseInput: ThingModel.Warehouse;
 	var warehouseOutput: ThingModel.Warehouse;
 
@@ -10,7 +10,7 @@ describe("ProtoConversions Test", ()=> {
 
 	var observer: ThingModel.Proto.ProtoModelObserver;
 
-	beforeEach(()=> {
+	beforeEach(() => {
 		warehouseInput = new ThingModel.Warehouse();
 		warehouseOutput = new ThingModel.Warehouse();
 
@@ -170,7 +170,7 @@ describe("ProtoConversions Test", ()=> {
 
 	it("should has correct datetime properties", () => {
 		var thing = ThingModel.BuildANewThing.WithoutType.IdentifiedBy("twingo")
-			.ContainingA.DateTime("birthdate", new Date(Date.UTC(1998,6,24)))
+			.ContainingA.DateTime("birthdate", new Date(Date.UTC(1998, 6, 24)))
 			.AndA.DateTime("now", new Date());
 
 		warehouseOutput.RegisterThing(thing.Build());
@@ -178,9 +178,9 @@ describe("ProtoConversions Test", ()=> {
 
 		var newThing = warehouseInput.GetThing("twingo");
 		newThing.GetProperty<ThingModel.Property.DateTime>("birthdate").Value.should.be.eql(
-			new Date(Date.UTC(1998,6,24)));
+			new Date(Date.UTC(1998, 6, 24)));
 		(+newThing.GetProperty<ThingModel.Property.DateTime>("now").Value).should.be.lessThan(
-			+new Date());
+			(+new Date())+1);
 	});
 
 	it("works with connexions", () => {

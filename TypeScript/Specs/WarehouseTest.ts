@@ -6,8 +6,8 @@ class WarehouseChangeObserver implements ThingModel.IWarehouseObserver {
 	public UpdatedThing: boolean = false;
 	public DeletedThing: boolean = false;
 	public DefinedType: boolean = false;
-	
-	public Reset() : void {
+
+	public Reset(): void {
 		this.NewThing = false;
 		this.UpdatedThing = false;
 		this.DefinedType = false;
@@ -17,14 +17,14 @@ class WarehouseChangeObserver implements ThingModel.IWarehouseObserver {
 	public New(thing: ThingModel.Thing): void {
 		this.NewThing = true;
 	}
-	
+
 	public Deleted(thing: ThingModel.Thing): void {
 		this.DeletedThing = true;
 	}
-	
+
 	public Updated(thing: ThingModel.Thing): void {
 		this.UpdatedThing = true;
-	}	
+	}
 
 	public Define(thingType: ThingModel.ThingType): void {
 		this.DefinedType = true;
@@ -60,28 +60,28 @@ describe("Warehouse Test", () => {
 
 		warehouseChangeObserver.Reset();
 
-		(()=> {
+		(() => {
 			warehouse.RegisterType(null);
 		}).should.throw(/null/);
 
 		warehouseChangeObserver.DefinedType.should.be.false;
 	});
 
-	it("should register things", ()=> {
+	it("should register things", () => {
 		warehouse.RegisterThing(thing);
 
 		warehouseChangeObserver.NewThing.should.be.true;
 
 		warehouseChangeObserver.Reset();
 
-		(()=> {
+		(() => {
 			warehouse.RegisterThing(null);
 		}).should.throw(/null/);
 
 		warehouseChangeObserver.NewThing.should.be.false;
 	});
 
-	it("should register things and types in one instruction", ()=> {
+	it("should register things and types in one instruction", () => {
 		warehouse.RegisterThing(thing, true, true);
 
 		warehouseChangeObserver.NewThing.should.be.true;
@@ -94,7 +94,7 @@ describe("Warehouse Test", () => {
 		warehouseChangeObserver.DefinedType.should.be.false;
 	});
 
-	it("should understand when it's an update", ()=> {
+	it("should understand when it's an update", () => {
 		warehouse.RegisterThing(thing);
 		warehouseChangeObserver.UpdatedThing.should.be.false;
 
@@ -112,7 +112,7 @@ describe("Warehouse Test", () => {
 		warehouseChangeObserver.NewThing.should.be.false;
 	});
 
-	it("should delete the things", ()=> {
+	it("should delete the things", () => {
 		warehouse.RegisterThing(thing);
 		warehouse.RemoveThing(thing);
 
@@ -132,7 +132,7 @@ describe("Warehouse Test", () => {
 		warehouseChangeObserver.NewThing.should.be.true;
 	});
 
-	it("should register things recursively", ()=> {
+	it("should register things recursively", () => {
 		warehouse.RegisterThing(thing);
 		warehouseChangeObserver.Reset();
 
@@ -159,7 +159,7 @@ describe("Warehouse Test", () => {
 		warehouseChangeObserver.NewThing.should.be.true;
 	});
 
-	it("should handle deletes and connections", ()=> {
+	it("should handle deletes and connections", () => {
 		var otherThing = new ThingModel.Thing("lapin");
 		otherThing.Connect(thing);
 
