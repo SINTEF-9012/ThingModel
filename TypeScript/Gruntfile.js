@@ -29,7 +29,7 @@ module.exports = function(grunt) {
 			ts: {
 				options: {
 					sourceMap: true,
-					sourceMapName: 'build/ThinModel.min.js.map'
+					sourceMapName: 'build/ThingModel.min.js.map'
 				},
 				files: {
 					'build/ThingModel.min.js' : ['build/ThingModel.js']
