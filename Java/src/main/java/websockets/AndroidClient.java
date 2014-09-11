@@ -13,7 +13,6 @@ import org.thingmodel.proto.ProtoModelObserver;
 import org.thingmodel.proto.ProtoTransaction;
 import org.thingmodel.proto.ToProtobuf;
 
-import javax.xml.bind.DatatypeConverter;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -101,8 +100,6 @@ public class AndroidClient {
                     @Override
                     public void onDataAvailable(DataEmitter dataEmitter, ByteBufferList byteBufferList) {
                         byte[] buffer = byteBufferList.getAllByteArray();
-
-                        System.out.println(DatatypeConverter.printBase64Binary(buffer));
 
                         try {
                             ProtoTransaction.Transaction t = ProtoTransaction.Transaction.parseFrom(buffer);
