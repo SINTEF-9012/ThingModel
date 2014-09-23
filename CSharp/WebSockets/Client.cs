@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using ThingModel.Proto;
 using WebSocketSharp;
@@ -21,6 +22,8 @@ namespace ThingModel.WebSockets
         private readonly ProtoModelObserver _thingModelObserver;
 		private readonly object _lock = new Object();
 
+        private readonly IList<string> _sendMessageWaitingList;
+
         public Client(string senderID, string path, Warehouse warehouse)
         {
             SenderID = senderID;
@@ -39,6 +42,8 @@ namespace ThingModel.WebSockets
             _ws.OnClose += WsOnClose;
 			_ws.OnOpen += WsOnOpen;
 
+            _sendMessageWaitingList = new List<string>();
+
             Connect();
         }
 
@@ -48,6 +53,16 @@ namespace ThingModel.WebSockets
             _toProtobuf = new ToProtobuf();
 
 		    _reconnectionDelay = 1;
+
+	        if (_sendMessageWaitingList.Count > 0)
+	        {
+	            foreach (var message in _sendMessageWaitingList)
+	            {
+	                Send(message);
+	            }
+                _sendMessageWaitingList.Clear();
+	        }
+
 		    Send();
 	    }
 
@@ -75,7 +90,14 @@ namespace ThingModel.WebSockets
         {
             lock (_lock)
             {
-                _ws.Send(message);
+                if (_closed)
+                {
+                    _sendMessageWaitingList.Add(message);
+                }
+                else
+                {
+                    _ws.Send(message);
+                }
             }
         }
 

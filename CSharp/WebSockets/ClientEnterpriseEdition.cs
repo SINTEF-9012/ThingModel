@@ -27,16 +27,16 @@ namespace ThingModel.WebSockets
         {
             if (!IsPaused) return;
 
-            IsPaused = false;
             Send("play");
+            IsPaused = false;
         }
 
         public void Pause()
         {
             if (IsPaused) return;
 
-            IsPaused = true;
             Send("pause");
+            IsPaused = true;
         }
 
 		private static readonly TimeSpan DateTimeEpoch = new TimeSpan(
