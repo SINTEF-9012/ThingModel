@@ -41,9 +41,9 @@ module ThingModel.Proto {
 		}
 
 		public GetTransaction(toProtobuf: ToProtobuf, senderID: string,
-			allDefinitions: boolean = false): Transaction {
+			allDefinitions: boolean = false, onlyDefinitions: boolean = false): Transaction {
 			return toProtobuf.Convert(
-				_.values(this.Updates),
+				onlyDefinitions ? [] : _.values(this.Updates),
 				_.values(this.Deletions),
 				_.values(allDefinitions ? this.PermanentDefinitions : this.Definitions),
 				senderID);

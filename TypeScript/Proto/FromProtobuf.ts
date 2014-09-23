@@ -3,11 +3,11 @@ module ThingModel.Proto {
 	export class FromProtobuf {
 		private _warehouse: Warehouse;
 
-		private _stringDeclarations: { [key: number]: string };
+		public StringDeclarations: { [key: number]: string };
 
 		constructor(warehouse: Warehouse) {
 			this._warehouse = warehouse;
-			this._stringDeclarations = {};
+			this.StringDeclarations = {};
 		}
 
 		private KeyToString(key: number): string {
@@ -15,7 +15,7 @@ module ThingModel.Proto {
 				return "";
 			}
 
-			var value = this._stringDeclarations[key];
+			var value = this.StringDeclarations[key];
 
 			return typeof value === "undefined" ? "undefined" : value;
 		}
@@ -30,7 +30,7 @@ module ThingModel.Proto {
 
 			// Convert the string declarations
 			_.each(transaction.string_declarations, (d: StringDeclaration) => {
-				this._stringDeclarations[d.key] = d.value;
+				this.StringDeclarations[d.key] = d.value;
 			});
 
 			var senderId = this.KeyToString(transaction.string_sender_id);

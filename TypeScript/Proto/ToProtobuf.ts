@@ -6,8 +6,8 @@ module ThingModel.Proto {
 		private _transaction: Transaction;
 
 		// String declaration dictionary
-		private _stringDeclarations: { [value: string]: number };
-		private _stringDeclarationsCpt: number;
+		public StringDeclarations: { [value: string]: number };
+		public StringDeclarationsCpt: number;
 
 		// String to declares
 		private _stringToDeclare: { [value: string]: boolean };
@@ -16,8 +16,8 @@ module ThingModel.Proto {
 		private _propertiesState: { [key: string]: Property };
 
 		constructor() {
-			this._stringDeclarations = {};
-			this._stringDeclarationsCpt = 0;
+			this.StringDeclarations = {};
+			this.StringDeclarationsCpt = 0;
 			this._stringToDeclare = {};
 			this._thingsState = {};
 			this._propertiesState = {};
@@ -28,14 +28,14 @@ module ThingModel.Proto {
 				return 0;
 			}
 
-			var key = this._stringDeclarations[value];
+			var key = this.StringDeclarations[value];
 
 			if (key) {
 				return key;
 			}
 
-			key = ++this._stringDeclarationsCpt;
-			this._stringDeclarations[value] = key;
+			key = ++this.StringDeclarationsCpt;
+			this.StringDeclarations[value] = key;
 
 			var stringDeclaration = new ProtoTools.Builder.StringDeclaration();
 
@@ -327,7 +327,7 @@ module ThingModel.Proto {
 
 		public ApplyThingsSuppressions(things: ThingModel.Thing[]): void {
 			_.each(things, (thing: ThingModel.Thing) => {
-				var key = this._stringDeclarations[thing.ID];
+				var key = this.StringDeclarations[thing.ID];
 
 				if (key) {
 					this.ManageThingSuppression(key);
