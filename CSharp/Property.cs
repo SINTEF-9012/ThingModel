@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Globalization;
 using System.Text;
 
@@ -82,7 +82,15 @@ namespace ThingModel
 
 				public override Property Clone()
 				{
-					return new Point(_key, Value);
+                    var p = new Point(_key, new ThingModel.Location.Point(
+                        Value.X, Value.Y, Value.Z));
+
+                    if (Value.System != null)
+				    {
+				        p.Value.System = Value.System;
+				    }
+
+				    return p;
 				}
 	        }
 
@@ -100,7 +108,15 @@ namespace ThingModel
 				
 				public override Property Clone()
 				{
-					return new LatLng(_key, Value);
+                    var p = new LatLng(_key, new ThingModel.Location.LatLng(
+                        Value.Latitude, Value.Longitude, Value.Altitude));
+
+                    if (Value.System != null)
+				    {
+				        p.Value.System = Value.System;
+				    }
+
+				    return p;
 				}
 	        }
 
@@ -118,7 +134,15 @@ namespace ThingModel
 				
 				public override Property Clone()
 				{
-					return new Equatorial(_key, Value);
+                    var p = new Equatorial(_key, new ThingModel.Location.Equatorial(
+                        Value.RightAscension, Value.Declination, Value.HourAngle));
+
+                    if (Value.System != null)
+				    {
+				        p.Value.System = Value.System;
+				    }
+
+				    return p;
 				}
 	        }
         }
@@ -146,6 +170,7 @@ namespace ThingModel
 				
 			public override Property Clone()
 			{
+                // String are immutable, providing Value directly is enough
 				return new String(_key, Value);
 			}
         }
