@@ -14,6 +14,8 @@ module ThingModel.WebSockets {
 
 		private _observers: IClientObserver[];
 
+		private _sendMessageWaitingList: string[];
+
 		constructor(senderID: string, path: string, warehouse: Warehouse) {
 			this.SenderID = senderID;
 			this._path = path;
@@ -30,6 +32,8 @@ module ThingModel.WebSockets {
 			this._reconnection = false;
 
 			this._observers = null;
+
+			this._sendMessageWaitingList = [];
 
 			this.Connect();
 		}
@@ -49,6 +53,14 @@ module ThingModel.WebSockets {
 				this._connexionDelay = 2000;
 
 				var firstOpen = !this._reconnection;
+
+				if (this._sendMessageWaitingList.length > 0) {
+					_.each(this._sendMessageWaitingList, (message: string) => {
+						this.SendMessage(message);
+					});
+
+					this._sendMessageWaitingList = [];
+				}
 
 				// Send changes
 				this.Send();
@@ -80,13 +92,16 @@ module ThingModel.WebSockets {
 
 			this._ws.onmessage = (message) => {
 				// Convert the Blob message to an ArrayBuffer object
+				var data = message.data;
 
-				if (useFileReader) {
+				if (typeof data === "string") {
+					console.info("ThingModel has received a string: "+message);
+				} else if (useFileReader) {
 					var fileReader = new FileReader();
-					fileReader.readAsArrayBuffer(message.data);
+					fileReader.readAsArrayBuffer(data);
 					fileReader.onload = () => this.parseBuffer(fileReader.result);
 				} else {
-					this.parseBuffer(message.data);
+					this.parseBuffer(data);
 				}
 			};
 
@@ -117,6 +132,14 @@ module ThingModel.WebSockets {
 				console.debug("ThingModel: transaction sent");
 
 				this.NotifyObservers((obs) => obs.OnSend());
+			}
+		}
+
+		/* protected */ public SendMessage(message: string): void {
+			if (this._closed) {
+				this._sendMessageWaitingList.push(message);
+			} else {
+				this._ws.send(message);
 			}
 		}
 
