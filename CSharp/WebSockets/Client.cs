@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 using ThingModel.Proto;
 using WebSocketSharp;
@@ -51,7 +51,7 @@ namespace ThingModel.WebSockets
 		    Send();
 	    }
 
-	    public void Send()
+	    public virtual void Send()
         {
 			lock (_lock) {
 				if (_closed)
@@ -69,6 +69,14 @@ namespace ThingModel.WebSockets
 					_reconnection = false;
 				}
 			}
+        }
+
+        protected void Send(string message)
+        {
+            lock (_lock)
+            {
+                _ws.Send(message);
+            }
         }
 
         private void WsOnClose(object sender, CloseEventArgs closeEventArgs)
@@ -122,11 +130,19 @@ namespace ThingModel.WebSockets
 					catch (Exception e)
 					{
 						Console.WriteLine(SenderID + " | Big exception when receiving the message : " + e.Message);
-					}	
-				}
+					}
+                }
+                else if (args.Type == Opcode.Text)
+                {
+                    WsOnStringMessage(args.Data);
+                }
 			}
         }
 
+        protected virtual void WsOnStringMessage(string message)
+        {
+            Console.WriteLine("ThingModelClient has received a string: "+message);
+        }
 
         public void Close()
         {

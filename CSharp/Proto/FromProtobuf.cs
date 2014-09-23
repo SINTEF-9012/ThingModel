@@ -64,7 +64,7 @@ namespace ThingModel.Proto
 				var id = KeyToString(thingKey);
 				thingsToDelete.Add(Warehouse.GetThing(id));
 			}
-			Warehouse.RemoveCollection(thingsToDelete, senderId);
+			Warehouse.RemoveCollection(thingsToDelete, true, senderId);
 
 	        foreach (var type in transaction.thingtypes_declaration_list)
 	        {

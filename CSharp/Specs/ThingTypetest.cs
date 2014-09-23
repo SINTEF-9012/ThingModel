@@ -1,4 +1,4 @@
-﻿#region
+#region
 
 using System;
 using NUnit.Framework;
@@ -95,8 +95,20 @@ namespace ThingModel.Specs
 	    public void CheckEqualityComparator()
 	    {
 		    Assert.That(_type, Is.EqualTo(_type));
+		    Assert.That(_type, Is.Not.EqualTo(null));
+		    Assert.IsFalse(_type.Is(null));
+		    Assert.That(_type, Is.Not.EqualTo(BuildANewThingType.Named("pony")));
+
 		    var newType = BuildANewThingType.Named("Plane");
 		    
+			Assert.That(_type, Is.Not.EqualTo((ThingType) newType));
+
+		    newType = BuildANewThingType.Named("Plane")
+                .ContainingA.String("canard");
+			Assert.That(_type, Is.Not.EqualTo((ThingType) newType));
+	        
+		    newType = BuildANewThingType.Named("Plane")
+                .ContainingA.String("location");
 			Assert.That(_type, Is.Not.EqualTo((ThingType) newType));
 
 		    newType.ContainingA.LocationLatLng("location");

@@ -1,6 +1,7 @@
-﻿#region
+#region
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using NUnit.Framework;
 
@@ -235,6 +236,23 @@ namespace ThingModel.Specs
 	    }
 
         [Test]
+        public void DeleteCollectionWithTwoConnectedThings()
+        {
+            var otherThing = new Thing("lapin");
+            otherThing.Connect(_thing);
+            _warehouse.RegisterThing(otherThing);
+            //_warehouse.RegisterThing(_thing);
+            
+            Assert.That(_warehouse.Things.Count, Is.EqualTo(2));
+
+            _warehouseChangeObserver.Reset();
+            _warehouse.RemoveCollection(new HashSet<Thing>{_thing});
+
+            Assert.That(_warehouseChangeObserver.UpdatedThing, Is.True);
+            Assert.That(_warehouse.Things.Count, Is.EqualTo(1));
+        }
+
+        [Test]
         public void MultiThreadCarnage()
         {
             Assert.DoesNotThrow(delegate
@@ -456,6 +474,12 @@ namespace ThingModel.Specs
 			_warehouse.RegisterThing(_thing);
 			Assert.That(newThing, Is.False);
             Assert.That(updatedThing, Is.True);
+
+		    _warehouse.Events.EnableMutationsObservation();
+			_warehouse.RegisterThing(_thing);
+	        deletedThing = false;
+            _warehouse.RemoveThing(_thing);
+            Assert.That(deletedThing, Is.True);
 	    }
     }
 

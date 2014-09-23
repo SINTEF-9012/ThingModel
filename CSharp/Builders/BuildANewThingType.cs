@@ -1,12 +1,9 @@
-﻿using System;
+using System;
 
 namespace ThingModel.Builders
 {
 	public class BuildANewThingType
 	{
-		private BuildANewThingType()
-		{}
-
 		public static ThingTypePropertyBuilder Named(String name)
 		{
 			return new ThingTypePropertyBuilder(new ThingType(name));

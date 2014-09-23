@@ -1,4 +1,4 @@
-﻿#region
+#region
 
 using System;
 using NUnit.Framework;
@@ -194,6 +194,133 @@ namespace ThingModel.Specs
             Assert.That(b.Latitude, Is.EqualTo(42));
             Assert.That(b.Longitude, Is.EqualTo(42));
             Assert.That(b.Altitude, Is.EqualTo(42));
+        }
+
+        [Test]
+        public void TestPropertyTypeHashCode()
+        {
+            var a = new PropertyType("location", typeof (Property.Location.Equatorial));
+            var b = new PropertyType("location", typeof (Property.Location.LatLng));
+
+            Assert.That(a.GetHashCode(), Is.Not.EqualTo(b.GetHashCode()));
+
+            b = new PropertyType("location2", typeof (Property.Location.Equatorial));
+            Assert.That(a.GetHashCode(), Is.Not.EqualTo(b.GetHashCode()));
+            
+            b = new PropertyType("location", typeof (Property.Location.Equatorial));
+            b.Required = false;
+            Assert.That(a.GetHashCode(), Is.Not.EqualTo(b.GetHashCode()));
+            
+            b = new PropertyType("location", typeof (Property.Location.Equatorial));
+            b.Description = "this is a location";
+            Assert.That(a.GetHashCode(), Is.Not.EqualTo(b.GetHashCode()));
+            
+            b = new PropertyType("location", typeof (Property.Location.Equatorial));
+            Assert.That(a.GetHashCode(), Is.EqualTo(b.GetHashCode()));
+        }
+
+        [Test]
+        public void TestLocationHashCode()
+        {
+            var a = new Location.LatLng();
+            var b = new Location.LatLng(1, 2, 3);
+
+            Assert.That(a.GetHashCode(), Is.Not.EqualTo(b.GetHashCode()));
+
+            // Same even it the type is not exactly the same
+            var c = new Location.Point();
+            Assert.That(a.GetHashCode(), Is.EqualTo(c.GetHashCode()));
+
+            b = new Location.LatLng();
+            Assert.That(a.GetHashCode(), Is.EqualTo(b.GetHashCode()));
+        }
+
+        [Test]
+        public void TestEmptyPropertyKey()
+        {
+            Assert.Throws<Exception>(() => new Property.DateTime(""));
+        }
+
+        [Test]
+        public void TestEmptyPropertyTestkey()
+        {
+            Assert.Throws<Exception>(() => new PropertyType("", typeof (Property.String)));
+        }
+
+        [Test]
+        public void TestClonePoint()
+        {
+            var a = new Property.Location.Point("p");
+            a.Value = new Location.Point();
+            var b = (Property.Location.Point) a.Clone();
+
+            a.Value.X += 2;
+
+            Assert.That(a.Value.X, Is.Not.EqualTo(b.Value.X));
+        }
+        
+        [Test]
+        public void TestCloneLatLng()
+        {
+            var a = new Property.Location.LatLng("p");
+            a.Value = new Location.LatLng();
+            var b = (Property.Location.LatLng) a.Clone();
+
+            a.Value.Latitude += 2;
+
+            Assert.That(a.Value.Latitude, Is.Not.EqualTo(b.Value.Latitude));
+        }
+        
+        [Test]
+        public void TestCloneEquatorial()
+        {
+            var a = new Property.Location.Equatorial("p");
+            a.Value = new Location.Equatorial();
+            var b = (Property.Location.Equatorial) a.Clone();
+
+            a.Value.Declination += 2;
+
+            Assert.That(a.Value.Declination, Is.Not.EqualTo(b.Value.Declination));
+        }
+        
+        [Test]
+        public void TestCloneString()
+        {
+            var a = new Property.String("p");
+            a.Value = "a";
+            var b = (Property.String) a.Clone();
+            a.Value = "b";
+            Assert.That(a.Value, Is.Not.EqualTo(b.Value));
+        }
+        
+        [Test]
+        public void TestCloneInt()
+        {
+            var a = new Property.Int("p");
+            a.Value = 1;
+            var b = (Property.Int) a.Clone();
+            a.Value = 2;
+            Assert.That(a.Value, Is.Not.EqualTo(b.Value));
+        }
+
+        [Test]
+        public void TestCloneBoolean()
+        {
+            var a = new Property.Boolean("p");
+            a.Value = true;
+            var b = (Property.Boolean) a.Clone();
+            a.Value = false;
+            Assert.That(a.Value, Is.Not.EqualTo(b.Value));
+        }
+
+        [Test]
+        public void TestCloneDateTime()
+        {
+            var a = new Property.DateTime("p");
+            a.Value = new DateTime(1,2,3);
+            var b = (Property.DateTime) a.Clone();
+            a.Value = new DateTime(4,5,6);
+            Assert.That(a.Value, Is.Not.EqualTo(b.Value));
         }
     }
 }

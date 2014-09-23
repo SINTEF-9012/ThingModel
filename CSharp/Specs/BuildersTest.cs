@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+using System;
+using NUnit.Framework;
 using ThingModel.Builders;
 
 namespace ThingModel.Specs
@@ -28,8 +29,8 @@ namespace ThingModel.Specs
 
 			ThingType superRabbit = BuildANewThingType.Named("super_rabbit")
 				.WhichIs("A better rabbit")
-				.ContainingA.CopyOf(type)
-				.AndAn.Int("power");
+				.ContainingAn.Int("power")
+				.AndA.CopyOf(type);
 
 			Assert.That(superRabbit.GetPropertyDefinition("name"), Is.Not.Null);
 			Assert.That(superRabbit.GetPropertyDefinition("power"), Is.Not.Null);
@@ -47,13 +48,24 @@ namespace ThingModel.Specs
 			Thing duck = BuildANewThing.As(duckType)
 				.IdentifiedBy("ab548")
 				.ContainingA.String("name", "Roger")
-				.AndA.Location("localization", new Location.Point())
+                .AndA.Location(new Location.Point())
+				.AndA.Location("destination", new Location.Point())
 				.AndAn.Int("nbChildren", 12);
 
 			Assert.That(duck.ID, Is.EqualTo("ab548"));
 			Assert.That(duck.Type.Name, Is.EqualTo("duck"));
 			Assert.That(duck.GetProperty<Property.Int>("nbChildren").Value,
 				Is.EqualTo(12));
+
+            Thing spaceShip = BuildANewThing.WithoutType()
+                .IdentifiedBy("spaceShip")
+                .ContainingAn.Int("speed", 12)
+                .AndA.Location(new Location.LatLng(1, 2, 3))
+                .AndA.Location(new Location.Equatorial(1, 2, 3)) // change type
+                .AndA.Location("destination", new Location.Equatorial(4, 5, 6))
+                .AndA.Location("from", new Location.LatLng(7,8))
+                .AndA.DateTime("arrivalTime", new DateTime(2087, 8, 14))
+                .AndA.Double("averageSpeed", Double.NaN);
 		}
 	}
 }

@@ -1,4 +1,4 @@
-﻿
+
 using System;
 using NUnit.Framework;
 using ThingModel.Proto;
@@ -95,9 +95,14 @@ namespace ThingModel.Specs
         public void CheckDeletes()
         {
             var duck = new Thing("canard");
+            duck.String("name", "roger");
             _warehouse.RegisterThing(duck);
 
-            var transaction = _toProtobuf.Convert(new Thing[0], new [] {duck}, new ThingType[0], "bob");
+            var transaction = _toProtobuf.Convert(new []{duck}, new Thing[] {}, new ThingType[0], "bob");
+            _fromProtobuf.Convert(transaction);
+            Assert.That(_warehouse.GetThing("canard"), Is.Not.Null);
+
+            transaction = _toProtobuf.Convert(new Thing[]{}, new [] {duck}, new ThingType[0], "bob");
 
             Assert.That(transaction.things_remove_list.Count, Is.EqualTo(1));
 
