@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace ThingModel
@@ -106,33 +106,39 @@ namespace ThingModel
             
         }
 
-		public void RemoveCollection(ISet<Thing> collection, string sender = null)
+		public void RemoveCollection(ISet<Thing> collection, bool notifyUpdates = true, string sender = null)
 		{
 			var thingsToDisconnect = new HashSet<Thing>();
 
 			foreach (var thing in collection)
 			{
-				RemoveThing(thing, false, sender);
 
-				lock (_lockDictionaryThings)
-				{
-					foreach (var t in _things)
-					{
-						if (t.Value.IsConnectedTo(thing))
-						{
-							thingsToDisconnect.Add(t.Value);
-						}
-					}
-				}
+			    if (notifyUpdates)
+			    {
+			        lock (_lockDictionaryThings)
+			        {
+			            foreach (var t in _things)
+			            {
+			                if (t.Value.IsConnectedTo(thing))
+			                {
+		                        thingsToDisconnect.Add(t.Value);
+			                }
+			            }
+			        }
+			    }
+
+			    RemoveThing(thing, false, sender);
 			}
 
-			foreach (var t in thingsToDisconnect)
-			{
-				if (!collection.Contains(t))
-				{
-					NotifyThingUpdate(t, sender);
-				}
-			}
+            if (notifyUpdates) {
+                foreach (var t in thingsToDisconnect)
+                {
+                    if (!collection.Contains(t))
+                    {
+                        NotifyThingUpdate(t, sender);
+                    }
+                }
+            }
 		}
 
 		public void RegisterCollection(IEnumerable<Thing> collection, bool alsoRegisterTypes = true, string sender = null)
