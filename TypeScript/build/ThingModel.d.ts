@@ -53,10 +53,23 @@ declare module ThingModel.WebSockets {
         constructor(senderID: string, path: string, warehouse: Warehouse);
         public Connect(): void;
         public Send(): void;
+        public SendMessage(message: string): void;
         public Close(): void;
         public IsConnected(): boolean;
         public RegisterObserver(observer: IClientObserver): void;
         public UnregisterObserver(observer: IClientObserver): void;
+    }
+}
+declare module ThingModel.WebSockets {
+    class ClientEnterpriseEdition extends Client {
+        public IsLive : boolean;
+        public IsPaused : boolean;
+        constructor(senderID: string, path: string, warehouse: Warehouse);
+        public Live(): void;
+        public Play(): void;
+        public Pause(): void;
+        public Load(time: Date): void;
+        public Send(): void;
     }
 }
 declare module ThingModel.WebSockets {
@@ -70,6 +83,9 @@ declare module ThingModel.WebSockets {
 }
 declare module ThingModel.Proto {
     class FromProtobuf {
+        public StringDeclarations: {
+            [key: number]: string;
+        };
         constructor(warehouse: Warehouse);
         public Convert(data: ArrayBuffer, check?: boolean): string;
         public ConvertTransaction(transaction: Transaction, check: boolean): string;
@@ -95,7 +111,7 @@ declare module ThingModel.Proto {
         public Updated(thing: ThingModel.Thing): void;
         public Define(thingType: ThingModel.ThingType): void;
         public SomethingChanged : boolean;
-        public GetTransaction(toProtobuf: ToProtobuf, senderID: string, allDefinitions?: boolean): Transaction;
+        public GetTransaction(toProtobuf: ToProtobuf, senderID: string, allDefinitions?: boolean, onlyDefinitions?: boolean): Transaction;
     }
 }
 declare module ThingModel.Proto {
@@ -106,6 +122,10 @@ declare module ThingModel.Proto {
 }
 declare module ThingModel.Proto {
     class ToProtobuf {
+        public StringDeclarations: {
+            [value: string]: number;
+        };
+        public StringDeclarationsCpt: number;
         constructor();
         public Convert(publish: ThingModel.Thing[], deletions: ThingModel.Thing[], declarations: ThingModel.ThingType[], senderID: string): Transaction;
         public ConvertTransaction(transaction: Transaction): ArrayBuffer;
@@ -176,12 +196,14 @@ declare module ThingModel {
 }
 declare module ThingModel {
     class Property {
+        public _key: string;
         public _value: any;
         public Key : string;
         public Type : Type;
         constructor(key: string, value: any);
         public ValueToString(): string;
         public CompareValue(other: Property): boolean;
+        public Clone(): Property;
     }
     module Property {
         module Location {
@@ -189,42 +211,50 @@ declare module ThingModel {
                 constructor(key: string, value?: ThingModel.Location.Point);
                 public Value : ThingModel.Location.Point;
                 public Type : Type;
+                public Clone(): Point;
             }
             class LatLng extends Property {
                 constructor(key: string, value?: ThingModel.Location.LatLng);
                 public Value : ThingModel.Location.LatLng;
                 public Type : Type;
+                public Clone(): LatLng;
             }
             class Equatorial extends Property {
                 constructor(key: string, value?: ThingModel.Location.Equatorial);
                 public Value : ThingModel.Location.Equatorial;
                 public Type : Type;
+                public Clone(): Equatorial;
             }
         }
         class String extends Property {
             constructor(key: string, value?: string);
             public Value : string;
             public Type : Type;
+            public Clone(): String;
         }
         class Double extends Property {
             constructor(key: string, value?: number);
             public Value : number;
             public Type : Type;
+            public Clone(): Double;
         }
         class Int extends Property {
             constructor(key: string, value?: number);
             public Value : number;
             public Type : Type;
+            public Clone(): Int;
         }
         class Boolean extends Property {
             constructor(key: string, value?: boolean);
             public Value : boolean;
             public Type : Type;
+            public Clone(): Boolean;
         }
         class DateTime extends Property {
             constructor(key: string, value?: Date);
             public Value : Date;
             public Type : Type;
+            public Clone(): Double;
         }
     }
 }
@@ -327,7 +357,7 @@ declare module ThingModel {
         public RegisterCollection(collection: Thing[], alsoRegisterTypes?: boolean, sender?: string): void;
         public RemoveCollection(collection: {
             [id: string]: Thing;
-        }, sender?: string): void;
+        }, notifyUpdates?: boolean, sender?: string): void;
         public RemoveThing(thing: Thing, notifyUpdates?: boolean, sender?: string): void;
         public RegisterObserver(observer: IWarehouseObserver): void;
         public UnregisterObserver(observer: IWarehouseObserver): void;

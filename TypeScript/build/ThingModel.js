@@ -1,4 +1,4 @@
-﻿var ThingModel;
+var ThingModel;
 (function (ThingModel) {
     var BuildANewThing = (function () {
         function BuildANewThing(type) {
@@ -228,6 +228,8 @@ var ThingModel;
 
                 this._observers = null;
 
+                this._sendMessageWaitingList = [];
+
                 this.Connect();
             }
             Client.prototype.Connect = function () {
@@ -246,6 +248,14 @@ var ThingModel;
                     _this._connexionDelay = 2000;
 
                     var firstOpen = !_this._reconnection;
+
+                    if (_this._sendMessageWaitingList.length > 0) {
+                        _.each(_this._sendMessageWaitingList, function (message) {
+                            _this.SendMessage(message);
+                        });
+
+                        _this._sendMessageWaitingList = [];
+                    }
 
                     _this.Send();
 
@@ -283,14 +293,18 @@ var ThingModel;
                 var useFileReader = typeof FileReader !== "undefined";
 
                 this._ws.onmessage = function (message) {
-                    if (useFileReader) {
+                    var data = message.data;
+
+                    if (typeof data === "string") {
+                        console.info("ThingModel has received a string: " + message);
+                    } else if (useFileReader) {
                         var fileReader = new FileReader();
-                        fileReader.readAsArrayBuffer(message.data);
+                        fileReader.readAsArrayBuffer(data);
                         fileReader.onload = function () {
                             return _this.parseBuffer(fileReader.result);
                         };
                     } else {
-                        _this.parseBuffer(message.data);
+                        _this.parseBuffer(data);
                     }
                 };
             };
@@ -323,6 +337,14 @@ var ThingModel;
                     this.NotifyObservers(function (obs) {
                         return obs.OnSend();
                     });
+                }
+            };
+
+            Client.prototype.SendMessage = function (message) {
+                if (this._closed) {
+                    this._sendMessageWaitingList.push(message);
+                } else {
+                    this._ws.send(message);
                 }
             };
 
@@ -362,20 +384,100 @@ var ThingModel;
     })(ThingModel.WebSockets || (ThingModel.WebSockets = {}));
     var WebSockets = ThingModel.WebSockets;
 })(ThingModel || (ThingModel = {}));
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var ThingModel;
+(function (ThingModel) {
+    (function (WebSockets) {
+        var ClientEnterpriseEdition = (function (_super) {
+            __extends(ClientEnterpriseEdition, _super);
+            function ClientEnterpriseEdition(senderID, path, warehouse) {
+                _super.call(this, senderID, path, warehouse);
+
+                this._isLive = true;
+                this._isPaused = false;
+            }
+            Object.defineProperty(ClientEnterpriseEdition.prototype, "IsLive", {
+                get: function () {
+                    return this._isLive;
+                },
+                enumerable: true,
+                configurable: true
+            });
+
+            Object.defineProperty(ClientEnterpriseEdition.prototype, "IsPaused", {
+                get: function () {
+                    return this._isPaused;
+                },
+                enumerable: true,
+                configurable: true
+            });
+
+            ClientEnterpriseEdition.prototype.Live = function () {
+                if (this._isLive && !this._isPaused)
+                    return;
+
+                this.SendMessage("live");
+
+                this._isLive = true;
+                this._isPaused = false;
+            };
+
+            ClientEnterpriseEdition.prototype.Play = function () {
+                if (!this._isPaused)
+                    return;
+
+                this.SendMessage("play");
+
+                this._isPaused = false;
+            };
+
+            ClientEnterpriseEdition.prototype.Pause = function () {
+                if (this._isPaused)
+                    return;
+
+                this.SendMessage("pause");
+
+                this._isPaused = true;
+            };
+
+            ClientEnterpriseEdition.prototype.Load = function (time) {
+                this.SendMessage("load " + time.getTime());
+
+                this._isLive = false;
+                this._isPaused = true;
+            };
+
+            ClientEnterpriseEdition.prototype.Send = function () {
+                if (!this._isLive || this._isPaused) {
+                    throw new Error("ThingModelClientEnterpriseEdition cannot send data while paused or in a past situation");
+                }
+                _super.prototype.Send.call(this);
+            };
+            return ClientEnterpriseEdition;
+        })(WebSockets.Client);
+        WebSockets.ClientEnterpriseEdition = ClientEnterpriseEdition;
+    })(ThingModel.WebSockets || (ThingModel.WebSockets = {}));
+    var WebSockets = ThingModel.WebSockets;
+})(ThingModel || (ThingModel = {}));
 var ThingModel;
 (function (ThingModel) {
     (function (Proto) {
         var FromProtobuf = (function () {
             function FromProtobuf(warehouse) {
                 this._warehouse = warehouse;
-                this._stringDeclarations = {};
+                this.StringDeclarations = {};
             }
             FromProtobuf.prototype.KeyToString = function (key) {
                 if (key == 0) {
                     return "";
                 }
 
-                var value = this._stringDeclarations[key];
+                var value = this.StringDeclarations[key];
 
                 return typeof value === "undefined" ? "undefined" : value;
             };
@@ -390,7 +492,7 @@ var ThingModel;
             FromProtobuf.prototype.ConvertTransaction = function (transaction, check) {
                 var _this = this;
                 _.each(transaction.string_declarations, function (d) {
-                    _this._stringDeclarations[d.key] = d.value;
+                    _this.StringDeclarations[d.key] = d.value;
                 });
 
                 var senderId = this.KeyToString(transaction.string_sender_id);
@@ -405,7 +507,7 @@ var ThingModel;
                     }
                 });
 
-                this._warehouse.RemoveCollection(thingsToDelete, senderId);
+                this._warehouse.RemoveCollection(thingsToDelete, true, senderId);
 
                 _.each(transaction.thingtypes_declaration_list, function (d) {
                     _this.ConvertThingTypeDeclaration(d, senderId);
@@ -628,9 +730,10 @@ var ThingModel;
                 configurable: true
             });
 
-            ProtoModelObserver.prototype.GetTransaction = function (toProtobuf, senderID, allDefinitions) {
+            ProtoModelObserver.prototype.GetTransaction = function (toProtobuf, senderID, allDefinitions, onlyDefinitions) {
                 if (typeof allDefinitions === "undefined") { allDefinitions = false; }
-                return toProtobuf.Convert(_.values(this.Updates), _.values(this.Deletions), _.values(allDefinitions ? this.PermanentDefinitions : this.Definitions), senderID);
+                if (typeof onlyDefinitions === "undefined") { onlyDefinitions = false; }
+                return toProtobuf.Convert(onlyDefinitions ? [] : _.values(this.Updates), _.values(this.Deletions), _.values(allDefinitions ? this.PermanentDefinitions : this.Definitions), senderID);
             };
             return ProtoModelObserver;
         })();
@@ -656,8 +759,8 @@ var ThingModel;
     (function (Proto) {
         var ToProtobuf = (function () {
             function ToProtobuf() {
-                this._stringDeclarations = {};
-                this._stringDeclarationsCpt = 0;
+                this.StringDeclarations = {};
+                this.StringDeclarationsCpt = 0;
                 this._stringToDeclare = {};
                 this._thingsState = {};
                 this._propertiesState = {};
@@ -667,14 +770,14 @@ var ThingModel;
                     return 0;
                 }
 
-                var key = this._stringDeclarations[value];
+                var key = this.StringDeclarations[value];
 
                 if (key) {
                     return key;
                 }
 
-                key = ++this._stringDeclarationsCpt;
-                this._stringDeclarations[value] = key;
+                key = ++this.StringDeclarationsCpt;
+                this.StringDeclarations[value] = key;
 
                 var stringDeclaration = new Proto.ProtoTools.Builder.StringDeclaration();
 
@@ -936,7 +1039,7 @@ var ThingModel;
             ToProtobuf.prototype.ApplyThingsSuppressions = function (things) {
                 var _this = this;
                 _.each(things, function (thing) {
-                    var key = _this._stringDeclarations[thing.ID];
+                    var key = _this.StringDeclarations[thing.ID];
 
                     if (key) {
                         _this.ManageThingSuppression(key);
@@ -949,12 +1052,6 @@ var ThingModel;
     })(ThingModel.Proto || (ThingModel.Proto = {}));
     var Proto = ThingModel.Proto;
 })(ThingModel || (ThingModel = {}));
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
 var ThingModel;
 (function (ThingModel) {
     (function (Location) {
@@ -1071,7 +1168,7 @@ var ThingModel;
 
             Object.defineProperty(Equatorial.prototype, "HourAngle", {
                 get: function () {
-                    return this.Y;
+                    return this.Z;
                 },
                 set: function (hourAngle) {
                     this.Z = hourAngle;
@@ -1135,6 +1232,10 @@ var ThingModel;
 
             return false;
         };
+
+        Property.prototype.Clone = function () {
+            return new Property(this._key, this._value);
+        };
         return Property;
     })();
     ThingModel.Property = Property;
@@ -1165,6 +1266,16 @@ var ThingModel;
                     enumerable: true,
                     configurable: true
                 });
+
+                Point.prototype.Clone = function () {
+                    var p = new ThingModel.Location.Point(this._value.X, this._value.Y, this._value.Z);
+
+                    if (this._value.System) {
+                        p.System = this._value.System;
+                    }
+
+                    return new Property.Location.Point(this._key, p);
+                };
                 return Point;
             })(Property);
             Location.Point = Point;
@@ -1193,6 +1304,16 @@ var ThingModel;
                     enumerable: true,
                     configurable: true
                 });
+
+                LatLng.prototype.Clone = function () {
+                    var p = new ThingModel.Location.LatLng(this._value.X, this._value.Y, this._value.Z);
+
+                    if (this._value.System) {
+                        p.System = this._value.System;
+                    }
+
+                    return new Property.Location.LatLng(this._key, p);
+                };
                 return LatLng;
             })(Property);
             Location.LatLng = LatLng;
@@ -1221,6 +1342,16 @@ var ThingModel;
                     enumerable: true,
                     configurable: true
                 });
+
+                Equatorial.prototype.Clone = function () {
+                    var p = new ThingModel.Location.Equatorial(this._value.X, this._value.Y, this._value.Z);
+
+                    if (this._value.System) {
+                        p.System = this._value.System;
+                    }
+
+                    return new Property.Location.Equatorial(this._key, p);
+                };
                 return Equatorial;
             })(Property);
             Location.Equatorial = Equatorial;
@@ -1251,6 +1382,10 @@ var ThingModel;
                 enumerable: true,
                 configurable: true
             });
+
+            String.prototype.Clone = function () {
+                return new Property.String(this._key, this._value);
+            };
             return String;
         })(Property);
         Property.String = String;
@@ -1279,6 +1414,10 @@ var ThingModel;
                 enumerable: true,
                 configurable: true
             });
+
+            Double.prototype.Clone = function () {
+                return new Property.Double(this._key, this._value);
+            };
             return Double;
         })(Property);
         Property.Double = Double;
@@ -1307,6 +1446,10 @@ var ThingModel;
                 enumerable: true,
                 configurable: true
             });
+
+            Int.prototype.Clone = function () {
+                return new Property.Int(this._key, this._value);
+            };
             return Int;
         })(Property);
         Property.Int = Int;
@@ -1335,6 +1478,10 @@ var ThingModel;
                 enumerable: true,
                 configurable: true
             });
+
+            Boolean.prototype.Clone = function () {
+                return new Property.Boolean(this._key, this._value);
+            };
             return Boolean;
         })(Property);
         Property.Boolean = Boolean;
@@ -1363,6 +1510,10 @@ var ThingModel;
                 enumerable: true,
                 configurable: true
             });
+
+            DateTime.prototype.Clone = function () {
+                return new Property.Double(this._key, this._value ? new Date(this._value.getTime()) : this._value);
+            };
             return DateTime;
         })(Property);
         Property.DateTime = DateTime;
@@ -1873,27 +2024,33 @@ var ThingModel;
             });
         };
 
-        Warehouse.prototype.RemoveCollection = function (collection, sender) {
+        Warehouse.prototype.RemoveCollection = function (collection, notifyUpdates, sender) {
             var _this = this;
+            if (typeof notifyUpdates === "undefined") { notifyUpdates = true; }
             if (typeof sender === "undefined") { sender = null; }
             var thingsToDisconnect = {};
 
             _.each(_.keys(collection), function (id) {
                 var thing = collection[id];
-                _this.RemoveThing(thing, false, sender);
 
-                _.each(_this._things, function (t) {
-                    if (t.IsConnectedTo(thing)) {
-                        thingsToDisconnect[t.ID] = t;
+                if (notifyUpdates) {
+                    _.each(_this._things, function (t) {
+                        if (t.IsConnectedTo(thing)) {
+                            thingsToDisconnect[t.ID] = t;
+                        }
+                    });
+                }
+
+                _this.RemoveThing(thing, false, sender);
+            });
+
+            if (notifyUpdates) {
+                _.each(_.keys(thingsToDisconnect), function (id) {
+                    if (!collection.hasOwnProperty(id)) {
+                        _this.NotifyThingUpdate(thingsToDisconnect[id]);
                     }
                 });
-            });
-
-            _.each(_.keys(thingsToDisconnect), function (id) {
-                if (!collection.hasOwnProperty(id)) {
-                    _this.NotifyThingUpdate(thingsToDisconnect[id]);
-                }
-            });
+            }
         };
 
         Warehouse.prototype.RemoveThing = function (thing, notifyUpdates, sender) {
