@@ -66,6 +66,7 @@
     <Compile Include="Proto\Transaction.cs" />
     <Compile Include="Specs\Bootstrap.cs" />
     <Compile Include="Specs\BuildersTest.cs" />
+    <Compile Include="Specs\ClientEntrerpriseEditionTest.cs" />
     <Compile Include="Specs\PropertyTest.cs" />
     <Compile Include="Specs\ProtoConversions.cs" />
     <Compile Include="Specs\ThingTest.cs" />
@@ -77,11 +78,15 @@
     <Compile Include="ThingType.cs" />
     <Compile Include="Warehouse.cs" />
     <Compile Include="WebSockets\Client.cs" />
+    <Compile Include="WebSockets\ClientEnterpriseEdition.cs" />
     <Compile Include="WebSockets\Server.cs" />
     <Compile Include="WarehouseEvents.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="_RunCodeCoverageInOutput.bat">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
