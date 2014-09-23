@@ -2,7 +2,7 @@ module ThingModel {
 
 	export class Property {
 
-		private _key: string;
+		/* protected */ _key: string;
 
 		/* protected */
 		_value: any;
@@ -46,6 +46,10 @@ module ThingModel {
 
 			return false;
 		}
+
+		public Clone(): Property {
+			return new Property(this._key, this._value);
+		}
 	}
 
 	export module Property {
@@ -68,6 +72,18 @@ module ThingModel {
 				public get Type(): Type {
 					return Type.LocationPoint;
 				}
+
+				public Clone(): Property.Location.Point {
+					var p = new ThingModel.Location.Point(
+						this._value.X, this._value.Y, this._value.Z);
+
+					if (this._value.System) {
+						p.System = this._value.System;
+					}
+
+					return new Property.Location.Point(
+						this._key,p);
+				}
 			}
 
 			export class LatLng extends Property {
@@ -86,6 +102,18 @@ module ThingModel {
 				public get Type(): Type {
 					return Type.LocationLatLng;
 				}
+
+				public Clone(): Property.Location.LatLng {
+					var p = new ThingModel.Location.LatLng(
+						this._value.X, this._value.Y, this._value.Z);
+
+					if (this._value.System) {
+						p.System = this._value.System;
+					}
+
+					return new Property.Location.LatLng(
+						this._key,p);
+				}
 			}
 
 			export class Equatorial extends Property {
@@ -103,6 +131,18 @@ module ThingModel {
 
 				public get Type(): Type {
 					return Type.LocationEquatorial;
+				}
+
+				public Clone(): Property.Location.Equatorial {
+					var p = new ThingModel.Location.Equatorial(
+						this._value.X, this._value.Y, this._value.Z);
+
+					if (this._value.System) {
+						p.System = this._value.System;
+					}
+
+					return new Property.Location.Equatorial(
+						this._key,p);
 				}
 			}
 		}
@@ -124,6 +164,10 @@ module ThingModel {
 			public get Type(): Type {
 				return Type.String;
 			}
+
+			public Clone(): Property.String {
+				return new Property.String(this._key, this._value);
+			}
 		}
 
 		export class Double extends Property {
@@ -141,6 +185,10 @@ module ThingModel {
 
 			public get Type(): Type {
 				return Type.Double;
+			}
+
+			public Clone(): Property.Double {
+				return new Property.Double(this._key, this._value);
 			}
 		}
 
@@ -160,6 +208,10 @@ module ThingModel {
 			public get Type(): Type {
 				return Type.Int;
 			}
+
+			public Clone(): Property.Int {
+				return new Property.Int(this._key, this._value);
+			}
 		}
 
 		export class Boolean extends Property {
@@ -177,6 +229,10 @@ module ThingModel {
 
 			public get Type(): Type {
 				return Type.Boolean;
+			}
+
+			public Clone(): Property.Boolean {
+				return new Property.Boolean(this._key, this._value);
 			}
 		}
 
@@ -196,6 +252,11 @@ module ThingModel {
 
 			public get Type(): Type {
 				return Type.DateTime;
+			}
+
+			public Clone(): Property.Double {
+				return new Property.Double(this._key, this._value ?
+					new Date(this._value.getTime()) : this._value);
 			}
 		}
 
