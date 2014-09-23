@@ -128,7 +128,7 @@
 			}
 
 			public get HourAngle() {
-				return this.Y;
+				return this.Z;
 			}
 
 			public set HourAngle(hourAngle: number) {
