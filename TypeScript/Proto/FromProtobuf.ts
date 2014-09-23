@@ -45,7 +45,7 @@ module ThingModel.Proto {
 				}
 			});
 
-			this._warehouse.RemoveCollection(thingsToDelete, senderId);
+			this._warehouse.RemoveCollection(thingsToDelete, true, senderId);
 
 			// Declare the things type
 			_.each(transaction.thingtypes_declaration_list, (d: ThingType) => {

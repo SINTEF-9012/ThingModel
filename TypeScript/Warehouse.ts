@@ -73,25 +73,30 @@ module ThingModel {
 			});
 		}
 
-		public RemoveCollection(collection: { [id: string]: Thing }, sender: string=null) {
+		public RemoveCollection(collection: { [id: string]: Thing }, notifyUpdates = true, sender: string=null) {
 			var thingsToDisconnect: { [id: string]: Thing } = {};
 
 			_.each(_.keys(collection), (id: string) => {
 				var thing = collection[id];
-				this.RemoveThing(thing, false, sender);
 
-				_.each(this._things, (t: Thing) => {
-					if (t.IsConnectedTo(thing)) {
-						thingsToDisconnect[t.ID] = t;
+				if (notifyUpdates) {
+					_.each(this._things, (t: Thing) => {
+						if (t.IsConnectedTo(thing)) {
+							thingsToDisconnect[t.ID] = t;
+						}
+					});
+				}
+
+				this.RemoveThing(thing, false, sender);
+			});
+
+			if (notifyUpdates) {
+				_.each(_.keys(thingsToDisconnect), (id: string) => {
+					if (!collection.hasOwnProperty(id)) {
+						this.NotifyThingUpdate(thingsToDisconnect[id]);
 					}
 				});
-			});
-
-			_.each(_.keys(thingsToDisconnect), (id: string) => {
-				if (!collection.hasOwnProperty(id)) {
-					this.NotifyThingUpdate(thingsToDisconnect[id]);
-				}
-			});
+			}
 		}
 
 		public RemoveThing(thing: Thing, notifyUpdates = true, sender: string=null): void {
