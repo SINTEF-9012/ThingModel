@@ -112,29 +112,36 @@ public class Warehouse {
 	}
 
 	public void RemoveCollection(Collection<Thing> collection) {
-		RemoveCollection(collection, null);
+		RemoveCollection(collection, true, null);
 	}
 
-	public void RemoveCollection(Collection<Thing> collection, String sender) {
+	public void RemoveCollection(Collection<Thing> collection, boolean notifyUpdates, String sender) {
 		HashSet<Thing> thingsToDisconnect = new HashSet<>();
 
 		for (Thing thing : collection) {
-			RemoveThing(thing, false, sender);
 
-			synchronized (_lockThings) {
-				for (Thing t : _things.values()) {
-					if (t.IsConnectedTo(thing)) {
-						thingsToDisconnect.add(t);
-					}
-				}
-			}
+
+            if (notifyUpdates) {
+
+                synchronized (_lockThings) {
+                    for (Thing t : _things.values()) {
+                        if (t.IsConnectedTo(thing)) {
+                            thingsToDisconnect.add(t);
+                        }
+                    }
+                }
+            }
+
+            RemoveThing(thing, false, sender);
 		}
 
-		for (Thing tt : thingsToDisconnect) {
-			if (!collection.contains(tt)) {
-				NotifyThingUpdate(tt, sender);
-			}
-		}
+        if (notifyUpdates) {
+            for (Thing tt : thingsToDisconnect) {
+                if (!collection.contains(tt)) {
+                    NotifyThingUpdate(tt, sender);
+                }
+            }
+        }
 	}
 
 	public void RegisterCollection(Collection<Thing> collection) {

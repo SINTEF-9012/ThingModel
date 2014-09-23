@@ -16,7 +16,7 @@ import org.thingmodel.proto.ProtoTransaction.Transaction;
 
 public class ToProtobuf {
 	// String declarations dictionary, for the sender side
-	private HashMap<String, Integer> _stringDeclarations = new HashMap<>();
+	public HashMap<String, Integer> StringDeclarations = new HashMap<>();
 	
 	// Current transaction object
 	// It will be filled step by step
@@ -97,14 +97,14 @@ public class ToProtobuf {
 			return 0;
 		}
 		
-		Integer key = _stringDeclarations.get(value);
+		Integer key = StringDeclarations.get(value);
 		if (key != null) {
 			return key;
 		}
 		
-		key = _stringDeclarations.size()+1;
+		key = StringDeclarations.size()+1;
 		
-		_stringDeclarations.put(value, key);
+		StringDeclarations.put(value, key);
 
 		_transaction.addStringDeclarations(
 			StringDeclaration.newBuilder()
@@ -372,7 +372,7 @@ public class ToProtobuf {
 	
 	public void ApplyThingsSuppressions(Collection<org.thingmodel.Thing> things) {
 		for (org.thingmodel.Thing thing : things) {
-			Integer key = _stringDeclarations.get(thing.getId());
+			Integer key = StringDeclarations.get(thing.getId());
 			if (key != null){
 				ManageThingSuppression(key);
 			}

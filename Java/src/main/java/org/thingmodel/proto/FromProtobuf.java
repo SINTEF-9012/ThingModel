@@ -28,14 +28,14 @@ public class FromProtobuf {
 	}
 	 
 	
-	private Map<Integer, String> _stringDeclarations = new HashMap<>();
+	public Map<Integer, String> StringDeclarations = new HashMap<>();
 	
 	protected String keyToString(int key) {
 		if (key == 0) {
 			return "";
 		}
 	
-		String value = _stringDeclarations.get(key);
+		String value = StringDeclarations.get(key);
 				
 		return value != null ? value : "undefined";
 	}
@@ -64,7 +64,7 @@ public class FromProtobuf {
 			int key = transaction.getThingsRemoveList(i);
 			thingsToDelete.add(_warehouse.getThing(keyToString(key)));
 		}
-		_warehouse.RemoveCollection(thingsToDelete, senderId);
+		_warehouse.RemoveCollection(thingsToDelete, true, senderId);
 		
 		
 		for (int i = 0, l = transaction.getThingtypesDeclarationListCount(); i < l; ++i) {
@@ -108,7 +108,7 @@ public class FromProtobuf {
 	}
 
 	protected void ConvertStringDeclaration(StringDeclaration declaration) {
-		_stringDeclarations.put(declaration.getKey(), declaration.getValue());
+		StringDeclarations.put(declaration.getKey(), declaration.getValue());
 	}
 
 	protected void ConvertThingTypeDeclaration(ThingType thingType, String senderId) {
@@ -230,7 +230,7 @@ public class FromProtobuf {
 		}
 	
 		if (check && type != null && !type.Check(modelThing)) {
-			System.out.println("Object «"+id+"» from «"+senderId+"» is not valid, ignored");
+			System.out.println("Object \""+id+"\" from \""+senderId+"\" is not valid, ignored");
 		} else if (!thing.getConnectionsChange()) {
 			_warehouse.RegisterThing(modelThing, false, false, senderId);
 		}
