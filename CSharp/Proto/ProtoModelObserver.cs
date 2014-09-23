@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 namespace ThingModel.Proto
 {
@@ -61,7 +61,7 @@ namespace ThingModel.Proto
 	    }
 
         public Transaction GetTransaction(ToProtobuf toProtobuf, string senderID,
-			bool allDefinitions = false)
+			bool allDefinitions = false, bool onlyDefinitions = false)
         {
 	        List<ThingModel.Thing> copyUpdates;
 	        List<ThingModel.Thing> copyDeletions;
@@ -69,8 +69,15 @@ namespace ThingModel.Proto
 
 	        lock (_lockHashSet)
 	        {
-				copyUpdates = new List<ThingModel.Thing>(Updates);
-				copyDeletions = new List<ThingModel.Thing>(Deletions);
+	            if (onlyDefinitions)
+	            {
+                    copyUpdates = new List<ThingModel.Thing>();
+                    copyDeletions = new List<ThingModel.Thing>();
+	            } else
+	            {
+                    copyUpdates = new List<ThingModel.Thing>(Updates);
+                    copyDeletions = new List<ThingModel.Thing>(Deletions);
+	            }
 				copyDefinitions = new List<ThingModel.ThingType>(allDefinitions ?
 					PermanentDefinitions : Definitions);
 	        }

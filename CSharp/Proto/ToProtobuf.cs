@@ -12,7 +12,7 @@ namespace ThingModel.Proto
     internal class ToProtobuf
     {
         // String declarations dictionary, for the sender side
-        protected readonly IDictionary<string, int> StringDeclarations = new Dictionary<string, int>();
+        public IDictionary<string, int> StringDeclarations = new Dictionary<string, int>();
 
         // Current transaction object
         // It will be filled step by step

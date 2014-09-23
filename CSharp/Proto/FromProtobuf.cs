@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using ProtoBuf;
@@ -18,7 +18,7 @@ namespace ThingModel.Proto
                 {PropertyType.Type.DATETIME, typeof (ThingModel.Property.DateTime)},
             };
 
-        protected readonly IDictionary<int,string> StringDeclarations = new Dictionary<int, string>();
+        public IDictionary<int,string> StringDeclarations = new Dictionary<int, string>();
 
         protected string KeyToString(int key)
         {
@@ -153,7 +153,7 @@ namespace ThingModel.Proto
             if (thing.string_type_name != 0)
             {
                 // Here the type can be null if the string type name is not registered
-                // in the Warehouse (can be an error from a client)
+                // in the LiveWarehouse (can be an error from a client)
 
                 // So, if the type is null, it rolls back to the default type
                 // It's a robust model
