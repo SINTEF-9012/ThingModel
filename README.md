@@ -82,14 +82,14 @@ var typeRabbit = BuildANewThingType.Named("rabbit")
 var rabbit = BuildANewThing.As(typeRabbit)
 				.IdentifiedBy("ab548")
 				.ContainingA.String("name", "Roger")
-				.AndA.LocationLatLng(new Location.LatLng(60,10))
+				.AndA.Location(new Location.LatLng(60,10))
 				.AndAn.Int("nbChildren", 12);
 
 // The warehouse stores the objects
 var warehouse = new Warehouse();
 
 // Create a websocket client
-var client = new Client("Emitter", "ws://localhost:1234", warehouse);
+var client = new Client("Emitter", "ws://localhost:8083/", warehouse);
 
 // Register the rabbit
 warehouse.RegisterThing(rabbit);
@@ -100,7 +100,7 @@ client.Send();
 
 ```csharp
 var warehouse = new Warehouse();
-var client = new Client("Receiver", "ws://localhost:1234", warehouse);
+var client = new Client("Receiver", "ws://localhost:8083/", warehouse);
 
 warehouse.Events.OnNew += (sender, args) => {
     Console.WriteLine(args.Thing.String("name"));
