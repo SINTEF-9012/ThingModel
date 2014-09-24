@@ -1,7 +1,7 @@
 ![ThingModel](https://raw.github.com/SINTEF-9012/ThingModel/master/Documentation/Logo.png)
 ==========
 
-ThingModel synchronizes data and models in realtime over the network for multiple devices. Mainly iPads, PC and a PixelSense table.
+ThingModel synchronizes data and models in realtime over the network for multiple devices.
 
 ThingModel is a new wheel, but a simple, fast and light one.
 
@@ -26,10 +26,11 @@ If you are looking for innovative products about models, you should also take a 
   * For the PixelSense table
   * And because C# is cool
  * __JavaScript__ (and TypeScript)
-  * Recent HTML5 browsers (need WebSocket support)
-  * Can work in Node.JS
+  * HTML5 browsers
+  * Works with Node.JS
  * __Java__
-  * Mainly for Minecraft
+  * Android (for the Google Glass)
+  * Minecraft
   * Or a HLA bridge for VBS
 
 ## A collection of tools
