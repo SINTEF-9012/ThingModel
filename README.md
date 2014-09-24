@@ -23,13 +23,14 @@ If you are looking for innovative products about models, you should also take a 
 ## Multi-plateform
 
  * __C# .Net__
+  * .Net and Mono
   * For the PixelSense table
   * And because C# is cool
  * __JavaScript__ (and TypeScript)
   * HTML5 browsers
   * Works with Node.JS
  * __Java__
-  * Android (for the Google Glass)
+  * Android (with Google Glass support)
   * Minecraft
   * Or a HLA bridge for VBS
 
