@@ -218,6 +218,21 @@ namespace ThingModel.Specs
 
             Assert.That(_warehouse.GetThing("twingo").GetProperty<Property.DateTime>("birthdate").Value, Is.EqualTo(birthdate));
         }
+        
+        [Test]
+        public void CheckJavascriptFalseProperties()
+        {
+            var thing = new Thing("twingo");
+            thing.Double("speed", 0.0);
+            thing.Boolean("accelerating", false);
+            thing.Int("nbElectricalEngines", 0);
+
+            _fromProtobuf.Convert(_toProtobuf.Convert(new[] { thing }, new Thing[0], new ThingType[0], null));
+
+            Assert.That(_warehouse.GetThing("twingo").Double("speed"), Is.EqualTo(0.0));
+            Assert.That(_warehouse.GetThing("twingo").Boolean("accelerating"), Is.False);
+            Assert.That(_warehouse.GetThing("twingo").Int("nbElectricalEngines"), Is.EqualTo(0));
+        }
 
         [Test]
         public void CheckConnectedThings()

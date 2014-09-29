@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using NUnit.Framework;
+using ThingModel.Builders;
 using ThingModel.WebSockets;
 
 namespace ThingModel.Specs
@@ -43,28 +44,28 @@ namespace ThingModel.Specs
                 _defineEvent.Set();
             }
 
-            public bool WaitNew(int millisecondsTimeout = 2500)
+            public bool WaitNew(int millisecondsTimeout = 3500)
             {
 	            if (!_newEvent.WaitOne(millisecondsTimeout)) return false;
 	            Thread.Sleep(5);
 	            return true;
             }
 
-            public bool WaitDeleted(int millisecondsTimeout = 2500)
+            public bool WaitDeleted(int millisecondsTimeout = 3500)
             {
 	            if (!_deleteEvent.WaitOne(millisecondsTimeout)) return false;
 	            Thread.Sleep(5);
 	            return true;
             }
 
-            public bool WaitUpdated(int millisecondsTimeout = 2500)
+            public bool WaitUpdated(int millisecondsTimeout = 3500)
             {
 	            if (!_updatedEvent.WaitOne(millisecondsTimeout)) return false;
 	            Thread.Sleep(5);
 	            return true;
             }
 
-            public bool WaitDefine(int millisecondsTimeout = 2500)
+            public bool WaitDefine(int millisecondsTimeout = 3500)
             {
 	            if (!_defineEvent.WaitOne(millisecondsTimeout)) return false;
 	            Thread.Sleep(5);
@@ -166,6 +167,8 @@ namespace ThingModel.Specs
             _clientA.Send();
             _clientB.Connect();
 
+            Assert.That(_clientB.IsConnected(), Is.True);
+
             Assert.That(_warehouseWaitB.WaitNew(), Is.True);
             Assert.That(_warehouseB.GetThing("boat"), Is.Not.Null);
         }
@@ -261,6 +264,78 @@ namespace ThingModel.Specs
 
             Assert.That(_warehouseB.GetThing("lapin").Type.Name, Is.EqualTo(type.Name));
         }
+
+        [Test]
+        public void TestTypeDefinitionWithoutThing()
+        {
+            var type = BuildANewThingType.Named("rabbit")
+                .WhichIs("Just a rabbit")
+                .ContainingA.LocationLatLng();
+
+            _warehouseA.RegisterType(type);
+
+            _clientA.Send();
+
+            Assert.That(_warehouseWaitB.WaitDefine(), Is.True);
+        }
+
+        [Test]
+        public void TestTypeDefinitionRegisteredBeforeWarehouseCreation()
+        {
+
+            ThingType typeRabbit = BuildANewThingType.Named("rabbit");
+            ThingType typeDuck = BuildANewThingType.Named("duck");
+            var warehouse = new Warehouse();
+            warehouse.RegisterType(typeRabbit);
+
+            var client = new Client("test_unconnected", Path, warehouse);
+
+            Assert.That(client.IsConnected(), Is.True);
+
+            var thing = BuildANewThing.As(typeDuck)
+                .IdentifiedBy("superduck");
+            warehouse.RegisterThing(thing);
+            client.Send();
+
+            Assert.That(_warehouseWaitB.WaitNew(), Is.True);
+
+            Assert.That(_warehouseB.GetThing("superduck"), Is.Not.Null);
+            Assert.That(_warehouseB.GetThingType("duck"), Is.Not.Null);
+
+            Assert.That(_warehouseB.GetThingType("rabbit"), Is.Not.Null);
+        }
+        
+        [Test]
+        public void TestTypeDefinitionRegisteredBeforeConnection()
+        {
+            // Stop the server
+            Assert.That(_clientA.IsConnected(), Is.True);
+            _server.Close();
+            Assert.That(_clientA.IsConnected(), Is.False);
+
+            ThingType typeRabbit = BuildANewThingType.Named("rabbit");
+            ThingType typeDuck = BuildANewThingType.Named("duck");
+            var warehouse = new Warehouse();
+            var client = new Client("test_unconnected", Path, warehouse);
+            warehouse.RegisterType(typeRabbit);
+
+            _server = new Server(Path);
+            Thread.Sleep(2500);
+            Assert.That(client.IsConnected(), Is.True);
+
+            var thing = BuildANewThing.As(typeDuck)
+                .IdentifiedBy("superduck");
+            warehouse.RegisterThing(thing);
+            client.Send();
+
+            Assert.That(_warehouseWaitB.WaitNew(), Is.True);
+
+            Assert.That(_warehouseB.GetThing("superduck"), Is.Not.Null);
+            Assert.That(_warehouseB.GetThingType("duck"), Is.Not.Null);
+
+            Assert.That(_warehouseB.GetThingType("rabbit"), Is.Not.Null);
+        }
+
 
 	    [Test]
 	    public void TestThingTypeChange()
@@ -444,5 +519,42 @@ namespace ThingModel.Specs
 
 			Thread.Sleep(500);
 	    }
+
+        [Test]
+        public void TestPotentiallyNullProperties()
+        {
+            
+            var thingA = new Thing("twingo");
+            thingA.Double("speed", 0.0);
+            thingA.Boolean("accelerating", false);
+            thingA.Int("nbElectricalEngines", 0);
+            
+            _warehouseA.RegisterThing(thingA);
+            _clientA.Send();
+
+            Assert.That(_warehouseWaitB.WaitNew(), Is.True);
+
+            var thingB = _warehouseB.GetThing("twingo");
+            Assert.That(thingB, Is.Not.Null);
+
+            Assert.That(thingB.Double("speed"), Is.EqualTo(0.0));
+            Assert.That(thingB.Boolean("accelerating"), Is.False);
+            Assert.That(thingB.Int("nbElectricalEngines"), Is.EqualTo(0));
+
+            var warehouseC = new Warehouse();
+            var clientC = new Client("UnitTestC", Path, warehouseC);
+
+            var warehouseWaitC = new WarehouseWait();
+            warehouseC.RegisterObserver(warehouseWaitC);
+
+            Assert.That(warehouseWaitC.WaitNew(), Is.True);
+
+            var thingC = warehouseC.GetThing("twingo");
+            Assert.That(thingC, Is.Not.Null);
+
+            Assert.That(thingC.Double("speed"), Is.EqualTo(0.0));
+            Assert.That(thingC.Boolean("accelerating"), Is.False);
+            Assert.That(thingC.Int("nbElectricalEngines"), Is.EqualTo(0));
+        }
     }
 }
