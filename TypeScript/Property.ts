@@ -173,6 +173,9 @@ module ThingModel {
 		export class Double extends Property {
 			constructor(key: string, value?: number) {
 				super(key, value);
+				if (this._value == null) {
+					this._value = 0.0;
+				}
 			}
 
 			public get Value(): number {
@@ -180,7 +183,7 @@ module ThingModel {
 			}
 
 			public set Value(value: number) {
-				this._value = value;
+				this._value = value == null ? 0.0 : value;
 			}
 
 			public get Type(): Type {
@@ -195,6 +198,9 @@ module ThingModel {
 		export class Int extends Property {
 			constructor(key: string, value?: number) {
 				super(key, value);
+				if (this._value == null) {
+					this._value = 0;
+				}
 			}
 
 			public get Value(): number {
@@ -216,7 +222,7 @@ module ThingModel {
 
 		export class Boolean extends Property {
 			constructor(key: string, value?: boolean) {
-				super(key, value);
+				super(key, !!value);
 			}
 
 			public get Value(): boolean {
@@ -224,7 +230,7 @@ module ThingModel {
 			}
 
 			public set Value(value: boolean) {
-				this._value = value;
+				this._value = !!value;
 			}
 
 			public get Type(): Type {
