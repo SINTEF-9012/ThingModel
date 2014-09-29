@@ -58,12 +58,15 @@ var ThingModel;
 
         ThingPropertyBuilder.prototype.Location = function (mixed, value) {
             var key;
-            if (value) {
+            if (typeof value !== "undefined") {
                 key = mixed;
             } else {
                 key = "location";
                 value = mixed;
             }
+
+            if (!value)
+                return this;
 
             switch (value.type) {
                 case "equatorial":
@@ -1394,13 +1397,16 @@ var ThingModel;
             __extends(Double, _super);
             function Double(key, value) {
                 _super.call(this, key, value);
+                if (this._value == null) {
+                    this._value = 0.0;
+                }
             }
             Object.defineProperty(Double.prototype, "Value", {
                 get: function () {
                     return this._value;
                 },
                 set: function (value) {
-                    this._value = value;
+                    this._value = value == null ? 0.0 : value;
                 },
                 enumerable: true,
                 configurable: true
@@ -1426,6 +1432,9 @@ var ThingModel;
             __extends(Int, _super);
             function Int(key, value) {
                 _super.call(this, key, value);
+                if (this._value == null) {
+                    this._value = 0;
+                }
             }
             Object.defineProperty(Int.prototype, "Value", {
                 get: function () {
@@ -1457,14 +1466,14 @@ var ThingModel;
         var Boolean = (function (_super) {
             __extends(Boolean, _super);
             function Boolean(key, value) {
-                _super.call(this, key, value);
+                _super.call(this, key, !!value);
             }
             Object.defineProperty(Boolean.prototype, "Value", {
                 get: function () {
                     return this._value;
                 },
                 set: function (value) {
-                    this._value = value;
+                    this._value = !!value;
                 },
                 enumerable: true,
                 configurable: true
@@ -1755,7 +1764,7 @@ var ThingModel;
         });
 
         Thing.prototype.String = function (key, value) {
-            if (value) {
+            if (typeof value !== "undefined") {
                 this.SetProperty(new ThingModel.Property.String(key, value));
                 return this;
             } else {
@@ -1768,7 +1777,7 @@ var ThingModel;
         };
 
         Thing.prototype.Double = function (key, value) {
-            if (value) {
+            if (typeof value !== "undefined") {
                 this.SetProperty(new ThingModel.Property.Double(key, value));
                 return this;
             } else {
@@ -1781,7 +1790,7 @@ var ThingModel;
         };
 
         Thing.prototype.Int = function (key, value) {
-            if (value) {
+            if (typeof value !== "undefined") {
                 this.SetProperty(new ThingModel.Property.Int(key, value));
                 return this;
             } else {
@@ -1794,7 +1803,7 @@ var ThingModel;
         };
 
         Thing.prototype.Boolean = function (key, value) {
-            if (value) {
+            if (typeof value !== "undefined") {
                 this.SetProperty(new ThingModel.Property.Boolean(key, value));
                 return this;
             } else {
@@ -1807,7 +1816,7 @@ var ThingModel;
         };
 
         Thing.prototype.DateTime = function (key, value) {
-            if (value) {
+            if (typeof value !== "undefined") {
                 this.SetProperty(new ThingModel.Property.DateTime(key, value));
                 return this;
             } else {
@@ -1829,7 +1838,7 @@ var ThingModel;
                 value = mixed;
             }
 
-            if (value) {
+            if (typeof value !== "undefined") {
                 this.SetProperty(new ThingModel.Property.Location.Point(key, value));
                 return this;
             } else {
@@ -1851,7 +1860,7 @@ var ThingModel;
                 value = mixed;
             }
 
-            if (value) {
+            if (typeof value !== "undefined") {
                 this.SetProperty(new ThingModel.Property.Location.LatLng(key, value));
                 return this;
             } else {
@@ -1873,7 +1882,7 @@ var ThingModel;
                 value = mixed;
             }
 
-            if (value) {
+            if (typeof value !== "undefined") {
                 this.SetProperty(new ThingModel.Property.Location.Equatorial(key, value));
                 return this;
             } else {
