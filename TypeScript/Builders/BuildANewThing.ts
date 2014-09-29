@@ -65,12 +65,14 @@ module ThingModel {
 		public Location(mixed: any, value?: Location): ThingPropertyBuilder {
 
 			var key;
-			if (value) {
+			if (typeof value !== "undefined") {
 				key = mixed;
 			} else {
 				key = "location";
 				value = mixed;
 			}
+
+			if (!value) return this;
 
 			switch (value.type) {
 			case "equatorial":

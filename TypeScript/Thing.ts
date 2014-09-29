@@ -219,7 +219,7 @@ module ThingModel {
 		public String(key: string): string;
 		public String(key: string, value: string): Thing;
 		public String(key: string, value?: string): any {
-			if (value) {
+			if (typeof value !== "undefined") {
 				this.SetProperty(new Property.String(key, value));
 				return this;
 			} else {
@@ -234,7 +234,7 @@ module ThingModel {
 		public Double(key: string): number;
 		public Double(key: string, value: number): Thing;
 		public Double(key: string, value?: number): any {
-			if (value) {
+			if (typeof value !== "undefined") {
 				this.SetProperty(new Property.Double(key, value));
 				return this;
 			} else {
@@ -249,7 +249,7 @@ module ThingModel {
 		public Int(key: string): number;
 		public Int(key: string, value: number): Thing;
 		public Int(key: string, value?: number): any {
-			if (value) {
+			if (typeof value !== "undefined") {
 				this.SetProperty(new Property.Int(key, value));
 				return this;
 			} else {
@@ -264,7 +264,7 @@ module ThingModel {
 		public Boolean(key: string): boolean;
 		public Boolean(key: string, value: boolean): Thing;
 		public Boolean(key: string, value?: boolean): any {
-			if (value) {
+			if (typeof value !== "undefined") {
 				this.SetProperty(new Property.Boolean(key, value));
 				return this;
 			} else {
@@ -279,7 +279,7 @@ module ThingModel {
 		public DateTime(key: string): Date;
 		public DateTime(key: string, value: Date): Thing;
 		public DateTime(key: string, value?: Date): any {
-			if (value) {
+			if (typeof value !== "undefined") {
 				this.SetProperty(new Property.DateTime(key, value));
 				return this;
 			} else {
@@ -305,7 +305,7 @@ module ThingModel {
 				value = mixed;
 			}
 
-			if (value) {
+			if (typeof value !== "undefined") {
 				this.SetProperty(new Property.Location.Point(key, value));
 				return this;
 			} else {
@@ -331,7 +331,7 @@ module ThingModel {
 				value = mixed;
 			}
 
-			if (value) {
+			if (typeof value !== "undefined") {
 				this.SetProperty(new Property.Location.LatLng(key, value));
 				return this;
 			} else {
@@ -357,7 +357,7 @@ module ThingModel {
 				value = mixed;
 			}
 
-			if (value) {
+			if (typeof value !== "undefined") {
 				this.SetProperty(new Property.Location.Equatorial(key, value));
 				return this;
 			} else {

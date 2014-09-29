@@ -183,6 +183,22 @@ describe("ProtoConversions Test", () => {
 			(+new Date())+1);
 	});
 
+	it("should has correct javascript false properties", () => {
+		var thing = ThingModel.BuildANewThing.WithoutType.IdentifiedBy("twingo").Build();
+
+		thing.Double("speed", 0.0);
+		thing.Boolean("accelerating", false);
+		thing.Int("nbElectricalEngines", 0);
+
+		warehouseOutput.RegisterThing(thing);
+		fromProtobuf.Convert(observer.GetTransaction(toProtobuf, null).toArrayBuffer());
+
+		var newThing = warehouseInput.GetThing("twingo");
+		newThing.Double("speed").should.be.equal(0.0);
+		newThing.Boolean("accelerating").should.be.false;
+		newThing.Int("nbElectricalEngines").should.be.equal(0);
+	});
+
 	it("works with connexions", () => {
 		var group = new ThingModel.Thing("family"),
 			roger = new ThingModel.Thing("roger"),
