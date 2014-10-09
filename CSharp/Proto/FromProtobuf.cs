@@ -97,7 +97,7 @@ namespace ThingModel.Proto
                     
                 }
 
-                Warehouse.RegisterThing(tuple.Item1, false);    
+                Warehouse.RegisterThing(tuple.Item1, false, false, senderId);    
             }
 
 

@@ -379,5 +379,24 @@ namespace ThingModel.Specs
             var transaction = _toProtobuf.Convert(new Thing[0], new [] {duck}, new ThingType[0], "niceSenderIdDelete");
             _fromProtobuf.Convert(transaction);
 	    }
+        
+        [Test]
+        public void SenderIdInformationWithConnection()
+        {
+		    var sem = false;
+		    _warehouse.Events.OnReceivedNew += (sender, args) => sem = true;
+
+            
+            var type = new ThingType("message");
+            type.DefineProperty(PropertyType.Create<Property.String>("content"));
+
+            var message = new Thing("first", type);
+            message.SetProperty(new Property.String("content", "Hello World"));
+            message.Connect(new Thing("this is a thing"));
+
+            _fromProtobuf.Convert(_toProtobuf.Convert(new [] {message}, new Thing[0], new [] {type}, "niceSenderIdNew"));
+			Assert.That(sem, Is.True);
+        }
+
     }
 }
