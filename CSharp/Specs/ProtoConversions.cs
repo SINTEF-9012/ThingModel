@@ -220,6 +220,27 @@ namespace ThingModel.Specs
         }
         
         [Test]
+        public void CheckDateTimeNowProperty()
+        {
+            var thing = new Thing("twingo");
+            var lastUse = DateTime.Now;
+            var lastUseUtc = DateTime.UtcNow;
+
+            lastUse = new DateTime(lastUse.Year, lastUse.Month, lastUse.Day, lastUse.Hour, lastUse.Minute, lastUse.Second, lastUse.Kind);
+            lastUseUtc = new DateTime(lastUseUtc.Year, lastUseUtc.Month, lastUseUtc.Day, lastUseUtc.Hour, lastUseUtc.Minute, lastUseUtc.Second, lastUseUtc.Kind);
+
+            thing.SetProperty(new Property.DateTime("lastUse", lastUse));
+            thing.SetProperty(new Property.DateTime("lastUseUtc", lastUseUtc));
+
+            _fromProtobuf.Convert(_toProtobuf.Convert(new[] { thing }, new Thing[0], new ThingType[0], null));
+
+            Assert.That(_warehouse.GetThing("twingo").GetProperty<Property.DateTime>("lastUse").Value, Is.EqualTo(lastUse.ToUniversalTime()), "lastUse");
+            Assert.That(_warehouse.GetThing("twingo").GetProperty<Property.DateTime>("lastUseUtc").Value, Is.EqualTo(lastUseUtc), "lastUseUtc");
+            Assert.That(_warehouse.GetThing("twingo").GetProperty<Property.DateTime>("lastUseUtc").Value, Is.EqualTo(lastUse.ToUniversalTime()), "lastUseUtc vs lastUse");
+            Assert.That(_warehouse.GetThing("twingo").GetProperty<Property.DateTime>("lastUse").Value, Is.EqualTo(lastUseUtc), "lastUse vs lastUseUtc");
+        }
+        
+        [Test]
         public void CheckJavascriptFalseProperties()
         {
             var thing = new Thing("twingo");

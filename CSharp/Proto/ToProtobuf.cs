@@ -325,7 +325,8 @@ namespace ThingModel.Proto
         protected void ConvertProperty(ThingModel.Property.DateTime property, Property proto)
         {
             proto.type = Property.Type.DATETIME;
-	        proto.datetime_value = property.Value.Subtract(DateTimeEpoch).Ticks/10000;
+            var date = property.Value;
+	        proto.datetime_value = date.ToUniversalTime().Subtract(DateTimeEpoch).Ticks/10000;
         }
 
 	    protected void ManageThingSuppression(int thingId)
