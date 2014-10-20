@@ -2,7 +2,7 @@ using System;
 
 namespace ThingModel.WebSockets
 {
-    class ClientEnterpriseEdition : Client
+    public class ClientEnterpriseEdition : Client
     {
         public bool IsLive { get; private set; }
         public bool IsPaused { get; private set; }

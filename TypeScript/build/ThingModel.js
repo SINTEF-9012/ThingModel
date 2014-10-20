@@ -457,7 +457,8 @@ var ThingModel;
 
             ClientEnterpriseEdition.prototype.Send = function () {
                 if (!this._isLive || this._isPaused) {
-                    throw new Error("ThingModelClientEnterpriseEdition cannot send data while paused or in a past situation");
+                    console.debug("ThingModelClientEnterpriseEdition cannot send data while paused or in a past situation");
+                    return;
                 }
                 _super.prototype.Send.call(this);
             };

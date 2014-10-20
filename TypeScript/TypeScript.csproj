@@ -16,6 +16,7 @@
     <IISExpressUseClassicPipelineMode />
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="Specs\mocha-build.html" />
     <Content Include="Specs\mocha.html" />
     <Content Include="web.config" />
   </ItemGroup>
@@ -42,6 +43,7 @@
     <TypeScriptCompile Include="Type.ts" />
     <TypeScriptCompile Include="WebSockets\Client.ts" />
     <TypeScriptCompile Include="Warehouse.ts" />
+    <TypeScriptCompile Include="WebSockets\ClientEnterpriseEdition.ts" />
     <TypeScriptCompile Include="WebSockets\IClientObserver.ts" />
   </ItemGroup>
   <ItemGroup>
