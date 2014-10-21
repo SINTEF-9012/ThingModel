@@ -1,0 +1,24 @@
+{
+  "name": "thingmodel",
+  "version": "0.19.3",
+  "description": "Synchronize data and models across multiple devices",
+  "main": "TypeScript/build/ThingModel.node.js",
+  "keywords": ["ThingModel", "Model", "Meta model", "WebSockets", "Protocol Buffers", "Rabbits"],
+  "homepage": "https://github.com/SINTEF-9012/ThingModel",
+  "bugs": {
+    "url": "https://github.com/SINTEF-9012/ThingModel/issues"
+  },
+  "license": "MIT",
+  "author": {
+    "name": "Antoine Pultier"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SINTEF-9012/ThingModel.git"
+  },
+  "dependencies": {
+    "protobufjs": "~3.6.0",
+    "lodash": "~2.4.1",
+    "ws": "~0.4.32"
+  }
+}

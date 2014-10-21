@@ -8,7 +8,7 @@ module.exports = function(grunt) {
 		clean: {
 			ts: {
 				files: [{
-					src:["Builders/*.d.ts","WebSockets/*.d.ts","Proto/*.d.ts","*.d.ts", "!Proto/Proto.d.ts"],
+					src:["Builders/*.{d.ts,js.map}","WebSockets/*.{d.ts,js.map}","Proto/*.{d.ts,js.map}","*.{d.ts,js.map}", "!Proto/Proto.d.ts"],
 				}]
 			}
 		},
@@ -35,13 +35,27 @@ module.exports = function(grunt) {
 					'build/ThingModel.min.js' : ['build/ThingModel.js']
 				}
 			}
+		},
+		file_append: {
+			nodify: {
+				files: {
+					'build/ThingModel.node.js': {
+						input: './build/ThingModel.js',
+						prepend: "var WebSocket = require('ws'),_ = require('lodash');\n"+
+								"console.debug = console.log;\n"+
+								"var dcodeIO = {ProtoBuf: require('protobufjs')};\n\n",
+						append: 'module.exports = ThingModel;\n'
+					}
+				}
+			}
 		}
 	});
 
 	grunt.registerTask('build', [
 		'clean:ts',
 		'ts:build',
-		'uglify'
+		'uglify',
+		'file_append:nodify'
 	]);
 
 	grunt.registerTask('default', ['build']);
