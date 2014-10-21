@@ -62,6 +62,8 @@ __Nuget__: ```Install-Package ThingModel -Pre```
 
 __Bower__: ```bower install ThingModel```
 
+__NPM__: ```npm install thingmodel```
+
 __Maven__: *need motivation*
 
 Otherwise: [__Download__](https://github.com/SINTEF-9012/ThingModel/archive/master.zip)
