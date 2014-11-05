@@ -108,6 +108,11 @@ namespace ThingModel
 
 		public void RemoveCollection(ISet<Thing> collection, bool notifyUpdates = true, string sender = null)
 		{
+		    if (collection.Count == 0)
+		    {
+		        return;
+		    }
+
 			var thingsToDisconnect = new HashSet<Thing>();
 
 			foreach (var thing in collection)
