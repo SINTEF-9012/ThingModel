@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace ThingModel
 {
@@ -57,7 +57,7 @@ namespace ThingModel
         public bool Check(Property property)
         {
             return (!Required && property == null) ||
-                (property != null && property.GetType() == Type && Key.Equals(property.Key));
+                (property != null && (property.GetType() == Type || property.GetType().IsSubclassOf(Type)) && Key.Equals(property.Key));
         }
 
 	    public PropertyType Clone()
