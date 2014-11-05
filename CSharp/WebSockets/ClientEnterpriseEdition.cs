@@ -4,13 +4,23 @@ namespace ThingModel.WebSockets
 {
     public class ClientEnterpriseEdition : Client
     {
-        public bool IsLive { get; private set; }
-        public bool IsPaused { get; private set; }
+        private bool _isLive = true;
+        private bool _isPaused = false;
+
+        public bool IsLive
+        {
+            get { return _isLive; }
+            private set { _isLive = value; }
+        }
+
+        public bool IsPaused
+        {
+            get { return _isPaused; }
+            private set { _isPaused = value; }
+        }
 
         public ClientEnterpriseEdition(string senderID, string path, Warehouse warehouse) : base(senderID, path, warehouse)
         {
-            IsLive = true;
-            IsPaused = false;
         }
 
 
