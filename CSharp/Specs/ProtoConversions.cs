@@ -1,6 +1,7 @@
 
 using System;
 using NUnit.Framework;
+using ThingModel.Builders;
 using ThingModel.Proto;
 
 namespace ThingModel.Specs
@@ -216,7 +217,7 @@ namespace ThingModel.Specs
 
             _fromProtobuf.Convert(_toProtobuf.Convert(new[] { thing }, new Thing[0], new ThingType[0], null));
 
-            Assert.That(_warehouse.GetThing("twingo").GetProperty<Property.DateTime>("birthdate").Value, Is.EqualTo(birthdate));
+            Assert.That(_warehouse.GetThing("twingo").GetProperty<Property.DateTime>("birthdate").Value, Is.EqualTo(birthdate.ToUniversalTime()));
         }
         
         [Test]
@@ -398,5 +399,31 @@ namespace ThingModel.Specs
 			Assert.That(sem, Is.True);
         }
 
+        [Test]
+        public void LocationType()
+        {
+            ThingType type = BuildANewThingType.Named("message")
+                .ContainingA.LocationLatLng()
+                .AndA.LocationEquatorial("equatorial")
+                .AndA.LocationPoint("point");
+
+            Thing thing = BuildANewThing.As(type)
+                .IdentifiedBy("sms1")
+                .ContainingA.Location(new Location.LatLng())
+                .AndA.Location("equatorial", new Location.Equatorial())
+                .AndA.Location("point", new Location.Point());
+
+            Assert.That(type.Check(thing), Is.True);
+
+            var transaction = _toProtobuf.Convert(new []{thing}, new Thing[0], new []{type}, "tests");
+
+            _fromProtobuf.Convert(transaction);
+
+            var newThing = _warehouse.GetThing("sms1");
+
+            Assert.That(newThing, Is.Not.Null);
+
+            Assert.That(type.Check(newThing), Is.True);
+        }
     }
 }

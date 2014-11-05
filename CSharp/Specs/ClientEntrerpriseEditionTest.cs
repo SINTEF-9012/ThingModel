@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using NUnit.Framework;
+using ThingModel.Builders;
 using ThingModel.WebSockets;
 
 namespace ThingModel.Specs
@@ -10,6 +11,7 @@ namespace ThingModel.Specs
     {
         private Server _server;
         private ClientEnterpriseEdition _client;
+        private Warehouse _warehouse;
 
         private const string Path = "ws://localhost:4251/";
 
@@ -17,7 +19,8 @@ namespace ThingModel.Specs
         protected void SetUp()
         {
             _server = new Server(Path);
-            _client = new ClientEnterpriseEdition("UnitTestA", Path, new Warehouse());
+            _warehouse = new Warehouse();
+            _client = new ClientEnterpriseEdition("UnitTestA", Path, _warehouse);
         }
         
         [TearDown]
@@ -81,6 +84,36 @@ namespace ThingModel.Specs
             _client.Load(new DateTime(1980,5,22));
 
             Assert.Throws<Exception>(() => _client.Send());
+        }
+
+        [Test]
+        public void TestTypeDeclaration()
+        {
+            var _warehouseB = new Warehouse();
+            var _clientB = new Client("ClientB", Path, _warehouseB);
+
+            var _warehouseWaitB = new WebSocketServers.WarehouseWait();
+            _warehouseB.RegisterObserver(_warehouseWaitB);
+
+            Assert.That(_client.IsConnected(), Is.True);
+            Assert.That(_clientB.IsConnected(), Is.True);
+
+            ThingType type = BuildANewThingType.Named("rabbit")
+                .ContainingA.LocationLatLng();
+
+            Thing thing = BuildANewThing.As(type).IdentifiedBy("lapin")
+                .ContainingA.Location(new Location.LatLng(1,2));
+
+            Assert.That(type.Check(thing), Is.True);
+
+            _warehouse.RegisterThing(thing);
+            _client.Send();
+            
+            Assert.That(_warehouseWaitB.WaitNew(), Is.True);
+            Assert.That(_warehouseWaitB.WaitDefine(), Is.True);
+
+            Assert.That(_warehouseB.GetThing("lapin").Type, Is.Not.Null);
+            Assert.That(_warehouseB.GetThing("lapin").Type.Name, Is.EqualTo("rabbit"));
         }
     }
 }

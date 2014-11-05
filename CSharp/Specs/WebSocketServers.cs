@@ -17,7 +17,7 @@ namespace ThingModel.Specs
         private Warehouse _warehouseA;
         private Warehouse _warehouseB;
 
-        private class WarehouseWait : IWarehouseObserver
+        public class WarehouseWait : IWarehouseObserver
         {
             private readonly AutoResetEvent _newEvent = new AutoResetEvent(false);
             private readonly AutoResetEvent _deleteEvent = new AutoResetEvent(false);
