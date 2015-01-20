@@ -38,15 +38,16 @@ module.exports = function(grunt) {
 		},
 		file_append: {
 			nodify: {
-				files: {
-					'build/ThingModel.node.js': {
-						input: './build/ThingModel.js',
+				files: [
+					{
+						input: 'build/ThingModel.js',
+						output: 'build/ThingModel.node.js',
 						prepend: "var WebSocket = require('ws'),_ = require('lodash');\n"+
 								"console.debug = console.log;\n"+
 								"var dcodeIO = {ProtoBuf: require('protobufjs')};\n\n",
 						append: 'module.exports = ThingModel;\n'
 					}
-				}
+				]
 			}
 		}
 	});
