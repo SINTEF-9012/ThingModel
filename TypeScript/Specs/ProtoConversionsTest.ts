@@ -324,5 +324,23 @@ describe("ProtoConversions Test", () => {
 		transaction = observer.GetTransaction(toProtobuf, "niceSenderIdDelete");
 		fromProtobuf.Convert(transaction.toArrayBuffer());
 	});
+
+	it("should handle null and undefined strings",() => {
+		var thing = ThingModel.BuildANewThing.WithoutType.IdentifiedBy("computer")
+			.ContainingA.String("poisson", undefined)
+			.AndA.String("hostname", undefined);
+
+		warehouseOutput.RegisterThing(thing.Build());
+
+		var transaction = observer.GetTransaction(toProtobuf, "");
+
+		transaction.string_declarations.length.should.be.equal(3);
+
+		fromProtobuf.Convert(transaction.toArrayBuffer());
+
+		var newThing = warehouseInput.GetThing("computer");
+		newThing.GetProperty<ThingModel.Property.String>("poisson").Value
+			.should.be.equal("");
+	});
 // ReSharper restore WrongExpressionStatement
 });

@@ -301,7 +301,9 @@ module ThingModel.Proto {
 			proto.setType(Property.Type.STRING);
 
 			var st = new ProtoTools.Builder.Property.String();
-			if (value && this._stringToDeclare[value]) {
+			if (value == null) {
+				st.setValue("");
+			} else if (value && this._stringToDeclare[value]) {
 				st.setStringValue(this.StringToKey(value));
 			} else {
 				st.setValue(value);
