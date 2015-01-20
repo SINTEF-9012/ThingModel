@@ -14,23 +14,10 @@
 		<script src="../bower_components/long/Long.js"></script>
 		<script src="../bower_components/bytebuffer/dist/ByteBufferAB.js"></script>
 		<script src="../bower_components/protobuf/dist/ProtoBuf.noparse.js"></script>
-		<script src="../Location.js"></script>
-		<script src="../Type.js"></script>
-		<script src="../Property.js"></script>
-		<script src="../PropertyType.js"></script>
-		<script src="../ThingType.js"></script>
-		<script src="../Thing.js"></script>
-		<script src="../Warehouse.js"></script>
-		<script src="../Proto/ProtoTools.js"></script>
-		<script src="../Proto/ProtoModelObserver.js"></script>
-		<script src="../Proto/FromProtobuf.js"></script>
-		<script src="../Proto/ToProtobuf.js"></script>
-		<script src="../WebSockets/Client.js"></script>
-		<script src="../Builders/BuildANewThing.js"></script>
-		<script src="../Builders/BuildANewThingType.js"></script>
+		<script src="../build/ThingModel.js"></script>
 		<script src="../bower_components/mocha/mocha.js"></script>
 
-		<script> mocha.setup('bdd') </script>
+		<script>mocha.setup('bdd')</script>
 
 		<script src="PropertyTest.js"></script>
 		<script src="ThingTypeTest.js"></script>
@@ -38,6 +25,7 @@
 		<script src="WarehouseTest.js"></script>
 		<script src="ProtoConversionsTest.js"></script>
 		<script src="BuildersTest.js"></script>
+
 
 		<script>
 			mocha.checkLeaks();
