@@ -11,18 +11,15 @@ var ThingModel;
             enumerable: true,
             configurable: true
         });
-
         BuildANewThing.As = function (type) {
             return new BuildANewThing(type);
         };
-
         BuildANewThing.prototype.IdentifiedBy = function (id) {
             return new ThingPropertyBuilder(new ThingModel.Thing(id, this.type));
         };
         return BuildANewThing;
     })();
     ThingModel.BuildANewThing = BuildANewThing;
-
     var ThingPropertyBuilder = (function () {
         function ThingPropertyBuilder(thing) {
             this.thing = thing;
@@ -35,39 +32,33 @@ var ThingModel;
             this.thing.SetProperty(new ThingModel.Property.String(key, value));
             return this;
         };
-
         ThingPropertyBuilder.prototype.Double = function (key, value) {
             this.thing.SetProperty(new ThingModel.Property.Double(key, value));
             return this;
         };
-
         ThingPropertyBuilder.prototype.Int = function (key, value) {
             this.thing.SetProperty(new ThingModel.Property.Int(key, value));
             return this;
         };
-
         ThingPropertyBuilder.prototype.Boolean = function (key, value) {
             this.thing.SetProperty(new ThingModel.Property.Boolean(key, value));
             return this;
         };
-
         ThingPropertyBuilder.prototype.DateTime = function (key, value) {
             this.thing.SetProperty(new ThingModel.Property.DateTime(key, value));
             return this;
         };
-
         ThingPropertyBuilder.prototype.Location = function (mixed, value) {
             var key;
             if (typeof value !== "undefined") {
                 key = mixed;
-            } else {
+            }
+            else {
                 key = "location";
                 value = mixed;
             }
-
             if (!value)
                 return this;
-
             switch (value.type) {
                 case "equatorial":
                     this.thing.SetProperty(new ThingModel.Property.Location.Equatorial(key, value));
@@ -82,7 +73,6 @@ var ThingModel;
             }
             return this;
         };
-
         ThingPropertyBuilder.prototype.Build = function () {
             return this.thing;
         };
@@ -101,11 +91,9 @@ var ThingModel;
         return BuildANewThingType;
     })();
     ThingModel.BuildANewThingType = BuildANewThingType;
-
     var ThingTypePropertyBuilder = (function () {
         function ThingTypePropertyBuilder(type) {
             this.type = type;
-
             this.ContainingA = this;
             this.ContainingAn = this;
             this.AndA = this;
@@ -119,77 +107,63 @@ var ThingModel;
             enumerable: true,
             configurable: true
         });
-
         ThingTypePropertyBuilder.prototype.WhichIs = function (description) {
             if (!this.lastProperty) {
                 this.type.Description = description;
-            } else {
+            }
+            else {
                 this.lastProperty.Description = description;
             }
-
             return this;
         };
-
         ThingTypePropertyBuilder.prototype._createProperty = function (key, name, type) {
             if (!this.lastPropertyAdded && this.lastProperty != null) {
                 this.type.DefineProperty(this.lastProperty);
                 this.lastPropertyAdded = false;
             }
-
             var prop = new ThingModel.PropertyType(key, type, true);
             prop.Name = name;
-
             if (this.nextPropertyIsNotRequired) {
                 this.nextPropertyIsNotRequired = false;
                 prop.Required = false;
             }
-
             this.lastProperty = prop;
         };
-
         ThingTypePropertyBuilder.prototype.String = function (key, name) {
             this._createProperty(key, name, 5 /* String */);
             return this;
         };
-
         ThingTypePropertyBuilder.prototype.LocationPoint = function (key, name) {
-            if (typeof key === "undefined") { key = "location"; }
+            if (key === void 0) { key = "location"; }
             this._createProperty(key, name, 2 /* LocationPoint */);
             return this;
         };
-
         ThingTypePropertyBuilder.prototype.LocationLatLng = function (key, name) {
-            if (typeof key === "undefined") { key = "location"; }
+            if (key === void 0) { key = "location"; }
             this._createProperty(key, name, 3 /* LocationLatLng */);
             return this;
         };
-
         ThingTypePropertyBuilder.prototype.LocationEquatorial = function (key, name) {
-            if (typeof key === "undefined") { key = "location"; }
+            if (key === void 0) { key = "location"; }
             this._createProperty(key, name, 4 /* LocationEquatorial */);
             return this;
         };
-
         ThingTypePropertyBuilder.prototype.Double = function (key, name) {
             this._createProperty(key, name, 6 /* Double */);
             return this;
         };
-
         ThingTypePropertyBuilder.prototype.Int = function (key, name) {
             this._createProperty(key, name, 7 /* Int */);
             return this;
         };
-
         ThingTypePropertyBuilder.prototype.Boolean = function (key, name) {
             this._createProperty(key, name, 8 /* Boolean */);
             return this;
         };
-
         ThingTypePropertyBuilder.prototype.DateTime = function (key, name) {
             this._createProperty(key, name, 9 /* DateTime */);
             return this;
         };
-
         ThingTypePropertyBuilder.prototype.CopyOf = function (otherType) {
             var _this = this;
             _.each(otherType.Properties, function (propertyType) {
@@ -197,12 +171,10 @@ var ThingModel;
             });
             return this;
         };
-
         ThingTypePropertyBuilder.prototype.Build = function () {
             if (!this.lastPropertyAdded && this.lastProperty != null) {
                 this.type.DefineProperty(this.lastProperty);
             }
-
             return this.type;
         };
         return ThingTypePropertyBuilder;
@@ -211,28 +183,22 @@ var ThingModel;
 })(ThingModel || (ThingModel = {}));
 var ThingModel;
 (function (ThingModel) {
+    var WebSockets;
     (function (WebSockets) {
         var Client = (function () {
             function Client(senderID, path, warehouse) {
                 this._connexionDelay = 2000;
                 this.SenderID = senderID;
                 this._path = path;
-
                 this._warehouse = warehouse;
-
                 this._thingModelObserver = new ThingModel.Proto.ProtoModelObserver();
                 warehouse.RegisterObserver(this._thingModelObserver);
-
                 this._fromProtobuf = new ThingModel.Proto.FromProtobuf(this._warehouse);
                 this._toProtobuf = new ThingModel.Proto.ToProtobuf();
-
                 this._closed = true;
                 this._reconnection = false;
-
                 this._observers = null;
-
                 this._sendMessageWaitingList = [];
-
                 this.Connect();
             }
             Client.prototype.Connect = function () {
@@ -240,90 +206,61 @@ var ThingModel;
                 if (!this._closed) {
                     return;
                 }
-
                 this._ws = new WebSocket(this._path);
-
                 this._ws.onopen = function () {
                     console.info("ThingModel: Open connection");
                     _this._closed = false;
                     _this._fromProtobuf = new ThingModel.Proto.FromProtobuf(_this._warehouse);
                     _this._toProtobuf = new ThingModel.Proto.ToProtobuf();
                     _this._connexionDelay = 2000;
-
                     var firstOpen = !_this._reconnection;
-
                     if (_this._sendMessageWaitingList.length > 0) {
                         _.each(_this._sendMessageWaitingList, function (message) {
                             _this.SendMessage(message);
                         });
-
                         _this._sendMessageWaitingList = [];
                     }
-
                     _this.Send();
-
                     if (firstOpen) {
-                        _this.NotifyObservers(function (obs) {
-                            return obs.OnFirstOpen();
-                        });
+                        _this.NotifyObservers(function (obs) { return obs.OnFirstOpen(); });
                     }
-
-                    _this.NotifyObservers(function (obs) {
-                        return obs.OnOpen();
-                    });
+                    _this.NotifyObservers(function (obs) { return obs.OnOpen(); });
                 };
-
                 this._ws.onclose = function () {
                     if (!_this._closed) {
                         _this._closed = true;
                         console.info("ThingModel: Connection lost");
-
-                        _this.NotifyObservers(function (obs) {
-                            return obs.OnClose();
-                        });
+                        _this.NotifyObservers(function (obs) { return obs.OnClose(); });
                     }
                     _this._reconnection = true;
-
-                    setTimeout(function () {
-                        return _this.Connect();
-                    }, _this._connexionDelay);
-
+                    setTimeout(function () { return _this.Connect(); }, _this._connexionDelay);
                     if (_this._connexionDelay < 20000) {
                         _this._connexionDelay += 3500;
                     }
                 };
-
                 var useFileReader = typeof FileReader !== "undefined";
-
                 this._ws.onmessage = function (message) {
                     var data = message.data;
-
                     if (typeof data === "string") {
                         console.info("ThingModel has received a string: " + message);
-                    } else if (useFileReader) {
+                    }
+                    else if (useFileReader) {
                         var fileReader = new FileReader();
                         fileReader.readAsArrayBuffer(data);
-                        fileReader.onload = function () {
-                            return _this.parseBuffer(fileReader.result);
-                        };
-                    } else {
+                        fileReader.onload = function () { return _this.parseBuffer(fileReader.result); };
+                    }
+                    else {
                         _this.parseBuffer(data);
                     }
                 };
             };
-
             Client.prototype.parseBuffer = function (buffer) {
                 var senderName = this._fromProtobuf.Convert(buffer);
                 console.debug("ThingModel: message from: " + senderName);
-
                 this._toProtobuf.ApplyThingsSuppressions(_.values(this._thingModelObserver.Deletions));
                 this._thingModelObserver.Reset();
-
-                this.NotifyObservers(function (obs) {
-                    return obs.OnTransaction(senderName);
-                });
+                this.NotifyObservers(function (obs) { return obs.OnTransaction(senderName); });
             };
-
             Client.prototype.Send = function () {
                 if (this._closed) {
                     console.debug("ThingModel: Does not send, waiting for connexion");
@@ -331,51 +268,43 @@ var ThingModel;
                 }
                 if (this._thingModelObserver.SomethingChanged) {
                     var transaction = this._thingModelObserver.GetTransaction(this._toProtobuf, this.SenderID, this._reconnection);
-
                     this._ws.send(this._toProtobuf.ConvertTransaction(transaction));
                     this._thingModelObserver.Reset();
                     this._reconnection = false;
                     console.debug("ThingModel: transaction sent");
-
-                    this.NotifyObservers(function (obs) {
-                        return obs.OnSend();
-                    });
+                    this.NotifyObservers(function (obs) { return obs.OnSend(); });
                 }
             };
-
             Client.prototype.SendMessage = function (message) {
                 if (this._closed) {
                     this._sendMessageWaitingList.push(message);
-                } else {
+                }
+                else {
                     this._ws.send(message);
                 }
             };
-
             Client.prototype.Close = function () {
                 if (!this._closed) {
                     this._ws.close();
                     this._closed = true;
                 }
             };
-
             Client.prototype.IsConnected = function () {
                 return this._closed;
             };
-
             Client.prototype.RegisterObserver = function (observer) {
                 if (this._observers === null) {
                     this._observers = [observer];
-                } else {
+                }
+                else {
                     this._observers.push(observer);
                 }
             };
-
             Client.prototype.UnregisterObserver = function (observer) {
                 if (this._observers !== null) {
                     this._observers.splice(_.indexOf(this._observers, observer), 1);
                 }
             };
-
             Client.prototype.NotifyObservers = function (callback) {
                 if (this._observers !== null) {
                     _.each(this._observers, callback);
@@ -384,8 +313,7 @@ var ThingModel;
             return Client;
         })();
         WebSockets.Client = Client;
-    })(ThingModel.WebSockets || (ThingModel.WebSockets = {}));
-    var WebSockets = ThingModel.WebSockets;
+    })(WebSockets = ThingModel.WebSockets || (ThingModel.WebSockets = {}));
 })(ThingModel || (ThingModel = {}));
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -395,12 +323,12 @@ var __extends = this.__extends || function (d, b) {
 };
 var ThingModel;
 (function (ThingModel) {
+    var WebSockets;
     (function (WebSockets) {
         var ClientEnterpriseEdition = (function (_super) {
             __extends(ClientEnterpriseEdition, _super);
             function ClientEnterpriseEdition(senderID, path, warehouse) {
                 _super.call(this, senderID, path, warehouse);
-
                 this._isLive = true;
                 this._isPaused = false;
             }
@@ -411,7 +339,6 @@ var ThingModel;
                 enumerable: true,
                 configurable: true
             });
-
             Object.defineProperty(ClientEnterpriseEdition.prototype, "IsPaused", {
                 get: function () {
                     return this._isPaused;
@@ -419,42 +346,30 @@ var ThingModel;
                 enumerable: true,
                 configurable: true
             });
-
             ClientEnterpriseEdition.prototype.Live = function () {
                 if (this._isLive && !this._isPaused)
                     return;
-
                 this.SendMessage("live");
-
                 this._isLive = true;
                 this._isPaused = false;
             };
-
             ClientEnterpriseEdition.prototype.Play = function () {
                 if (!this._isPaused)
                     return;
-
                 this.SendMessage("play");
-
                 this._isPaused = false;
             };
-
             ClientEnterpriseEdition.prototype.Pause = function () {
                 if (this._isPaused)
                     return;
-
                 this.SendMessage("pause");
-
                 this._isPaused = true;
             };
-
             ClientEnterpriseEdition.prototype.Load = function (time) {
                 this.SendMessage("load " + time.getTime());
-
                 this._isLive = false;
                 this._isPaused = true;
             };
-
             ClientEnterpriseEdition.prototype.Send = function () {
                 if (!this._isLive || this._isPaused) {
                     console.debug("ThingModelClientEnterpriseEdition cannot send data while paused or in a past situation");
@@ -465,11 +380,11 @@ var ThingModel;
             return ClientEnterpriseEdition;
         })(WebSockets.Client);
         WebSockets.ClientEnterpriseEdition = ClientEnterpriseEdition;
-    })(ThingModel.WebSockets || (ThingModel.WebSockets = {}));
-    var WebSockets = ThingModel.WebSockets;
+    })(WebSockets = ThingModel.WebSockets || (ThingModel.WebSockets = {}));
 })(ThingModel || (ThingModel = {}));
 var ThingModel;
 (function (ThingModel) {
+    var Proto;
     (function (Proto) {
         var FromProtobuf = (function () {
             function FromProtobuf(warehouse) {
@@ -480,29 +395,21 @@ var ThingModel;
                 if (key == 0) {
                     return "";
                 }
-
                 var value = this.StringDeclarations[key];
-
                 return typeof value === "undefined" ? "undefined" : value;
             };
-
             FromProtobuf.prototype.Convert = function (data, check) {
-                if (typeof check === "undefined") { check = false; }
+                if (check === void 0) { check = false; }
                 var transaction = Proto.ProtoTools.Builder.Transaction.decode(data);
-
                 return this.ConvertTransaction(transaction, check);
             };
-
             FromProtobuf.prototype.ConvertTransaction = function (transaction, check) {
                 var _this = this;
                 _.each(transaction.string_declarations, function (d) {
                     _this.StringDeclarations[d.key] = d.value;
                 });
-
                 var senderId = this.KeyToString(transaction.string_sender_id);
-
                 var thingsToDelete = {};
-
                 _.each(transaction.things_remove_list, function (key) {
                     var id = _this.KeyToString(key);
                     var thing = _this._warehouse.GetThing(id);
@@ -510,45 +417,33 @@ var ThingModel;
                         thingsToDelete[thing.ID] = thing;
                     }
                 });
-
                 this._warehouse.RemoveCollection(thingsToDelete, true, senderId);
-
                 _.each(transaction.thingtypes_declaration_list, function (d) {
                     _this.ConvertThingTypeDeclaration(d, senderId);
                 });
-
                 var thingsToConnect = [];
-
                 _.each(transaction.things_publish_list, function (t) {
                     var modelThing = _this.ConvertThingPublication(t, check, senderId);
-
                     if (t.connections_change) {
                         thingsToConnect.push({ proto: t, model: modelThing });
                     }
                 });
-
                 _.each(thingsToConnect, function (tuple) {
                     tuple.model.DisconnectAll();
-
                     _.each(tuple.proto.connections, function (connection) {
                         var t = _this._warehouse.GetThing(_this.KeyToString(connection));
-
                         if (t) {
                             tuple.model.Connect(t);
                         }
                     });
-
                     _this._warehouse.RegisterThing(tuple.model, false, false, senderId);
                 });
-
                 return senderId;
             };
-
             FromProtobuf.prototype.ConvertThingTypeDeclaration = function (thingType, senderId) {
                 var _this = this;
                 var modelType = new ThingModel.ThingType(this.KeyToString(thingType.string_name));
                 modelType.Description = this.KeyToString(thingType.string_description);
-
                 _.each(thingType.properties, function (propertyType) {
                     var type = null;
                     switch (propertyType.type) {
@@ -571,70 +466,53 @@ var ThingModel;
                             type = 9 /* DateTime */;
                             break;
                     }
-
                     var modelProperty = new ThingModel.PropertyType(_this.KeyToString(propertyType.string_key), type, propertyType.required);
-
                     modelProperty.Description = _this.KeyToString(propertyType.string_description);
                     modelProperty.Name = _this.KeyToString(propertyType.string_name);
-
                     modelType.DefineProperty(modelProperty);
                 });
-
                 this._warehouse.RegisterType(modelType, true, senderId);
             };
-
             FromProtobuf.prototype.ConvertThingPublication = function (thing, check, senderId) {
                 var _this = this;
                 var type = null;
-
                 if (thing.string_type_name != 0) {
                     type = this._warehouse.GetThingType(this.KeyToString(thing.string_type_name));
                 }
-
                 var id = this.KeyToString(thing.string_id);
-
                 var modelThing = this._warehouse.GetThing(id);
-
                 if (modelThing == null || (modelThing.Type == null && type != null || type == null && modelThing.Type != null || (modelThing.Type != null && type != null && modelThing.Type.Name != type.Name))) {
                     modelThing = new ThingModel.Thing(id, type);
                 }
-
                 _.each(thing.properties, function (property) {
                     _this.ConvertThingProperty(property, modelThing);
                 });
-
                 if (check && type != null && !type.Check(modelThing)) {
                     console.log("Object «" + id + "» from «" + senderId + "»not valid, ignored");
-                } else if (!thing.connections_change) {
+                }
+                else if (!thing.connections_change) {
                     this._warehouse.RegisterThing(modelThing, false, false, senderId);
                 }
-
                 return modelThing;
             };
-
             FromProtobuf.prototype.ConvertLocationProperty = function (location, property) {
                 if (property.location_value != null) {
                     location.X = property.location_value.x;
                     location.Y = property.location_value.y;
-
                     if (!property.location_value.z_null) {
                         location.Z = property.location_value.z;
                     }
                 }
             };
-
             FromProtobuf.prototype.ConvertThingProperty = function (property, modelThing) {
                 var modelProperty = null;
-
                 var key = this.KeyToString(property.string_key);
-
                 switch (property.type) {
                     case 2 /* LOCATION_EQUATORIAL */:
                         var locEquatorial = new ThingModel.Location.Equatorial();
                         this.ConvertLocationProperty(locEquatorial, property);
                         modelProperty = new ThingModel.Property.Location.Equatorial(key, locEquatorial);
                         break;
-
                     case 0 /* LOCATION_POINT */:
                         var locPoint = new ThingModel.Location.Point();
                         this.ConvertLocationProperty(locPoint, property);
@@ -645,49 +523,42 @@ var ThingModel;
                         this.ConvertLocationProperty(locLatLng, property);
                         modelProperty = new ThingModel.Property.Location.LatLng(key, locLatLng);
                         break;
-
                     case 3 /* STRING */:
                         var value;
                         if (property.string_value != null) {
                             value = property.string_value.value;
-
                             if (!value && property.string_value.string_value != 0) {
                                 value = this.KeyToString(property.string_value.string_value);
                             }
-                        } else {
+                        }
+                        else {
                             value = "undefined";
                         }
-
                         modelProperty = new ThingModel.Property.String(key, value);
                         break;
-
                     case 4 /* DOUBLE */:
                         modelProperty = new ThingModel.Property.Double(key, property.double_value);
                         break;
-
                     case 5 /* INT */:
                         modelProperty = new ThingModel.Property.Int(key, property.int_value);
                         break;
-
                     case 6 /* BOOLEAN */:
                         modelProperty = new ThingModel.Property.Boolean(key, property.boolean_value);
                         break;
-
                     case 7 /* DATETIME */:
                         modelProperty = new ThingModel.Property.DateTime(key, new Date(property.datetime_value.toNumber()));
                         break;
                 }
-
                 modelThing.SetProperty(modelProperty);
             };
             return FromProtobuf;
         })();
         Proto.FromProtobuf = FromProtobuf;
-    })(ThingModel.Proto || (ThingModel.Proto = {}));
-    var Proto = ThingModel.Proto;
+    })(Proto = ThingModel.Proto || (ThingModel.Proto = {}));
 })(ThingModel || (ThingModel = {}));
 var ThingModel;
 (function (ThingModel) {
+    var Proto;
     (function (Proto) {
         var ProtoModelObserver = (function () {
             function ProtoModelObserver() {
@@ -703,29 +574,24 @@ var ThingModel;
                 this.Definitions = {};
                 this.somethingChanged = true;
             };
-
             ProtoModelObserver.prototype.New = function (thing) {
                 this.Updates[thing.ID] = thing;
                 this.somethingChanged = true;
             };
-
             ProtoModelObserver.prototype.Deleted = function (thing) {
                 delete this.Updates[thing.ID];
                 this.Deletions[thing.ID] = thing;
                 this.somethingChanged = true;
             };
-
             ProtoModelObserver.prototype.Updated = function (thing) {
                 this.Updates[thing.ID] = thing;
                 this.somethingChanged = true;
             };
-
             ProtoModelObserver.prototype.Define = function (thingType) {
                 this.Definitions[thingType.Name] = thingType;
                 this.PermanentDefinitions[thingType.Name] = thingType;
                 this.somethingChanged = true;
             };
-
             Object.defineProperty(ProtoModelObserver.prototype, "SomethingChanged", {
                 get: function () {
                     return this.somethingChanged;
@@ -733,20 +599,19 @@ var ThingModel;
                 enumerable: true,
                 configurable: true
             });
-
             ProtoModelObserver.prototype.GetTransaction = function (toProtobuf, senderID, allDefinitions, onlyDefinitions) {
-                if (typeof allDefinitions === "undefined") { allDefinitions = false; }
-                if (typeof onlyDefinitions === "undefined") { onlyDefinitions = false; }
+                if (allDefinitions === void 0) { allDefinitions = false; }
+                if (onlyDefinitions === void 0) { onlyDefinitions = false; }
                 return toProtobuf.Convert(onlyDefinitions ? [] : _.values(this.Updates), _.values(this.Deletions), _.values(allDefinitions ? this.PermanentDefinitions : this.Definitions), senderID);
             };
             return ProtoModelObserver;
         })();
         Proto.ProtoModelObserver = ProtoModelObserver;
-    })(ThingModel.Proto || (ThingModel.Proto = {}));
-    var Proto = ThingModel.Proto;
+    })(Proto = ThingModel.Proto || (ThingModel.Proto = {}));
 })(ThingModel || (ThingModel = {}));
 var ThingModel;
 (function (ThingModel) {
+    var Proto;
     (function (Proto) {
         var ProtoTools = (function () {
             function ProtoTools() {
@@ -755,11 +620,11 @@ var ThingModel;
             return ProtoTools;
         })();
         Proto.ProtoTools = ProtoTools;
-    })(ThingModel.Proto || (ThingModel.Proto = {}));
-    var Proto = ThingModel.Proto;
+    })(Proto = ThingModel.Proto || (ThingModel.Proto = {}));
 })(ThingModel || (ThingModel = {}));
 var ThingModel;
 (function (ThingModel) {
+    var Proto;
     (function (Proto) {
         var ToProtobuf = (function () {
             function ToProtobuf() {
@@ -773,73 +638,52 @@ var ThingModel;
                 if (!value) {
                     return 0;
                 }
-
                 var key = this.StringDeclarations[value];
-
                 if (key) {
                     return key;
                 }
-
                 key = ++this.StringDeclarationsCpt;
                 this.StringDeclarations[value] = key;
-
                 var stringDeclaration = new Proto.ProtoTools.Builder.StringDeclaration();
-
                 stringDeclaration.setKey(key);
                 stringDeclaration.setValue(value);
-
                 this._transaction.string_declarations.push(stringDeclaration);
-
                 return key;
             };
-
             ToProtobuf.prototype.Convert = function (publish, deletions, declarations, senderID) {
                 var _this = this;
                 this._transaction = new Proto.ProtoTools.Builder.Transaction();
-
                 this._transaction.setStringSenderId(this.StringToKey(senderID));
-
                 _.each(publish, function (thing) {
                     _this.ConvertThing(thing);
                 });
-
                 this.ConvertDeleteList(deletions);
                 this.ConvertDeclarationList(declarations);
-
                 return this._transaction;
             };
-
             ToProtobuf.prototype.ConvertTransaction = function (transaction) {
                 return transaction.toArrayBuffer();
             };
-
             ToProtobuf.prototype.ConvertThing = function (thing) {
                 var _this = this;
                 var change = false;
-
                 var thingID = this.StringToKey(thing.ID);
-
                 var publication = new Proto.ProtoTools.Builder.Thing();
                 publication.setStringId(thingID);
                 publication.setStringTypeName(thing.Type != null ? this.StringToKey(thing.Type.Name) : 0);
                 publication.setConnectionsChange(false);
-
                 var previousThing = this._thingsState[thingID];
-
                 if (previousThing == null || previousThing.getStringTypeName() != publication.getStringTypeName()) {
                     change = true;
                 }
-
                 var connectedThingsCache = null;
-
                 if ((previousThing == null && thing.ConnectedThingsCount > 0) || (previousThing != null && previousThing.getConnections().length != thing.ConnectedThingsCount)) {
                     publication.setConnectionsChange(true);
-                } else {
+                }
+                else {
                     connectedThingsCache = thing.ConnectedThings;
-
                     _.any(connectedThingsCache, function (connectedThing) {
                         var connectionKey = _this.StringToKey(connectedThing.ID);
-
                         if (previousThing == null || !_.contains(previousThing.getConnections(), connectionKey)) {
                             publication.setConnectionsChange(true);
                             return true;
@@ -847,26 +691,20 @@ var ThingModel;
                         return false;
                     });
                 }
-
                 if (publication.getConnectionsChange()) {
                     change = true;
-
                     if (!connectedThingsCache) {
                         connectedThingsCache = thing.ConnectedThings;
                     }
-
                     _.each(connectedThingsCache, function (connectedThing) {
                         var connectionKey = _this.StringToKey(connectedThing.ID);
                         publication.connections.push(connectionKey);
                     });
                 }
-
                 _.each(thing.Properties, function (property) {
                     var propertyId = _this.StringToKey(property.Key);
-
                     var proto = new Proto.ProtoTools.Builder.Property();
                     proto.setStringKey(propertyId);
-
                     switch (property.Type) {
                         case 3 /* LocationLatLng */:
                         case 2 /* LocationPoint */:
@@ -893,63 +731,50 @@ var ThingModel;
                             proto.setDatetimeValue(property.Value.getTime());
                             break;
                     }
-
                     var propertyStateKey = thingID + ":" + propertyId;
-
                     if (previousThing != null) {
                         var previousProto = _this._propertiesState[propertyStateKey];
-
                         if (previousProto != null && previousProto.getType() == proto.getType() && previousProto.getBooleanValue() == proto.getBooleanValue() && previousProto.getDatetimeValue() == proto.getDatetimeValue() && previousProto.getDoubleValue() == proto.getDoubleValue() && previousProto.getIntValue() == proto.getIntValue()) {
                             var previousLoc = previousProto.getLocationValue();
                             var loc = proto.getLocationValue();
-
                             if ((previousLoc == null && loc == null) || (previousLoc != null && loc != null && previousLoc.x == loc.x && previousLoc.y == loc.y && previousLoc.z == loc.z && previousLoc.z_null == loc.z_null && previousLoc.getStringSystem() == loc.getStringSystem())) {
                                 var previousStr = previousProto.getStringValue();
                                 var str = proto.getStringValue();
-
                                 if ((previousStr == null && str == null) || (previousStr != null && str != null && ((previousStr.getStringValue() == str.getStringValue() && previousStr.getValue() == str.getValue()) || (property.ValueToString() == previousStr.getValue())))) {
                                     return;
                                 }
                             }
                         }
                     }
-
                     change = true;
                     publication.properties.push(proto);
                     _this._propertiesState[propertyStateKey] = proto;
                 });
-
                 if (change) {
                     this._transaction.things_publish_list.push(publication);
                     this._thingsState[thingID] = publication;
                 }
             };
-
             ToProtobuf.prototype.ConvertDeleteList = function (list) {
                 var _this = this;
                 _.each(list, function (thing) {
                     var key = _this.StringToKey(thing.ID);
                     _this._transaction.things_remove_list.push(key);
-
                     _this.ManageThingSuppression(key);
                 });
             };
-
             ToProtobuf.prototype.ConvertDeclarationList = function (list) {
                 var _this = this;
                 _.each(list, function (thingType) {
                     var declaration = new Proto.ProtoTools.Builder.ThingType();
-
                     declaration.setStringName(_this.StringToKey(thingType.Name));
                     declaration.setStringDescription(_this.StringToKey(thingType.Description));
-
                     _.each(thingType.Properties, function (propertyType) {
                         var prop = new Proto.ProtoTools.Builder.PropertyType();
                         prop.setStringKey(_this.StringToKey(propertyType.Key));
                         prop.setStringName(_this.StringToKey(propertyType.Name));
                         prop.setStringDescription(_this.StringToKey(propertyType.Description));
                         prop.setRequired(propertyType.Required);
-
                         switch (propertyType.Type) {
                             case 3 /* LocationLatLng */:
                             case 4 /* LocationEquatorial */:
@@ -973,17 +798,13 @@ var ThingModel;
                                 prop.setType(5 /* DATETIME */);
                                 break;
                         }
-
                         declaration.properties.push(prop);
                     });
-
                     _this._transaction.thingtypes_declaration_list.push(declaration);
                 });
             };
-
             ToProtobuf.prototype.ConvertLocationProperty = function (property, proto) {
                 var value = property.Value;
-
                 switch (value.type) {
                     case "latlng":
                         proto.setType(1 /* LOCATION_LATLNG */);
@@ -996,55 +817,46 @@ var ThingModel;
                         proto.setType(0 /* LOCATION_POINT */);
                         break;
                 }
-
                 var loc = new Proto.ProtoTools.Builder.Property.Location();
-
                 loc.setX(value.X);
                 loc.setY(value.Y);
                 loc.setStringSystem(this.StringToKey(value.System));
                 loc.setZNull(value.Z == null);
-
                 if (value.Z != null) {
                     loc.setZ(value.Z);
                 }
-
                 proto.setLocationValue(loc);
             };
-
             ToProtobuf.prototype.ConvertStringProperty = function (property, proto) {
                 var value = property.Value;
                 proto.setType(3 /* STRING */);
-
                 var st = new Proto.ProtoTools.Builder.Property.String();
-                if (value && this._stringToDeclare[value]) {
+                if (value == null) {
+                    st.setValue("");
+                }
+                else if (value && this._stringToDeclare[value]) {
                     st.setStringValue(this.StringToKey(value));
-                } else {
+                }
+                else {
                     st.setValue(value);
-
                     this._stringToDeclare[value] = true;
                 }
-
                 proto.setStringValue(st);
             };
-
             ToProtobuf.prototype.ManageThingSuppression = function (thingId) {
                 var _this = this;
                 delete this._thingsState[thingId];
-
                 var stringId = thingId + ":";
-
                 _.each(this._propertiesState, function (value, key) {
                     if (key.indexOf(stringId) === 0) {
                         delete _this._propertiesState[key];
                     }
                 });
             };
-
             ToProtobuf.prototype.ApplyThingsSuppressions = function (things) {
                 var _this = this;
                 _.each(things, function (thing) {
                     var key = _this.StringDeclarations[thing.ID];
-
                     if (key) {
                         _this.ManageThingSuppression(key);
                     }
@@ -1053,17 +865,17 @@ var ThingModel;
             return ToProtobuf;
         })();
         Proto.ToProtobuf = ToProtobuf;
-    })(ThingModel.Proto || (ThingModel.Proto = {}));
-    var Proto = ThingModel.Proto;
+    })(Proto = ThingModel.Proto || (ThingModel.Proto = {}));
 })(ThingModel || (ThingModel = {}));
 var ThingModel;
 (function (ThingModel) {
+    var Location;
     (function (Location) {
         var Point = (function () {
             function Point(x, y, z) {
-                if (typeof x === "undefined") { x = 0.0; }
-                if (typeof y === "undefined") { y = 0.0; }
-                if (typeof z === "undefined") { z = null; }
+                if (x === void 0) { x = 0.0; }
+                if (y === void 0) { y = 0.0; }
+                if (z === void 0) { z = null; }
                 this.X = x;
                 this.Y = y;
                 this.Z = z;
@@ -1072,14 +884,11 @@ var ThingModel;
             Point.prototype.Compare = function (other) {
                 return other != null && other.X === this.X && other.Y === this.Y && other.Z == this.Z && other.System == this.System;
             };
-
             Point.prototype.toString = function () {
                 var s = this.X + " - " + this.Y;
-
                 if (this.Z != null) {
                     s += " - " + this.Z;
                 }
-
                 if (this.System != null) {
                     s += " -- " + this.System;
                 }
@@ -1088,13 +897,12 @@ var ThingModel;
             return Point;
         })();
         Location.Point = Point;
-
         var LatLng = (function (_super) {
             __extends(LatLng, _super);
             function LatLng(latitude, longitude, altitude) {
-                if (typeof latitude === "undefined") { latitude = 0.0; }
-                if (typeof longitude === "undefined") { longitude = 0.0; }
-                if (typeof altitude === "undefined") { altitude = null; }
+                if (latitude === void 0) { latitude = 0.0; }
+                if (longitude === void 0) { longitude = 0.0; }
+                if (altitude === void 0) { altitude = null; }
                 _super.call(this, latitude, longitude, altitude);
                 this.type = "latlng";
             }
@@ -1108,8 +916,6 @@ var ThingModel;
                 enumerable: true,
                 configurable: true
             });
-
-
             Object.defineProperty(LatLng.prototype, "Longitude", {
                 get: function () {
                     return this.Y;
@@ -1120,8 +926,6 @@ var ThingModel;
                 enumerable: true,
                 configurable: true
             });
-
-
             Object.defineProperty(LatLng.prototype, "Altitude", {
                 get: function () {
                     return this.Z;
@@ -1132,17 +936,15 @@ var ThingModel;
                 enumerable: true,
                 configurable: true
             });
-
             return LatLng;
         })(Point);
         Location.LatLng = LatLng;
-
         var Equatorial = (function (_super) {
             __extends(Equatorial, _super);
             function Equatorial(rightAscension, declination, hourAngle) {
-                if (typeof rightAscension === "undefined") { rightAscension = 0.0; }
-                if (typeof declination === "undefined") { declination = 0.0; }
-                if (typeof hourAngle === "undefined") { hourAngle = 0.0; }
+                if (rightAscension === void 0) { rightAscension = 0.0; }
+                if (declination === void 0) { declination = 0.0; }
+                if (hourAngle === void 0) { hourAngle = 0.0; }
                 _super.call(this, rightAscension, declination, hourAngle);
                 this.type = "equatorial";
             }
@@ -1156,8 +958,6 @@ var ThingModel;
                 enumerable: true,
                 configurable: true
             });
-
-
             Object.defineProperty(Equatorial.prototype, "Declination", {
                 get: function () {
                     return this.Y;
@@ -1168,8 +968,6 @@ var ThingModel;
                 enumerable: true,
                 configurable: true
             });
-
-
             Object.defineProperty(Equatorial.prototype, "HourAngle", {
                 get: function () {
                     return this.Z;
@@ -1180,12 +978,10 @@ var ThingModel;
                 enumerable: true,
                 configurable: true
             });
-
             return Equatorial;
         })(Point);
         Location.Equatorial = Equatorial;
-    })(ThingModel.Location || (ThingModel.Location = {}));
-    var Location = ThingModel.Location;
+    })(Location = ThingModel.Location || (ThingModel.Location = {}));
 })(ThingModel || (ThingModel = {}));
 var ThingModel;
 (function (ThingModel) {
@@ -1204,7 +1000,6 @@ var ThingModel;
             enumerable: true,
             configurable: true
         });
-
         Object.defineProperty(Property.prototype, "Type", {
             get: function () {
                 return 0 /* Unknown */;
@@ -1212,39 +1007,35 @@ var ThingModel;
             enumerable: true,
             configurable: true
         });
-
         Property.prototype.ValueToString = function () {
             return this._value != null ? this._value.toString() : "";
         };
-
         Property.prototype.CompareValue = function (other) {
             if (other == null || (this._value != null && other._value == null)) {
                 return false;
             }
-
             if (this._value == null && other._value == null) {
                 return true;
             }
-
             if (this._value != null && other._value != null) {
                 if (this._value.Compare && other._value.Compare) {
                     return this._value.Compare(other._value);
-                } else {
+                }
+                else {
                     return this._value === other._value;
                 }
             }
-
             return false;
         };
-
         Property.prototype.Clone = function () {
             return new Property(this._key, this._value);
         };
         return Property;
     })();
     ThingModel.Property = Property;
-
+    var Property;
     (function (Property) {
+        var Location;
         (function (Location) {
             var Point = (function (_super) {
                 __extends(Point, _super);
@@ -1261,8 +1052,6 @@ var ThingModel;
                     enumerable: true,
                     configurable: true
                 });
-
-
                 Object.defineProperty(Point.prototype, "Type", {
                     get: function () {
                         return 2 /* LocationPoint */;
@@ -1270,20 +1059,16 @@ var ThingModel;
                     enumerable: true,
                     configurable: true
                 });
-
                 Point.prototype.Clone = function () {
                     var p = new ThingModel.Location.Point(this._value.X, this._value.Y, this._value.Z);
-
                     if (this._value.System) {
                         p.System = this._value.System;
                     }
-
                     return new Property.Location.Point(this._key, p);
                 };
                 return Point;
             })(Property);
             Location.Point = Point;
-
             var LatLng = (function (_super) {
                 __extends(LatLng, _super);
                 function LatLng(key, value) {
@@ -1299,8 +1084,6 @@ var ThingModel;
                     enumerable: true,
                     configurable: true
                 });
-
-
                 Object.defineProperty(LatLng.prototype, "Type", {
                     get: function () {
                         return 3 /* LocationLatLng */;
@@ -1308,20 +1091,16 @@ var ThingModel;
                     enumerable: true,
                     configurable: true
                 });
-
                 LatLng.prototype.Clone = function () {
                     var p = new ThingModel.Location.LatLng(this._value.X, this._value.Y, this._value.Z);
-
                     if (this._value.System) {
                         p.System = this._value.System;
                     }
-
                     return new Property.Location.LatLng(this._key, p);
                 };
                 return LatLng;
             })(Property);
             Location.LatLng = LatLng;
-
             var Equatorial = (function (_super) {
                 __extends(Equatorial, _super);
                 function Equatorial(key, value) {
@@ -1337,8 +1116,6 @@ var ThingModel;
                     enumerable: true,
                     configurable: true
                 });
-
-
                 Object.defineProperty(Equatorial.prototype, "Type", {
                     get: function () {
                         return 4 /* LocationEquatorial */;
@@ -1346,22 +1123,17 @@ var ThingModel;
                     enumerable: true,
                     configurable: true
                 });
-
                 Equatorial.prototype.Clone = function () {
                     var p = new ThingModel.Location.Equatorial(this._value.X, this._value.Y, this._value.Z);
-
                     if (this._value.System) {
                         p.System = this._value.System;
                     }
-
                     return new Property.Location.Equatorial(this._key, p);
                 };
                 return Equatorial;
             })(Property);
             Location.Equatorial = Equatorial;
-        })(Property.Location || (Property.Location = {}));
-        var Location = Property.Location;
-
+        })(Location = Property.Location || (Property.Location = {}));
         var String = (function (_super) {
             __extends(String, _super);
             function String(key, value) {
@@ -1377,8 +1149,6 @@ var ThingModel;
                 enumerable: true,
                 configurable: true
             });
-
-
             Object.defineProperty(String.prototype, "Type", {
                 get: function () {
                     return 5 /* String */;
@@ -1386,14 +1156,12 @@ var ThingModel;
                 enumerable: true,
                 configurable: true
             });
-
             String.prototype.Clone = function () {
                 return new Property.String(this._key, this._value);
             };
             return String;
         })(Property);
         Property.String = String;
-
         var Double = (function (_super) {
             __extends(Double, _super);
             function Double(key, value) {
@@ -1412,8 +1180,6 @@ var ThingModel;
                 enumerable: true,
                 configurable: true
             });
-
-
             Object.defineProperty(Double.prototype, "Type", {
                 get: function () {
                     return 6 /* Double */;
@@ -1421,14 +1187,12 @@ var ThingModel;
                 enumerable: true,
                 configurable: true
             });
-
             Double.prototype.Clone = function () {
                 return new Property.Double(this._key, this._value);
             };
             return Double;
         })(Property);
         Property.Double = Double;
-
         var Int = (function (_super) {
             __extends(Int, _super);
             function Int(key, value) {
@@ -1447,8 +1211,6 @@ var ThingModel;
                 enumerable: true,
                 configurable: true
             });
-
-
             Object.defineProperty(Int.prototype, "Type", {
                 get: function () {
                     return 7 /* Int */;
@@ -1456,14 +1218,12 @@ var ThingModel;
                 enumerable: true,
                 configurable: true
             });
-
             Int.prototype.Clone = function () {
                 return new Property.Int(this._key, this._value);
             };
             return Int;
         })(Property);
         Property.Int = Int;
-
         var Boolean = (function (_super) {
             __extends(Boolean, _super);
             function Boolean(key, value) {
@@ -1479,8 +1239,6 @@ var ThingModel;
                 enumerable: true,
                 configurable: true
             });
-
-
             Object.defineProperty(Boolean.prototype, "Type", {
                 get: function () {
                     return 8 /* Boolean */;
@@ -1488,14 +1246,12 @@ var ThingModel;
                 enumerable: true,
                 configurable: true
             });
-
             Boolean.prototype.Clone = function () {
                 return new Property.Boolean(this._key, this._value);
             };
             return Boolean;
         })(Property);
         Property.Boolean = Boolean;
-
         var DateTime = (function (_super) {
             __extends(DateTime, _super);
             function DateTime(key, value) {
@@ -1511,8 +1267,6 @@ var ThingModel;
                 enumerable: true,
                 configurable: true
             });
-
-
             Object.defineProperty(DateTime.prototype, "Type", {
                 get: function () {
                     return 9 /* DateTime */;
@@ -1520,21 +1274,19 @@ var ThingModel;
                 enumerable: true,
                 configurable: true
             });
-
             DateTime.prototype.Clone = function () {
                 return new Property.Double(this._key, this._value ? new Date(this._value.getTime()) : this._value);
             };
             return DateTime;
         })(Property);
         Property.DateTime = DateTime;
-    })(ThingModel.Property || (ThingModel.Property = {}));
-    var Property = ThingModel.Property;
+    })(Property = ThingModel.Property || (ThingModel.Property = {}));
 })(ThingModel || (ThingModel = {}));
 var ThingModel;
 (function (ThingModel) {
     var PropertyType = (function () {
         function PropertyType(key, type, required) {
-            if (typeof required === "undefined") { required = true; }
+            if (required === void 0) { required = true; }
             if (!key) {
                 throw "The PropertyType key should not be null or empty";
             }
@@ -1549,7 +1301,6 @@ var ThingModel;
             enumerable: true,
             configurable: true
         });
-
         Object.defineProperty(PropertyType.prototype, "Type", {
             get: function () {
                 return this._type;
@@ -1557,11 +1308,9 @@ var ThingModel;
             enumerable: true,
             configurable: true
         });
-
         PropertyType.prototype.Check = function (property) {
             return (!this.Required && property == null) || (property != null && property.Type == this._type && property.Key == this.Key);
         };
-
         PropertyType.prototype.Clone = function () {
             var newProp = new PropertyType(this._key, this._type, this.Required);
             newProp.Name = this.Name;
@@ -1576,15 +1325,13 @@ var ThingModel;
 (function (ThingModel) {
     var Thing = (function () {
         function Thing(id, type) {
-            if (typeof type === "undefined") { type = null; }
+            if (type === void 0) { type = null; }
             this._type = null;
             if (!id) {
                 throw new Error("The thing ID should not be null or empty");
             }
-
             this._id = id;
             this._type = type;
-
             this._properties = {};
             this._propertiesCount = 0;
             this._connections = {};
@@ -1597,7 +1344,6 @@ var ThingModel;
             enumerable: true,
             configurable: true
         });
-
         Object.defineProperty(Thing.prototype, "Type", {
             get: function () {
                 return this._type;
@@ -1605,41 +1351,32 @@ var ThingModel;
             enumerable: true,
             configurable: true
         });
-
         Thing.prototype.SetProperty = function (property) {
             if (!this.HasProperty(property.Key)) {
                 ++this._propertiesCount;
             }
             this._properties[property.Key] = property;
         };
-
         Thing.prototype.HasProperty = function (key) {
             return _.has(this._properties, key);
         };
-
         Thing.prototype.GetProperty = function (key, type) {
             var prop = this._properties[key];
             if (!prop || (type && prop.Type != type)) {
                 return null;
             }
-
             return prop;
         };
-
         Thing.prototype.GetString = function (key) {
             var prop = this.GetProperty(key, 5 /* String */);
-
             if (!prop) {
                 return null;
             }
-
             return prop.Value;
         };
-
         Thing.prototype.Connect = function (thing) {
             if (!thing)
                 return;
-
             if (thing === this || thing._id === this._id) {
                 throw new Error("You can't connect a thing directly to itself");
             }
@@ -1648,7 +1385,6 @@ var ThingModel;
             }
             this._connections[thing._id] = thing;
         };
-
         Thing.prototype.Disconnect = function (thing) {
             if (this.IsConnectedTo(thing)) {
                 --this._connectionsCount;
@@ -1657,16 +1393,13 @@ var ThingModel;
             }
             return false;
         };
-
         Thing.prototype.DisconnectAll = function () {
             this._connections = {};
             this._connectionsCount = 0;
         };
-
         Thing.prototype.IsConnectedTo = function (thing) {
             return !!thing && _.has(this._connections, thing._id);
         };
-
         Object.defineProperty(Thing.prototype, "ConnectedThings", {
             get: function () {
                 return _.values(this._connections);
@@ -1674,7 +1407,6 @@ var ThingModel;
             enumerable: true,
             configurable: true
         });
-
         Object.defineProperty(Thing.prototype, "ConnectedThingsCount", {
             get: function () {
                 return this._connectionsCount;
@@ -1682,7 +1414,6 @@ var ThingModel;
             enumerable: true,
             configurable: true
         });
-
         Object.defineProperty(Thing.prototype, "Properties", {
             get: function () {
                 return _.values(this._properties);
@@ -1690,61 +1421,47 @@ var ThingModel;
             enumerable: true,
             configurable: true
         });
-
         Thing.prototype.Compare = function (other, compareId, deepComparisonForConnectedThings) {
-            if (typeof compareId === "undefined") { compareId = true; }
-            if (typeof deepComparisonForConnectedThings === "undefined") { deepComparisonForConnectedThings = false; }
+            if (compareId === void 0) { compareId = true; }
+            if (deepComparisonForConnectedThings === void 0) { deepComparisonForConnectedThings = false; }
             if (this === other) {
                 return true;
             }
-
             if (!other || (this._type != null && other._type != null && this._type.Name != other._type.Name) || (this._type == null && other._type != null) || (this._type != null && other._type == null)) {
                 return false;
             }
-
             if (compareId && this._id != other._id) {
                 return false;
             }
-
             if (this._connectionsCount !== other._connectionsCount || _.any(this._connections, function (connectedThing) {
                 return !_.has(other._connections, connectedThing._id);
             })) {
                 return false;
             }
-
             if (this._propertiesCount !== other._propertiesCount || _.any(this._properties, function (property) {
                 var otherProp = other._properties[property.Key];
-
                 return otherProp == null || !otherProp.CompareValue(property);
             })) {
                 return false;
             }
-
             if (deepComparisonForConnectedThings) {
                 return this.RecursiveCompare(other, {});
             }
-
             return true;
         };
-
         Thing.prototype.RecursiveCompare = function (other, alreadyVisitedObjets) {
             if (_.has(alreadyVisitedObjets, this._id)) {
                 return true;
             }
-
             if (!this.Compare(other)) {
                 return false;
             }
-
             alreadyVisitedObjets[this._id] = true;
-
             return !_.any(this._connections, function (connectedThing) {
                 var otherThing = other._connections[connectedThing._id];
-
                 return !connectedThing.RecursiveCompare(otherThing, alreadyVisitedObjets);
             });
         };
-
         Object.defineProperty(Thing.prototype, "ContainingA", {
             get: function () {
                 if (!this._propertyBuilder) {
@@ -1755,7 +1472,6 @@ var ThingModel;
             enumerable: true,
             configurable: true
         });
-
         Object.defineProperty(Thing.prototype, "ContainingAn", {
             get: function () {
                 return this.ContainingA;
@@ -1763,12 +1479,12 @@ var ThingModel;
             enumerable: true,
             configurable: true
         });
-
         Thing.prototype.String = function (key, value) {
             if (typeof value !== "undefined") {
                 this.SetProperty(new ThingModel.Property.String(key, value));
                 return this;
-            } else {
+            }
+            else {
                 var p = this.GetProperty(key, 5 /* String */);
                 if (!p) {
                     return null;
@@ -1776,12 +1492,12 @@ var ThingModel;
                 return p.Value;
             }
         };
-
         Thing.prototype.Double = function (key, value) {
             if (typeof value !== "undefined") {
                 this.SetProperty(new ThingModel.Property.Double(key, value));
                 return this;
-            } else {
+            }
+            else {
                 var p = this.GetProperty(key, 6 /* Double */);
                 if (!p) {
                     return null;
@@ -1789,12 +1505,12 @@ var ThingModel;
                 return p.Value;
             }
         };
-
         Thing.prototype.Int = function (key, value) {
             if (typeof value !== "undefined") {
                 this.SetProperty(new ThingModel.Property.Int(key, value));
                 return this;
-            } else {
+            }
+            else {
                 var p = this.GetProperty(key, 7 /* Int */);
                 if (!p) {
                     return null;
@@ -1802,12 +1518,12 @@ var ThingModel;
                 return p.Value;
             }
         };
-
         Thing.prototype.Boolean = function (key, value) {
             if (typeof value !== "undefined") {
                 this.SetProperty(new ThingModel.Property.Boolean(key, value));
                 return this;
-            } else {
+            }
+            else {
                 var p = this.GetProperty(key, 8 /* Boolean */);
                 if (!p) {
                     return null;
@@ -1815,12 +1531,12 @@ var ThingModel;
                 return p.Value;
             }
         };
-
         Thing.prototype.DateTime = function (key, value) {
             if (typeof value !== "undefined") {
                 this.SetProperty(new ThingModel.Property.DateTime(key, value));
                 return this;
-            } else {
+            }
+            else {
                 var p = this.GetProperty(key, 9 /* DateTime */);
                 if (!p) {
                     return null;
@@ -1828,21 +1544,20 @@ var ThingModel;
                 return p.Value;
             }
         };
-
         Thing.prototype.LocationPoint = function (mixed, value) {
             var key;
-
             if (typeof mixed === 'string' || mixed instanceof String) {
                 key = mixed;
-            } else {
+            }
+            else {
                 key = "location";
                 value = mixed;
             }
-
             if (typeof value !== "undefined") {
                 this.SetProperty(new ThingModel.Property.Location.Point(key, value));
                 return this;
-            } else {
+            }
+            else {
                 var p = this.GetProperty(key, 2 /* LocationPoint */);
                 if (!p) {
                     return null;
@@ -1850,21 +1565,20 @@ var ThingModel;
                 return p.Value;
             }
         };
-
         Thing.prototype.LocationLatLng = function (mixed, value) {
             var key;
-
             if (typeof mixed === 'string' || mixed instanceof String) {
                 key = mixed;
-            } else {
+            }
+            else {
                 key = "location";
                 value = mixed;
             }
-
             if (typeof value !== "undefined") {
                 this.SetProperty(new ThingModel.Property.Location.LatLng(key, value));
                 return this;
-            } else {
+            }
+            else {
                 var p = this.GetProperty(key, 3 /* LocationLatLng */);
                 if (!p) {
                     return null;
@@ -1872,21 +1586,20 @@ var ThingModel;
                 return p.Value;
             }
         };
-
         Thing.prototype.LocationEquatorial = function (mixed, value) {
             var key;
-
             if (typeof mixed === 'string' || mixed instanceof String) {
                 key = mixed;
-            } else {
+            }
+            else {
                 key = "location";
                 value = mixed;
             }
-
             if (typeof value !== "undefined") {
                 this.SetProperty(new ThingModel.Property.Location.Equatorial(key, value));
                 return this;
-            } else {
+            }
+            else {
                 var p = this.GetProperty(key, 4 /* LocationEquatorial */);
                 if (!p) {
                     return null;
@@ -1915,21 +1628,17 @@ var ThingModel;
             enumerable: true,
             configurable: true
         });
-
         ThingType.prototype.Check = function (thing) {
             return (thing.Type === this || (thing.Type !== null && thing.Type._name === this._name)) && _.all(this._properties, function (propertyType) {
                 return propertyType.Check(thing.GetProperty(propertyType.Key));
             });
         };
-
         ThingType.prototype.DefineProperty = function (property) {
             this._properties[property.Key] = property;
         };
-
         ThingType.prototype.GetPropertyDefinition = function (key) {
             return this._properties[key];
         };
-
         Object.defineProperty(ThingType.prototype, "Properties", {
             get: function () {
                 return _.values(this._properties);
@@ -1966,83 +1675,69 @@ var ThingModel;
             this._observers = [];
         }
         Warehouse.prototype.RegisterType = function (type, force, sender) {
-            if (typeof force === "undefined") { force = true; }
-            if (typeof sender === "undefined") { sender = null; }
+            if (force === void 0) { force = true; }
+            if (sender === void 0) { sender = null; }
             if (!type) {
                 throw new Error("The thing type information is null.");
             }
-
             if (force || !_.has(this._thingTypes, type.Name)) {
                 this._thingTypes[type.Name] = type;
-
                 this.NotifyThingTypeDefine(type, sender);
             }
         };
-
         Warehouse.prototype.RegisterThing = function (thing, alsoRegisterConnections, alsoRegisterTypes, sender) {
             var _this = this;
-            if (typeof alsoRegisterConnections === "undefined") { alsoRegisterConnections = true; }
-            if (typeof alsoRegisterTypes === "undefined") { alsoRegisterTypes = true; }
-            if (typeof sender === "undefined") { sender = null; }
+            if (alsoRegisterConnections === void 0) { alsoRegisterConnections = true; }
+            if (alsoRegisterTypes === void 0) { alsoRegisterTypes = true; }
+            if (sender === void 0) { sender = null; }
             if (!thing) {
                 throw new Error("A thing should not be null if it want to be allowed in the warehouse");
             }
-
             var creation = !_.has(this._things, thing.ID);
             this._things[thing.ID] = thing;
-
             if (alsoRegisterTypes && thing.Type) {
                 this.RegisterType(thing.Type, false, sender);
             }
-
             if (alsoRegisterConnections) {
                 var alreadyVisitedObjects = {};
                 _.each(thing.ConnectedThings, function (connectedThing) {
                     _this.RecursiveRegisterThing(connectedThing, alsoRegisterTypes, alreadyVisitedObjects, sender);
                 });
             }
-
             if (creation) {
                 this.NotifyThingCreation(thing, sender);
-            } else {
+            }
+            else {
                 this.NotifyThingUpdate(thing, sender);
             }
         };
-
         Warehouse.prototype.RecursiveRegisterThing = function (thing, alsoRegisterTypes, alreadyVisitedObjects, sender) {
             var _this = this;
             if (alreadyVisitedObjects.hasOwnProperty(thing.ID)) {
                 return;
             }
-
             alreadyVisitedObjects[thing.ID] = true;
-
             this.RegisterThing(thing, false, alsoRegisterTypes, sender);
-
             _.each(thing.ConnectedThings, function (connectedThing) {
                 _this.RecursiveRegisterThing(connectedThing, alsoRegisterTypes, alreadyVisitedObjects, sender);
             });
         };
-
         Warehouse.prototype.RegisterCollection = function (collection, alsoRegisterTypes, sender) {
             var _this = this;
-            if (typeof alsoRegisterTypes === "undefined") { alsoRegisterTypes = true; }
-            if (typeof sender === "undefined") { sender = null; }
+            if (alsoRegisterTypes === void 0) { alsoRegisterTypes = true; }
+            if (sender === void 0) { sender = null; }
             var alreadyVisitedObjects = {};
             _.each(collection, function (thing) {
                 _this.RecursiveRegisterThing(thing, alsoRegisterTypes, alreadyVisitedObjects, sender);
             });
         };
-
         Warehouse.prototype.RemoveCollection = function (collection, notifyUpdates, sender) {
             var _this = this;
-            if (typeof notifyUpdates === "undefined") { notifyUpdates = true; }
-            if (typeof sender === "undefined") { sender = null; }
+            if (notifyUpdates === void 0) { notifyUpdates = true; }
+            if (sender === void 0) { sender = null; }
             var thingsToDisconnect = {};
-
             _.each(_.keys(collection), function (id) {
                 var thing = collection[id];
-
                 if (notifyUpdates) {
                     _.each(_this._things, function (t) {
                         if (t.IsConnectedTo(thing)) {
@@ -2050,10 +1745,8 @@ var ThingModel;
                         }
                     });
                 }
-
                 _this.RemoveThing(thing, false, sender);
             });
-
             if (notifyUpdates) {
                 _.each(_.keys(thingsToDisconnect), function (id) {
                     if (!collection.hasOwnProperty(id)) {
@@ -2062,15 +1755,13 @@ var ThingModel;
                 });
             }
         };
-
         Warehouse.prototype.RemoveThing = function (thing, notifyUpdates, sender) {
             var _this = this;
-            if (typeof notifyUpdates === "undefined") { notifyUpdates = true; }
-            if (typeof sender === "undefined") { sender = null; }
+            if (notifyUpdates === void 0) { notifyUpdates = true; }
+            if (sender === void 0) { sender = null; }
             if (!thing) {
                 return;
             }
-
             _.each(this._things, function (t) {
                 if (t.IsConnectedTo(thing)) {
                     t.Disconnect(thing);
@@ -2079,57 +1770,47 @@ var ThingModel;
                     }
                 }
             });
-
             if (_.has(this._things, thing.ID)) {
                 delete this._things[thing.ID];
                 this.NotifyThingDeleted(thing, sender);
             }
         };
-
         Warehouse.prototype.RegisterObserver = function (observer) {
             this._observers.push(observer);
         };
-
         Warehouse.prototype.UnregisterObserver = function (observer) {
             this._observers.splice(_.indexOf(this._observers, observer), 1);
         };
-
         Warehouse.prototype.NotifyThingTypeDefine = function (type, sender) {
-            if (typeof sender === "undefined") { sender = null; }
+            if (sender === void 0) { sender = null; }
             _.each(this._observers, function (observer) {
                 observer.Define(type, sender);
             });
         };
-
         Warehouse.prototype.NotifyThingUpdate = function (thing, sender) {
-            if (typeof sender === "undefined") { sender = null; }
+            if (sender === void 0) { sender = null; }
             _.each(this._observers, function (observer) {
                 observer.Updated(thing, sender);
             });
         };
-
         Warehouse.prototype.NotifyThingCreation = function (thing, sender) {
-            if (typeof sender === "undefined") { sender = null; }
+            if (sender === void 0) { sender = null; }
             _.each(this._observers, function (observer) {
                 observer.New(thing, sender);
             });
         };
-
         Warehouse.prototype.NotifyThingDeleted = function (thing, sender) {
-            if (typeof sender === "undefined") { sender = null; }
+            if (sender === void 0) { sender = null; }
             _.each(this._observers, function (observer) {
                 observer.Deleted(thing, sender);
             });
         };
-
         Warehouse.prototype.GetThing = function (id) {
             return this._things[id];
         };
-
         Warehouse.prototype.GetThingType = function (name) {
             return this._thingTypes[name];
         };
-
         Object.defineProperty(Warehouse.prototype, "Things", {
             get: function () {
                 return _.values(this._things);
@@ -2137,7 +1818,6 @@ var ThingModel;
             enumerable: true,
             configurable: true
         });
-
         Object.defineProperty(Warehouse.prototype, "ThingsTypes", {
             get: function () {
                 return _.values(this._thingTypes);
