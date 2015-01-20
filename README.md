@@ -11,7 +11,7 @@ If you are looking for innovative products about models, you should also take a 
 
 ## The model
 
-![Model](https://raw2.github.com/SINTEF-9012/ThingModel/master/Documentation/ThingModel.png)
+![Model](https://raw.githubusercontent.com/SINTEF-9012/ThingModel/master/Documentation/ThingModel.png)
 
 ## Light network synchronization
 
@@ -38,13 +38,13 @@ If you are looking for innovative products about models, you should also take a 
 
 ### A broadcast server
 
-![Screenshot server](https://raw2.github.com/SINTEF-9012/ThingModel/master/Documentation/Screenshot-Server.png)
+![Screenshot server](https://raw.github.com/SINTEF-9012/ThingModel/master/Documentation/Screenshot-Server.png)
 
 If this server doesn't suit your needs, you can easely develop your own ThingModel server.
 
 ### A time machine
 
-![Screenshot timemachine](https://raw2.github.com/SINTEF-9012/ThingModel/master/Documentation/Screenshot-TimeMachine.png)
+![Screenshot timemachine](https://raw.github.com/SINTEF-9012/ThingModel/master/Documentation/Screenshot-TimeMachine.png)
 
 The time machine saves the model in realtime (1 hertz as maximum frequency by default). Thanks to protocol buffers, gzip and sqlite, it's very light.
 
