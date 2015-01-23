@@ -425,5 +425,33 @@ namespace ThingModel.Specs
 
             Assert.That(type.Check(newThing), Is.True);
         }
+        
+        [Test]
+        public void StringUpdatedToEmptyString()
+        {
+            var thing = new Thing("computer");
+            thing.SetProperty(new Property.String("name", "Interstella"));
+
+            var transaction = _toProtobuf.Convert(new[] {thing}, new Thing[0], new ThingType[0], "");
+            _fromProtobuf.Convert(transaction);
+
+            var newThing = _warehouse.GetThing("computer");
+            Assert.That(newThing.String("name"), Is.EqualTo("Interstella"));
+
+            thing.String("name", "");
+            
+            transaction = _toProtobuf.Convert(new[] {thing}, new Thing[0], new ThingType[0], "");
+            _fromProtobuf.Convert(transaction);
+
+            Assert.That(newThing.String("name"), Is.EqualTo(""));
+            
+            thing.String("name", null);
+            
+            transaction = _toProtobuf.Convert(new[] {thing}, new Thing[0], new ThingType[0], "");
+            _fromProtobuf.Convert(transaction);
+
+            Assert.That(newThing.String("name"), Is.EqualTo(null));
+            Assert.That(newThing.String("name"), Is.Not.EqualTo(""));
+        }
     }
 }

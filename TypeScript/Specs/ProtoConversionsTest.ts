@@ -342,5 +342,28 @@ describe("ProtoConversions Test", () => {
 		newThing.GetProperty<ThingModel.Property.String>("poisson").Value
 			.should.be.equal("");
 	});
+
+	it("should send update when updated string is empty", () => {
+
+		var thing = new ThingModel.Thing("computer");
+		thing.String("name", "Interstella");
+
+		warehouseOutput.RegisterThing(thing);
+
+		var transaction = observer.GetTransaction(toProtobuf, "");
+		fromProtobuf.Convert(transaction.toArrayBuffer());
+
+		var newThing = warehouseInput.GetThing("computer");
+		newThing.String("name").should.be.equal("Interstella");
+
+		thing.String("name", "");
+
+		observer.Reset();
+		warehouseOutput.NotifyThingUpdate(thing);
+		transaction = observer.GetTransaction(toProtobuf, "");
+		fromProtobuf.Convert(transaction.toArrayBuffer());
+
+		newThing.String("name").should.be.equal("");
+	});
 // ReSharper restore WrongExpressionStatement
 });
