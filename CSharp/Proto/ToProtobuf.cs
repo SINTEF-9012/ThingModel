@@ -1,4 +1,4 @@
-﻿#region
+#region
 
 using System;
 using System.Collections.Generic;
@@ -33,6 +33,9 @@ namespace ThingModel.Proto
                 {typeof (ThingModel.Property.Boolean), PropertyType.Type.BOOLEAN},
                 {typeof (ThingModel.Property.DateTime), PropertyType.Type.DATETIME},
             };
+
+        private static readonly TimeSpan DateTimeEpoch = new TimeSpan(
+            new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).Ticks);
 
         // When a string is in this collection, it should be sent
         // as StringDeclaration for the next transaction
@@ -162,7 +165,33 @@ namespace ThingModel.Proto
                         string_key = StringToKey(property.Key)
                     };
 
-                ConvertProperty((dynamic) property, proto);
+                var type = PrototypesBinding[property.GetType()];
+                switch (type)
+                {
+                    case PropertyType.Type.LOCATION:
+                        ConvertLocationProperty((ThingModel.Property.Location) property, proto);
+                        break;
+                    case PropertyType.Type.STRING:
+                        ConvertStringProperty((ThingModel.Property.String) property, proto);
+                        break;
+                    case PropertyType.Type.DOUBLE:
+                        proto.type = Property.Type.DOUBLE;
+                        proto.double_value = ((ThingModel.Property.Double) property).Value;
+                        break;
+                    case PropertyType.Type.INT:
+                        proto.type = Property.Type.INT;
+                        proto.int_value = ((ThingModel.Property.Int) property).Value;
+                        break;
+                    case PropertyType.Type.BOOLEAN:
+                        proto.type = Property.Type.BOOLEAN;
+                        proto.boolean_value = ((ThingModel.Property.Boolean) property).Value;
+                        break;
+                    case PropertyType.Type.DATETIME:
+                        proto.type = Property.Type.DATETIME;
+                        var date = ((ThingModel.Property.DateTime) property).Value;
+                        proto.datetime_value = date.ToUniversalTime().Subtract(DateTimeEpoch).Ticks/10000;
+                        break;
+                }
 
                 var key = new Tuple<int, int>(publication.string_id, proto.string_key);
 
@@ -250,7 +279,7 @@ namespace ThingModel.Proto
             }
         }
 
-        protected void ConvertProperty(ThingModel.Property.Location property, Property proto)
+        protected void ConvertLocationProperty(ThingModel.Property.Location property, Property proto)
         {
             var value = property.Value;
 
@@ -281,7 +310,7 @@ namespace ThingModel.Proto
             }
         }
 
-        protected void ConvertProperty(ThingModel.Property.String property, Property proto)
+        protected void ConvertStringProperty(ThingModel.Property.String property, Property proto)
         {
             var value = property.Value;
 
@@ -299,34 +328,6 @@ namespace ThingModel.Proto
                 // Use string to key the next time
                 _stringToDeclare.Add(value);
             }
-        }
-
-        protected void ConvertProperty(ThingModel.Property.Double property, Property proto)
-        {
-            proto.type = Property.Type.DOUBLE;
-            proto.double_value = property.Value;
-        }
-
-        protected void ConvertProperty(ThingModel.Property.Int property, Property proto)
-        {
-            proto.type = Property.Type.INT;
-            proto.int_value = property.Value;
-        }
-
-        protected void ConvertProperty(ThingModel.Property.Boolean property, Property proto)
-        {
-            proto.type = Property.Type.BOOLEAN;
-            proto.boolean_value = property.Value;
-        }
-
-		private static readonly TimeSpan DateTimeEpoch = new TimeSpan(
-			new DateTime(1970,1,1,0,0,0, DateTimeKind.Utc).Ticks);
-
-        protected void ConvertProperty(ThingModel.Property.DateTime property, Property proto)
-        {
-            proto.type = Property.Type.DATETIME;
-            var date = property.Value;
-	        proto.datetime_value = date.ToUniversalTime().Subtract(DateTimeEpoch).Ticks/10000;
         }
 
 	    protected void ManageThingSuppression(int thingId)
