@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 using ThingModel.Proto;
 using WebSocketSharp;
 
@@ -8,187 +9,335 @@ namespace ThingModel.WebSockets
 {
     public class Client
     {
-        public string SenderID;
-        private readonly WebSocket _ws;
-		
-		// ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable
         private readonly Warehouse _warehouse;
         private ToProtobuf _toProtobuf;
         private FromProtobuf _fromProtobuf;
-        private bool _closed = true;
-        private int _reconnectionDelay = 1;
+        private readonly ProtoModelObserver _thingModelObserver;
+
+        private readonly AutoResetEvent _sendEvent = new AutoResetEvent(false);
+        private readonly AutoResetEvent _connexionEvent = new AutoResetEvent(false);
+        private WebSocket _ws = null;
+        
+        public string SenderID;
+        private readonly string _path;
+		
+        private readonly object _lockSocketEvents = new Object();
+        private readonly object _lockWsObject = new Object();
+        private readonly object _lockCloseSocket = new Object();
+        private readonly object _lockWarehouse = new Object();
+        private readonly object _lockSend = new Object();
+
+        private static readonly TimeSpan _timeout = TimeSpan.FromSeconds(8);
+        private static readonly TimeSpan _pingFrequency = TimeSpan.FromSeconds(5);
+        private static readonly TimeSpan _restartTimeout = TimeSpan.FromSeconds(16);
+
+        private readonly Timer _connexionCheckTimer = null;
+        private int _nbConnexionCheck = 0;
+        private DateTime _lastConnectedDate = DateTime.Now;
+
+        public bool DebugMode { get; set; }
+
+        private bool _running = true;
 	    private bool _reconnection = false;
         
-        private readonly ProtoModelObserver _thingModelObserver;
-		private readonly object _lock = new Object();
-
-        private readonly IList<string> _sendMessageWaitingList;
+        private readonly IList<string> _sendMessageWaitingList = new List<string>();
+        private bool _sendRequired = false;
 
         public Client(string senderID, string path, Warehouse warehouse)
         {
             SenderID = senderID;
+            _path = path;
 
             _warehouse = warehouse;
 
             _thingModelObserver = new ProtoModelObserver();
             _warehouse.RegisterObserver(_thingModelObserver);
 
-            _fromProtobuf = new FromProtobuf(warehouse);
-            _toProtobuf = new ToProtobuf();
-
-            _ws = new WebSocket(path);
-
-            _ws.OnMessage += WsOnMessage;
-            _ws.OnClose += WsOnClose;
-			_ws.OnOpen += WsOnOpen;
-
-            _sendMessageWaitingList = new List<string>();
-
-            Connect();
+            ThreadPool.QueueUserWorkItem(ThreadConnection);
+            _connexionCheckTimer = new Timer(ConnexionCheckTimer, null, _pingFrequency, _pingFrequency);
         }
 
-	    private void WsOnOpen(object sender, EventArgs eventArgs)
-	    {
-            _fromProtobuf = new FromProtobuf(_warehouse);
-            _toProtobuf = new ToProtobuf();
-
-		    _reconnectionDelay = 1;
-
-	        if (_sendMessageWaitingList.Count > 0)
-	        {
-	            foreach (var message in _sendMessageWaitingList)
-	            {
-	                Send(message);
-	            }
-                _sendMessageWaitingList.Clear();
-	        }
-
-		    Send();
-	    }
-
-	    public virtual void Send()
+        private void ConnexionCheckTimer(object state)
         {
-			lock (_lock) {
-				if (_closed)
-				{
-					Console.WriteLine("Does not send, waiting for connexion");
-					return;
-				}
-
-				if (_thingModelObserver.SomethingChanged())
-				{
-					var transaction = _thingModelObserver.GetTransaction(_toProtobuf, SenderID,
-						_reconnection);
-					_ws.Send(_toProtobuf.Convert(transaction));
-					_thingModelObserver.Reset();
-					_reconnection = false;
-				}
-			}
-        }
-
-        protected void Send(string message)
-        {
-            lock (_lock)
+            Interlocked.Increment(ref _nbConnexionCheck);
+            if (_nbConnexionCheck > 2)
             {
-                if (_closed)
+                Console.WriteLine("ThingModel: dead lock ???");
+            }
+
+            try
+            {
+                WebSocket w;
+                lock (_lockWsObject)
                 {
-                    _sendMessageWaitingList.Add(message);
+                    w = _ws;
                 }
-                else
+
+                if (w != null && w.ReadyState == WebSocketState.Open)
                 {
-                    _ws.Send(message);
+                    var now = DateTime.Now;
+                    if (w.IsAlive)
+                    {
+                        Console.WriteLine("ThingModel: ping: "+(DateTime.Now-now).Milliseconds+"ms");
+                        _lastConnectedDate = now;
+                    }
+                    else if (now - _lastConnectedDate > _restartTimeout)
+                    {
+                        lock (_lockCloseSocket)
+                        {
+                            if (w.ReadyState != WebSocketState.Closed || w.ReadyState != WebSocketState.Closing)
+                            {
+                                Console.WriteLine("ThingModel: closing unresponding websocket");
+                                lock (_lockWsObject)
+                                {
+                                    if (w == _ws)
+                                    {
+                                        _ws = null;
+                                    }
+                                }
+
+                                w.CloseAsync();
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("ThingModel: "+e.Message); 
+            }
+
+            Interlocked.Decrement(ref _nbConnexionCheck);
+        }
+
+        private void ThreadConnection(object state)
+        {
+            while (_running)
+            {
+                try
+                {
+                    WebSocketState s;
+                    lock (_lockWsObject)
+                    {
+                        s = _ws == null ? WebSocketState.Closed : _ws.ReadyState;
+                    }
+
+                    WebSocket w;
+                    switch (s)
+                    {
+                        case WebSocketState.Closing:
+                        case WebSocketState.Closed:
+                            Console.WriteLine("ThingModel: creating new connection");
+
+                            w = new WebSocket(_path);
+                            w.OnMessage += WsOnMessage;
+                            w.OnClose += WsOnClose;
+                            w.OnOpen += WsOnOpen;
+
+                            if (DebugMode)
+                            {
+                                w.Log.Level = LogLevel.Debug;
+                            }
+
+                            lock (_lockWsObject)
+                            {
+                                if (_ws != null)
+                                {
+					                _reconnection = true;
+                                }
+                                _ws = w;
+                            }
+
+                            w.Connect();
+
+                            _connexionEvent.WaitOne(_timeout);
+                            break;
+                        case WebSocketState.Connecting:
+                            Console.WriteLine("ThingModel: ...connecting...");
+                            _connexionEvent.WaitOne(_timeout);
+                            break;
+                        default:
+                            if (_sendEvent.WaitOne(1000))
+                            {
+                                lock (_lockSend)
+                                {
+                                    lock (_lockWsObject)
+                                    {
+                                        w = _ws;
+                                    }
+
+                                    if (w == null)
+                                    {
+                                        break;
+                                    }
+
+                                    if (_sendRequired)
+                                    {
+                                        byte[] output;
+                                        lock (_lockWarehouse)
+                                        {
+                                            var transaction = _thingModelObserver.GetTransaction(_toProtobuf, SenderID, _reconnection);
+                                            output = _toProtobuf.Convert(transaction);
+                                            _thingModelObserver.Reset();
+                                        }
+                                        lock (_lockWsObject)
+                                        {
+                                            _reconnection = false;
+                                        }
+                                        Console.WriteLine("ThingModel: sending: "+output);
+                                        _ws.Send(output);
+                                        _sendRequired = false;
+                                    }
+
+                                    if (_sendMessageWaitingList.Count > 0)
+                                    {
+                                        foreach (var message in _sendMessageWaitingList)
+                                        {
+                                            Console.WriteLine("ThingModel: sending text: "+message);
+                                            w.Send(message);
+                                        }
+                                        _sendMessageWaitingList.Clear();
+                                    }
+                                }
+                            }
+                            break;
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("ThingModel: communication exception: "+e.Message);
+                }
+            }
+
+            lock (_lockWsObject)
+            {
+                if (_ws != null && (_ws.ReadyState != WebSocketState.Closed || _ws.ReadyState != WebSocketState.Closing))
+                {
+                    _ws.Close();
                 }
             }
         }
 
-        private void WsOnClose(object sender, CloseEventArgs closeEventArgs)
+        private void WsOnOpen(object sender, EventArgs e)
         {
-            if (!_closed)
+            if (sender != _ws)
             {
-                Console.WriteLine("Connection lost, try to connect again in "+_reconnectionDelay+" seconds");
-	            
-				_reconnection = true;
-
-                // ReSharper disable ObjectCreationAsStatement
-                new Timer(state =>
+                var ws = sender as WebSocket;
+                if (ws != null)
                 {
-                    if (!_ws.IsAlive)
-                    {
-                        _ws.Connect();
-                    }
-
-                    // Increase the connection delay until 16 secondes
-                    if (_reconnectionDelay < 16)
-                    {
-                        _reconnectionDelay *= 2;   
-                    }
-                },
-                null, _reconnectionDelay*1, Timeout.Infinite);
-                // ReSharper restore ObjectCreationAsStatement
+                    Console.WriteLine("ThingModel: connected to an old websocket: will close");
+                    ws.CloseAsync();
+                    return;
+                }
             }
-            
+
+            Console.WriteLine("ThingModel: connected");
+
+            lock (_lockWarehouse)
+            {
+                _fromProtobuf = new FromProtobuf(_warehouse);
+                _toProtobuf = new ToProtobuf();
+            }
+
+            lock (_lockSocketEvents)
+            {
+                _connexionEvent.Set();
+            }
+        }
+
+        private void WsOnClose(object sender, CloseEventArgs e)
+        {
+            Console.WriteLine("ThingModel: closed");
         }
 
         private void WsOnMessage(object sender, MessageEventArgs args)
         {
-			lock (_lock)
-			{
+            if (sender != _ws)
+            {
+                var ws = sender as WebSocket;
+                if (ws != null)
+                {
+                    Console.WriteLine("ThingModel: message received on an old websocket: ignored");
+                    ws.CloseAsync();
+                    return;
+                }
+            }
+
+            lock (_lockSocketEvents)
+            {
 				if (args.Type == Opcode.Binary)
 				{
-					try
-					{
-						var senderName = _fromProtobuf.Convert(args.RawData);
-						if (senderName == "undefined")
-						{
-							Console.WriteLine("Something went wrong : received a undefined senderID");
-						}
-						else
-						{
-							_toProtobuf.ApplyThingsSuppressions(_thingModelObserver.Deletions);
-							Console.WriteLine(SenderID + " | Binary message from : " + senderName);
-						}
-						_thingModelObserver.Reset();
-					}
-					catch (Exception e)
-					{
-						Console.WriteLine(SenderID + " | Big exception when receiving the message : " + e.Message);
-					}
+				    Task.Factory.StartNew(() => WsOnBinaryMessage(args.RawData));
                 }
                 else if (args.Type == Opcode.Text)
                 {
-                    WsOnStringMessage(args.Data);
+				    Task.Factory.StartNew(() => WsOnStringMessage(args.Data));
                 }
-			}
+            }
         }
 
         protected virtual void WsOnStringMessage(string message)
         {
-            Console.WriteLine("ThingModelClient has received a string: "+message);
+            Console.WriteLine("ThingModel: Client has received an ignored string: "+message);
         }
 
-        public void Close()
+        private void WsOnBinaryMessage(byte[] message)
         {
-            _closed = true;
-            _ws.Close();
-        }
-
-        public void Connect()
-        {
-            if (_closed)
+            Console.WriteLine("auinetssaunie aaaz: "+Thread.CurrentThread.ManagedThreadId);
+            try
             {
-                _closed = false;
-                _ws.Connect();
+                lock (_lockWarehouse)
+                {
+                    var senderName = _fromProtobuf.Convert(message);
+                    if (senderName == "undefined")
+                    {
+                        Console.WriteLine("ThingModel: Something went wrong : has received an undefined senderID");
+                    }
+                    else
+                    {
+                        _toProtobuf.ApplyThingsSuppressions(_thingModelObserver.Deletions);
+                        Console.WriteLine("ThingModel: "+SenderID + " : Binary message from : " + senderName);
+                    }
+                    _thingModelObserver.Reset();
+                }
             }
+            catch (Exception e)
+            {
+                Console.WriteLine("ThingModel:" +SenderID + " : Exception when receiving the message : " + e.Message);
+            }
+        }
+
+        public virtual void Send()
+        {
+            lock (_lockSend)
+            {
+                _sendRequired = true;
+            }
+
+            _sendEvent.Set();
+        }
+        
+        protected void Send(string message)
+        {
+            lock (_lockSend)
+            {
+                _sendMessageWaitingList.Add(message);
+            }
+            _sendEvent.Set();
         }
 
         public bool IsConnected()
         {
-            return _ws.IsAlive;
+            lock (_lockWsObject)
+            {
+                return _ws != null && _ws.ReadyState == WebSocketState.Open;
+            }
         }
 
-        public void Debug()
+        public void Close()
         {
-            _ws.Log.Level = LogLevel.Info;
+            _connexionCheckTimer.Dispose();
+            _running = false;
         }
     }
 }
