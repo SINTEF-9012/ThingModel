@@ -32,13 +32,13 @@ namespace ThingModel.WebSockets
         private static readonly TimeSpan _restartTimeout = TimeSpan.FromSeconds(16);
         private static readonly TimeSpan _defaultWaitConnectionDelay = TimeSpan.FromSeconds(10);
 
-        private readonly Timer _connexionCheckTimer = null;
+        private Timer _connexionCheckTimer = null;
         private int _nbConnexionCheck = 0;
         private DateTime _lastConnectedDate = DateTime.Now;
 
         public bool DebugMode { get; set; }
 
-        private bool _running = true;
+        private bool _running = false;
 	    private bool _reconnection = false;
         
         private readonly IList<string> _sendMessageWaitingList = new List<string>();
@@ -54,8 +54,7 @@ namespace ThingModel.WebSockets
             _thingModelObserver = new ProtoModelObserver();
             _warehouse.RegisterObserver(_thingModelObserver);
 
-            ThreadPool.QueueUserWorkItem(ThreadConnection);
-            _connexionCheckTimer = new Timer(ConnexionCheckTimer, null, _pingFrequency, _pingFrequency);
+            Connect();
         }
 
         private void ConnexionCheckTimer(object state)
@@ -384,6 +383,19 @@ namespace ThingModel.WebSockets
         {
             _connexionCheckTimer.Dispose();
             _running = false;
+        }
+
+        public void Connect()
+        {
+            if (_running)
+            {
+                Console.WriteLine("ThingModel: already connected");
+                return;
+            }
+
+            _running = true;
+            ThreadPool.QueueUserWorkItem(ThreadConnection);
+            _connexionCheckTimer = new Timer(ConnexionCheckTimer, null, _pingFrequency, _pingFrequency);
         }
     }
 }

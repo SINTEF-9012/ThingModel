@@ -142,6 +142,7 @@ namespace ThingModel.Specs
 
 			_clientB.Connect();
 
+            Assert.That(_clientB.WaitConnection(TimeSpan.FromSeconds(8)), Is.True);
 
             Assert.That(_warehouseWaitB.WaitNew(5000), Is.True);
 	
@@ -170,7 +171,7 @@ namespace ThingModel.Specs
             _clientA.Send();
             _clientB.Connect();
 
-            Assert.That(_clientB.IsConnected(), Is.True);
+            Assert.That(_clientB.WaitConnection(TimeSpan.FromSeconds(8)), Is.True);
 
             Assert.That(_warehouseWaitB.WaitNew(), Is.True);
             Assert.That(_warehouseB.GetThing("boat"), Is.Not.Null);
