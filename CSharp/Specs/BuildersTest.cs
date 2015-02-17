@@ -66,6 +66,46 @@ namespace ThingModel.Specs
                 .AndA.Location("from", new Location.LatLng(7,8))
                 .AndA.DateTime("arrivalTime", new DateTime(2087, 8, 14))
                 .AndA.Double("averageSpeed", Double.NaN);
+			
+            Assert.That(spaceShip.ID, Is.EqualTo("spaceShip"));
+		    Assert.That(spaceShip.Type, Is.Null);
+			Assert.That(spaceShip.LocationEquatorial().Declination, Is.EqualTo(2));
+			Assert.That(spaceShip.LocationLatLng("from").Latitude, Is.EqualTo(7));
+			Assert.That(spaceShip.DateTime("arrivalTime"), Is.Not.Null);
 		}
+
+	    [Test]
+	    public void TestBuilderLikeThingSyntax()
+	    {
+			ThingType duckType = new ThingType("duck"); 
+
+			Thing duck = new Thing("ab548", duckType);
+            duck.String("name", "Roger");
+            duck.LocationPoint("location", new Location.Point());
+            duck.LocationPoint("destination", new Location.Point());
+            duck.Int("nbChildren", 12);
+
+			Assert.That(duck.ID, Is.EqualTo("ab548"));
+			Assert.That(duck.Type.Name, Is.EqualTo("duck"));
+			Assert.That(duck.Int("nbChildren"),	Is.EqualTo(12));
+			Assert.That(duck.LocationPoint().X, Is.EqualTo(0));
+			Assert.That(duck.LocationPoint("destination").X, Is.EqualTo(0));
+
+            Thing spaceShip = new Thing("spaceShip");
+            spaceShip.ContainingAn.Int("speed", 12);
+            spaceShip.LocationLatLng("location", new Location.LatLng(1, 2, 3));
+            spaceShip.LocationEquatorial("location", new Location.Equatorial(1, 2, 3)); // change type
+            spaceShip.LocationEquatorial("destination", new Location.Equatorial(4, 5, 6));
+            
+            spaceShip.ContainingA.Location("from", new Location.LatLng(7,8))
+                .AndA.DateTime("arrivalTime", new DateTime(2087, 8, 14))
+                .AndA.Double("averageSpeed", Double.NaN);
+            
+            Assert.That(spaceShip.ID, Is.EqualTo("spaceShip"));
+		    Assert.That(spaceShip.Type, Is.Null);
+			Assert.That(spaceShip.LocationEquatorial().Declination, Is.EqualTo(2));
+			Assert.That(spaceShip.LocationLatLng("from").Latitude, Is.EqualTo(7));
+			Assert.That(spaceShip.DateTime("arrivalTime"), Is.Not.Null);
+	    }
 	}
 }

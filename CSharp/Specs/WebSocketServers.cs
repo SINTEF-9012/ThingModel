@@ -1,5 +1,6 @@
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using ThingModel.Builders;
 using ThingModel.WebSockets;
@@ -291,6 +292,7 @@ namespace ThingModel.Specs
             ThingType typeRabbit = BuildANewThingType.Named("rabbit");
             ThingType typeDuck = BuildANewThingType.Named("duck");
             var warehouse = new Warehouse();
+            warehouse.RegisterType(typeDuck);
             warehouse.RegisterType(typeRabbit);
 
             var client = new Client("test_unconnected", Path, warehouse);
@@ -307,6 +309,7 @@ namespace ThingModel.Specs
             Assert.That(_warehouseB.GetThing("superduck"), Is.Not.Null);
             Assert.That(_warehouseB.GetThingType("duck"), Is.Not.Null);
 
+            // I am not sure if we should send rabbit here
             //Assert.That(_warehouseB.GetThingType("rabbit"), Is.Not.Null);
         }
         
@@ -507,13 +510,16 @@ namespace ThingModel.Specs
 			_warehouseA.RegisterThing(canard);
 			_clientA.Send();
 
-		    for (var i = 0; i < 50; ++i)
-		    {
-			    canard.String("name", "canard_" + i);
-				_warehouseA.RegisterThing(canard);
-				_clientA.Send();
-			Thread.Sleep(5);
-		    }
+	        Task.Factory.StartNew(() =>
+	        {
+                for (var i = 0; i < 50; ++i)
+                {
+                    canard.String("name", "canard_" + i);
+                    _warehouseA.RegisterThing(canard);
+                    _clientA.Send();
+                    Thread.Sleep(5);
+                }
+	        });
 
 		    var j = 0;
 		    _warehouseB.Events.OnReceivedUpdate += (sender, args) =>

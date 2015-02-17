@@ -1,7 +1,8 @@
-﻿#region
+#region
 
 using System;
 using NUnit.Framework;
+using ThingModel.Builders;
 
 #endregion
 
@@ -290,5 +291,28 @@ namespace ThingModel.Specs
 		    Assert.That(thing.String("name"), Is.EqualTo("Canard2"));
 		    Assert.That(thing.Boolean("second"), Is.EqualTo(false));
 	    }
+
+        [Test]
+        public void TestClone()
+        {
+            Thing pond = BuildANewThing.WithoutType().IdentifiedBy("pond");
+            Thing duck = BuildANewThing.WithoutType().IdentifiedBy("canard")
+                .ContainingAn.Int("age", 12);
+
+            duck.Connect(pond);
+
+            var duck2 = duck.Clone();
+            duck2.Int("age", 8);
+
+            Assert.That(duck.Int("age"),Is.EqualTo(12));
+            Assert.That(duck2.IsConnectedTo(pond), Is.True);
+            Assert.That(duck2.ConnectedThings[0], Is.Null);
+
+            duck2 = duck.Clone(true);
+            Assert.That(duck2.Int("age"),Is.EqualTo(12));
+            Assert.That(duck2.IsConnectedTo(pond), Is.True);
+            Assert.That(duck2.ConnectedThings[0], Is.Not.Null);
+            Assert.That(duck2.ConnectedThings[0], Is.EqualTo(pond));
+        }
     }
 }

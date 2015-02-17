@@ -252,11 +252,16 @@ namespace ThingModel.Specs
         {
             var a = new Property.Location.Point("p");
             a.Value = new Location.Point();
+            a.Value.System = "x/y";
             var b = (Property.Location.Point) a.Clone();
 
+            Assert.That(a.Value.System, Is.EqualTo(b.Value.System));
+
             a.Value.X += 2;
+            a.Value.System = "x-y";
 
             Assert.That(a.Value.X, Is.Not.EqualTo(b.Value.X));
+            Assert.That(a.Value.System, Is.Not.EqualTo(b.Value.System));
         }
         
         [Test]
@@ -264,11 +269,16 @@ namespace ThingModel.Specs
         {
             var a = new Property.Location.LatLng("p");
             a.Value = new Location.LatLng();
+            a.Value.System = "wgs84";
             var b = (Property.Location.LatLng) a.Clone();
 
+            Assert.That(a.Value.System, Is.EqualTo(b.Value.System));
+
             a.Value.Latitude += 2;
+            a.Value.System = "web";
 
             Assert.That(a.Value.Latitude, Is.Not.EqualTo(b.Value.Latitude));
+            Assert.That(a.Value.System, Is.Not.EqualTo(b.Value.System));
         }
         
         [Test]
@@ -276,11 +286,16 @@ namespace ThingModel.Specs
         {
             var a = new Property.Location.Equatorial("p");
             a.Value = new Location.Equatorial();
+            a.Value.System = "ksp";
             var b = (Property.Location.Equatorial) a.Clone();
 
+            Assert.That(a.Value.System, Is.EqualTo(b.Value.System));
+
             a.Value.Declination += 2;
+            a.Value.System = "";
 
             Assert.That(a.Value.Declination, Is.Not.EqualTo(b.Value.Declination));
+            Assert.That(a.Value.System, Is.Not.EqualTo(b.Value.System));
         }
         
         [Test]

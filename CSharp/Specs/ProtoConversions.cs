@@ -453,5 +453,20 @@ namespace ThingModel.Specs
             Assert.That(newThing.String("name"), Is.EqualTo(null));
             Assert.That(newThing.String("name"), Is.Not.EqualTo(""));
         }
+
+        [Test]
+        public void ShouldNotCrashWhenUndefinedString()
+        {
+            var thing = new Thing("computer");
+            thing.String("name", "Interstella");
+            var transaction = _toProtobuf.Convert(new[] {thing}, new Thing[0], new ThingType[0], "");
+
+            // Evil transaction
+            transaction.things_publish_list[0].properties[0].string_value = null;
+            _fromProtobuf.Convert(transaction);
+            
+            var newThing = _warehouse.GetThing("computer");
+            Assert.That(newThing.String("name"), Is.EqualTo("undefined"));
+        }
     }
 }

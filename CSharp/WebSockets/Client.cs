@@ -301,11 +301,13 @@ namespace ThingModel.WebSockets
             {
 				if (args.Type == Opcode.Binary)
 				{
-				    Task.Factory.StartNew(() => WsOnBinaryMessage(args.RawData));
+                    WsOnBinaryMessage(args.RawData);
+				    //Task.Factory.StartNew(() => WsOnBinaryMessage(args.RawData));
                 }
                 else if (args.Type == Opcode.Text)
                 {
-				    Task.Factory.StartNew(() => WsOnStringMessage(args.Data));
+                    WsOnStringMessage(args.Data);
+				    //Task.Factory.StartNew(() => WsOnStringMessage(args.Data));
                 }
             }
         }
@@ -324,7 +326,7 @@ namespace ThingModel.WebSockets
                     var transaction = _fromProtobuf.Deserialize(message);
                     var senderId = _fromProtobuf.GetStringId(transaction);
                     _thingModelObserver.IgnoreSenderId(senderId);
-                    var senderName = _fromProtobuf.Convert(message);
+                    var senderName = _fromProtobuf.Convert(transaction);
                     if (senderName == "undefined")
                     {
                         Console.WriteLine("ThingModel: Something went wrong : has received an undefined senderID");
@@ -332,7 +334,7 @@ namespace ThingModel.WebSockets
                     else
                     {
                         _toProtobuf.ApplyThingsSuppressions(_thingModelObserver.IgnoredDeletions);
-                        Console.WriteLine("ThingModel: "+SenderID + " :  message  : " + Convert.ToBase64String(message));
+                        Console.WriteLine("ThingModel: "+senderId + " : message : " + Convert.ToBase64String(message));
                     }
                     _thingModelObserver.ResetIgnore();
                     // TODO WTF ?_thingModelObserver.Reset();
