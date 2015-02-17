@@ -24,6 +24,10 @@ namespace ThingModel.Proto
 	        lock (_lockHashSet)
 	        {
 		        Updates.Add(thing);
+	            if (thing.Type != null && !PermanentDefinitions.Contains(thing.Type))
+	            {
+	                Define(thing.Type, sender);
+	            }
 	        }
         }
 
