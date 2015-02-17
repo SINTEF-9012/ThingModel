@@ -53,6 +53,7 @@ namespace ThingModel.Proto
 	        lock (_lockHashSet)
 	        {
 		        Definitions.Add(thing);
+		        PermanentDefinitions.Add(thing);
 	        }
         }
 
