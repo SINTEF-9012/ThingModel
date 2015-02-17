@@ -31,7 +31,7 @@ namespace ThingModel.WebSockets
 		    }
 	    }
 
-        private class ServerService : WebSocketService
+        private class ServerService : WebSocketBehavior
         {
             private readonly ToProtobuf _toProtobuf;
             private readonly FromProtobuf _fromProtobuf;
