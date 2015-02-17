@@ -15,7 +15,7 @@ namespace ThingModel.WebSockets
         private readonly ProtoModelObserver _thingModelObserver;
 
         private readonly AutoResetEvent _sendEvent = new AutoResetEvent(false);
-        private readonly AutoResetEvent _connexionEvent = new AutoResetEvent(false);
+        private readonly object _connexionEvent = new object();
         private WebSocket _ws = null;
         
         public string SenderID;
@@ -27,9 +27,10 @@ namespace ThingModel.WebSockets
         private readonly object _lockWarehouse = new Object();
         private readonly object _lockSend = new Object();
 
-        private static readonly TimeSpan _timeout = TimeSpan.FromSeconds(8);
-        private static readonly TimeSpan _pingFrequency = TimeSpan.FromSeconds(5);
+        private static readonly TimeSpan _timeout = TimeSpan.FromSeconds(4);
+        private static readonly TimeSpan _pingFrequency = TimeSpan.FromSeconds(4);
         private static readonly TimeSpan _restartTimeout = TimeSpan.FromSeconds(16);
+        private static readonly TimeSpan _defaultWaitConnectionDelay = TimeSpan.FromSeconds(10);
 
         private readonly Timer _connexionCheckTimer = null;
         private int _nbConnexionCheck = 0;
@@ -93,6 +94,7 @@ namespace ThingModel.WebSockets
                                     if (w == _ws)
                                     {
                                         _ws = null;
+					                    _reconnection = true;
                                     }
                                 }
 
@@ -136,7 +138,7 @@ namespace ThingModel.WebSockets
 
                             if (DebugMode)
                             {
-                                w.Log.Level = LogLevel.Debug;
+                                //w.Log.Level = LogLevel.Debug;
                             }
 
                             lock (_lockWsObject)
@@ -150,14 +152,30 @@ namespace ThingModel.WebSockets
 
                             w.Connect();
 
-                            _connexionEvent.WaitOne(_timeout);
+                            lock (_connexionEvent)
+                            {
+                                if (w.ReadyState != WebSocketState.Open)
+                                {
+                                    Monitor.Wait(_connexionEvent, _timeout);
+                                }
+                            }
                             break;
                         case WebSocketState.Connecting:
                             Console.WriteLine("ThingModel: ...connecting...");
-                            _connexionEvent.WaitOne(_timeout);
+                            lock (_connexionEvent)
+                            {
+                                Monitor.Wait(_connexionEvent, _timeout);
+                            }
                             break;
                         default:
-                            if (_sendEvent.WaitOne(1000))
+
+                            bool immediateSend;
+                            lock (_lockSend)
+                            {
+                                immediateSend = _sendRequired || _sendMessageWaitingList.Count > 0;
+                            }
+
+                            if (immediateSend || _sendEvent.WaitOne(1000))
                             {
                                 lock (_lockSend)
                                 {
@@ -176,17 +194,27 @@ namespace ThingModel.WebSockets
                                         byte[] output;
                                         lock (_lockWarehouse)
                                         {
-                                            var transaction = _thingModelObserver.GetTransaction(_toProtobuf, SenderID, _reconnection);
-                                            output = _toProtobuf.Convert(transaction);
-                                            _thingModelObserver.Reset();
+                                            if (_thingModelObserver.SomethingChanged())
+                                            {
+                                                var transaction = _thingModelObserver.GetTransaction(_toProtobuf,
+                                                    SenderID, _reconnection);
+                                                output = _toProtobuf.Convert(transaction);
+                                                _thingModelObserver.Reset();
+
+                                                lock (_lockWsObject)
+                                                {
+                                                    _reconnection = false;
+                                                }
+                                                Console.WriteLine("ThingModel: sending: " +
+                                                                  Convert.ToBase64String(output));
+                                                _ws.Send(output);
+                                            }
+                                            else
+                                            {
+                                                Console.WriteLine("ThingModel: nothing to send");
+                                            }
+                                            _sendRequired = false;
                                         }
-                                        lock (_lockWsObject)
-                                        {
-                                            _reconnection = false;
-                                        }
-                                        Console.WriteLine("ThingModel: sending: "+output);
-                                        _ws.Send(output);
-                                        _sendRequired = false;
                                     }
 
                                     if (_sendMessageWaitingList.Count > 0)
@@ -211,8 +239,9 @@ namespace ThingModel.WebSockets
 
             lock (_lockWsObject)
             {
-                if (_ws != null && (_ws.ReadyState != WebSocketState.Closed || _ws.ReadyState != WebSocketState.Closing))
+                if (_ws != null && _ws.ReadyState != WebSocketState.Closed && _ws.ReadyState != WebSocketState.Closing)
                 {
+                    Console.WriteLine("ThingModel: shutting down connexion");
                     _ws.Close();
                 }
             }
@@ -241,7 +270,10 @@ namespace ThingModel.WebSockets
 
             lock (_lockSocketEvents)
             {
-                _connexionEvent.Set();
+                lock (_connexionEvent)
+                {
+                    Monitor.PulseAll(_connexionEvent);
+                }
             }
         }
 
@@ -283,7 +315,6 @@ namespace ThingModel.WebSockets
 
         private void WsOnBinaryMessage(byte[] message)
         {
-            Console.WriteLine("auinetssaunie aaaz: "+Thread.CurrentThread.ManagedThreadId);
             try
             {
                 lock (_lockWarehouse)
@@ -296,9 +327,9 @@ namespace ThingModel.WebSockets
                     else
                     {
                         _toProtobuf.ApplyThingsSuppressions(_thingModelObserver.Deletions);
-                        Console.WriteLine("ThingModel: "+SenderID + " : Binary message from : " + senderName);
+                        Console.WriteLine("ThingModel: "+SenderID + " :  message  : " + Convert.ToBase64String(message));
                     }
-                    _thingModelObserver.Reset();
+                    // TODO WTF ?_thingModelObserver.Reset();
                 }
             }
             catch (Exception e)
@@ -332,6 +363,21 @@ namespace ThingModel.WebSockets
             {
                 return _ws != null && _ws.ReadyState == WebSocketState.Open;
             }
+        }
+
+        public bool WaitConnection(TimeSpan delay)
+        {
+            if (IsConnected()) return true;
+            lock (_connexionEvent)
+            {
+                return Monitor.Wait(_connexionEvent, delay);
+            }
+        }
+
+
+        public bool WaitConnection()
+        {
+            return WaitConnection(_defaultWaitConnectionDelay);
         }
 
         public void Close()
