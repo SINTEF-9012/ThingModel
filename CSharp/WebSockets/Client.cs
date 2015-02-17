@@ -43,6 +43,7 @@ namespace ThingModel.WebSockets
         
         private readonly IList<string> _sendMessageWaitingList = new List<string>();
         private bool _sendRequired = false;
+        private int _threadRunning = 0;
 
         public Client(string senderID, string path, Warehouse warehouse)
         {
@@ -113,6 +114,7 @@ namespace ThingModel.WebSockets
 
         private void ThreadConnection(object state)
         {
+            Interlocked.Increment(ref _threadRunning);
             while (_running)
             {
                 try
@@ -244,6 +246,7 @@ namespace ThingModel.WebSockets
                     _ws.Close();
                 }
             }
+            Interlocked.Decrement(ref _threadRunning);
         }
 
         private void WsOnOpen(object sender, EventArgs e)
@@ -394,7 +397,10 @@ namespace ThingModel.WebSockets
             }
 
             _running = true;
-            ThreadPool.QueueUserWorkItem(ThreadConnection);
+            if (_threadRunning == 0)
+            {
+                ThreadPool.QueueUserWorkItem(ThreadConnection);
+            }
             _connexionCheckTimer = new Timer(ConnexionCheckTimer, null, _pingFrequency, _pingFrequency);
         }
     }
