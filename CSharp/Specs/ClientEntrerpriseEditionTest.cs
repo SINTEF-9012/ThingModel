@@ -21,6 +21,7 @@ namespace ThingModel.Specs
             _server = new Server(Path);
             _warehouse = new Warehouse();
             _client = new ClientEnterpriseEdition("UnitTestA", Path, _warehouse);
+            _client.WaitConnection();
         }
         
         [TearDown]
@@ -94,6 +95,8 @@ namespace ThingModel.Specs
 
             var _warehouseWaitB = new WebSocketServers.WarehouseWait();
             _warehouseB.RegisterObserver(_warehouseWaitB);
+
+            _clientB.WaitConnection();
 
             Assert.That(_client.IsConnected(), Is.True);
             Assert.That(_clientB.IsConnected(), Is.True);
