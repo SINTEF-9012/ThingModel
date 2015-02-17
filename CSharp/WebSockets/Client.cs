@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -321,6 +321,9 @@ namespace ThingModel.WebSockets
             {
                 lock (_lockWarehouse)
                 {
+                    var transaction = _fromProtobuf.Deserialize(message);
+                    var senderId = _fromProtobuf.GetStringId(transaction);
+                    _thingModelObserver.IgnoreSenderId(senderId);
                     var senderName = _fromProtobuf.Convert(message);
                     if (senderName == "undefined")
                     {
@@ -328,9 +331,10 @@ namespace ThingModel.WebSockets
                     }
                     else
                     {
-                        _toProtobuf.ApplyThingsSuppressions(_thingModelObserver.Deletions);
+                        _toProtobuf.ApplyThingsSuppressions(_thingModelObserver.IgnoredDeletions);
                         Console.WriteLine("ThingModel: "+SenderID + " :  message  : " + Convert.ToBase64String(message));
                     }
+                    _thingModelObserver.ResetIgnore();
                     // TODO WTF ?_thingModelObserver.Reset();
                 }
             }

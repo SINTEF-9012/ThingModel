@@ -7,11 +7,31 @@ namespace ThingModel.Proto
 	    private readonly object _lockHashSet = new object();
         public readonly HashSet<ThingModel.Thing> Updates = new HashSet<ThingModel.Thing>();
         public readonly HashSet<ThingModel.Thing> Deletions = new HashSet<ThingModel.Thing>();
+        public readonly HashSet<ThingModel.Thing> IgnoredDeletions = new HashSet<ThingModel.Thing>();
         public readonly HashSet<ThingModel.ThingType> Definitions = new HashSet<ThingModel.ThingType>(); 
-        public readonly HashSet<ThingModel.ThingType> PermanentDefinitions = new HashSet<ThingModel.ThingType>(); 
+        public readonly HashSet<ThingModel.ThingType> PermanentDefinitions = new HashSet<ThingModel.ThingType>();
+
+        private string _ignoredSenderId = null;
+
+        public void IgnoreSenderId(string senderId)
+        {
+            lock (_lockHashSet)
+            {
+                _ignoredSenderId = senderId;
+            }
+        }
+
+        public void ResetIgnore()
+        {
+            lock (_lockHashSet)
+            {
+                _ignoredSenderId = null;
+                IgnoredDeletions.Clear();
+            }
+        }
 
         public void Reset()
-       { 
+        { 
 			lock (_lockHashSet) {
 				Updates.Clear();
 				Deletions.Clear();
@@ -23,6 +43,7 @@ namespace ThingModel.Proto
         {
 	        lock (_lockHashSet)
 	        {
+                if (sender != null && sender == _ignoredSenderId) return;
 		        Updates.Add(thing);
 	            if (thing.Type != null && !PermanentDefinitions.Contains(thing.Type))
 	            {
@@ -33,10 +54,17 @@ namespace ThingModel.Proto
 
         public void Deleted(ThingModel.Thing thing, string sender)
         {
-	        lock (_lockHashSet)
-	        {
-		        Updates.Remove(thing);
-		        Deletions.Add(thing);
+            lock (_lockHashSet)
+            {
+                if (sender != null && sender == _ignoredSenderId)
+                {
+                    IgnoredDeletions.Add(thing);
+                }
+                else
+                {
+                    Updates.Remove(thing);
+                    Deletions.Add(thing);
+                }
 	        }
         }
 
@@ -44,6 +72,7 @@ namespace ThingModel.Proto
         {
 	        lock (_lockHashSet)
 	        {
+                if (sender != null && sender == _ignoredSenderId) return;
 		        Updates.Add(thing);
 	        }
         }
@@ -52,6 +81,7 @@ namespace ThingModel.Proto
         {
 	        lock (_lockHashSet)
 	        {
+                if (sender != null && sender == _ignoredSenderId) return;
 		        Definitions.Add(thing);
 		        PermanentDefinitions.Add(thing);
 	        }

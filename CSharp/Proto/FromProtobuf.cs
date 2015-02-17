@@ -40,20 +40,31 @@ namespace ThingModel.Proto
 
         private readonly MemoryStream _memoryInput = new MemoryStream();
 
-        public string Convert(byte[] data, bool check = false)
+        public Transaction Deserialize(byte[] data)
         {
             _memoryInput.Write(data, 0, data.Length);
             _memoryInput.Position = 0;
+
             var transaction = Serializer.Deserialize<Transaction>(_memoryInput);
             
             _memoryInput.SetLength(0);
 
-            return Convert(transaction, check);
+            return transaction;
+        }
+
+        public string Convert(byte[] data, bool check = false)
+        {
+            return Convert(Deserialize(data), check);
+        }
+
+        public string GetStringId(Transaction transaction)
+        {
+            transaction.string_declarations.ForEach(ConvertStringDeclaration);
+            return KeyToString(transaction.string_sender_id);
         }
 
         public string Convert(Transaction transaction, bool check = false)
         {
-
             transaction.string_declarations.ForEach(ConvertStringDeclaration);
             var senderId = KeyToString(transaction.string_sender_id);
 
