@@ -37,7 +37,7 @@ namespace ThingModel.Specs
 
 			superRabbit.GetPropertyDefinition("nbChildren").Name = "Number of super children";
 			
-			Assert.That(type.GetPropertyDefinition("nbChildren").Name, Is.Not.StringContaining("super"));
+			Assert.That(type.GetPropertyDefinition("nbChildren").Name, Does.Not.Contain("super"));
 		}
 
 		[Test]

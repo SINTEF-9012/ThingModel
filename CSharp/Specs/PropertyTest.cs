@@ -46,15 +46,15 @@ namespace ThingModel.Specs
         {
             Assert.That(new Property.Boolean("lapin", true).ValueToString().Length, Is.GreaterThan(0));
 
-            Assert.That(new Property.String("name", "Alphonse").ValueToString(), Is.StringContaining("Alphonse"));
+            Assert.That(new Property.String("name", "Alphonse").ValueToString(), Does.Contain("Alphonse"));
 
-            Assert.That(new Property.Double("answer", 42).ValueToString(), Is.StringContaining("42"));
-            Assert.That(new Property.Int("rounded answer", 42).ValueToString(), Is.StringContaining("42"));
+            Assert.That(new Property.Double("answer", 42).ValueToString(), Does.Contain("42"));
+            Assert.That(new Property.Int("rounded answer", 42).ValueToString(), Does.Contain("42"));
 
             Assert.That(new Property.DateTime("time").ValueToString().Length, Is.GreaterThan(0));
 
             Assert.That(new Property.Location.LatLng("localization",
-                new Location.LatLng(42.0, 19.6, 100)).ValueToString(), Is.StringContaining("42"));
+                new Location.LatLng(42.0, 19.6, 100)).ValueToString(), Does.Contain("42"));
         }
 
         [Test]

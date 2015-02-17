@@ -169,6 +169,7 @@ namespace ThingModel.Specs
             _clientB.Close();
             _warehouseA.RegisterThing(new Thing("boat"));
             _clientA.Send();
+            Thread.Sleep(2000);
             _clientB.Connect();
 
             Assert.That(_clientB.WaitConnection(TimeSpan.FromSeconds(8)), Is.True);
