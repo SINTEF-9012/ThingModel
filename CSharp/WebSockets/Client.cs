@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -192,14 +192,13 @@ namespace ThingModel.WebSockets
 
                                     if (_sendRequired)
                                     {
-                                        byte[] output;
                                         lock (_lockWarehouse)
                                         {
                                             if (_thingModelObserver.SomethingChanged())
                                             {
                                                 var transaction = _thingModelObserver.GetTransaction(_toProtobuf,
                                                     SenderID, _reconnection);
-                                                output = _toProtobuf.Convert(transaction);
+                                                byte[] output = _toProtobuf.Convert(transaction);
                                                 _thingModelObserver.Reset();
 
                                                 lock (_lockWsObject)
