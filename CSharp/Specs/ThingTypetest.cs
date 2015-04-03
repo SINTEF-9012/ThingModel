@@ -1,6 +1,8 @@
 #region
 
 using System;
+using System.Linq;
+using System.Threading;
 using NUnit.Framework;
 using ThingModel.Builders;
 
@@ -128,6 +130,39 @@ namespace ThingModel.Specs
 
             Assert.That(typeA, Is.EqualTo(typeB));
             Assert.That(typeB, Is.EqualTo(typeA));
+        }
+        
+        [Test]
+        public void MultiThreadProperties()
+        {
+
+            ThingType thing = BuildANewThingType.Named("canard");
+
+            const int nbLoop = 100000;
+            var waitA = new AutoResetEvent(false);
+            var waitB = new AutoResetEvent(false);
+
+            new Thread(() =>
+            {
+                for (var i = 0; i < nbLoop; ++i)
+                {
+                    thing.DefineProperty(new PropertyType("a"+i, typeof (Property.Boolean)));
+                }
+	            waitA.Set();
+	        }).Start();
+            new Thread(() =>
+            {
+                for (var i = 0; i < nbLoop; ++i)
+                {
+                    thing.DefineProperty(new PropertyType("b"+i, typeof (Property.Boolean)));
+                }
+	            waitB.Set();
+	        }).Start();
+
+            waitA.WaitOne();
+            waitB.WaitOne();
+
+            Assert.That(thing.GetProperties().Count(), Is.EqualTo(nbLoop * 2));
         }
     }
 }

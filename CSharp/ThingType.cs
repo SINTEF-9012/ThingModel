@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -27,6 +27,12 @@ namespace ThingModel
         protected IDictionary<string, PropertyType> Properties { get; private set; } 
 
         /**
+         * The Properties dictionary is not thread-safe.
+         * The following object will be used as a lock.
+         */
+        private readonly object _PropertiesLock = new object();
+
+        /**
          * Create a new thing type.
          * The name should not be null or empty.
          */
@@ -47,26 +53,38 @@ namespace ThingModel
          */
         public bool Check(Thing thing)
         {
-            return (thing.Type.Equals(this) ||
-				(thing.Type != null && thing.Type.Name == Name)) &&
-				Properties.All(propertyType => propertyType.Value.Check(thing.GetProperty<Property>(propertyType.Key)));
+            lock (_PropertiesLock)
+            {
+                return (thing.Type.Equals(this) ||
+                    (thing.Type != null && thing.Type.Name == Name)) &&
+                    Properties.All(propertyType => propertyType.Value.Check(thing.GetProperty<Property>(propertyType.Key)));
+            }
         }
 
         public void DefineProperty(PropertyType property)
         {
-            Properties[property.Key] = property;
+            lock (_PropertiesLock)
+            {
+                Properties[property.Key] = property;
+            }
         }
 
         public PropertyType GetPropertyDefinition(string key)
         {
             PropertyType value;
-            Properties.TryGetValue(key, out value);
+            lock (_PropertiesLock)
+            {
+                Properties.TryGetValue(key, out value);
+            }
             return value;
         }
 
         public IEnumerable<PropertyType> GetProperties()
         {
-            return new List<PropertyType>(Properties.Values);
+            lock (_PropertiesLock)
+            {
+                return new List<PropertyType>(Properties.Values);
+            }
         }
 
 	    public bool Is(ThingType other)
@@ -76,22 +94,28 @@ namespace ThingModel
 			    return false;
 		    }
 
-	        if (Properties.Count != other.Properties.Count)
+	        lock (_PropertiesLock)
 	        {
-	            return false;
-	        }
-
-	        foreach (var propertyType in Properties)
-	        {
-	            PropertyType otherPropertyType;
-	            if (!other.Properties.TryGetValue(propertyType.Key, out otherPropertyType))
+	            lock (other._PropertiesLock)
 	            {
-	                return false;
-	            }
+                    if (Properties.Count != other.Properties.Count)
+                    {
+                        return false;
+                    }
 
-	            if (!propertyType.Value.Equals(otherPropertyType))
-	            {
-	                return false;
+                    foreach (var propertyType in Properties)
+                    {
+                        PropertyType otherPropertyType;
+                        if (!other.Properties.TryGetValue(propertyType.Key, out otherPropertyType))
+                        {
+                            return false;
+                        }
+
+                        if (!propertyType.Value.Equals(otherPropertyType))
+                        {
+                            return false;
+                        }
+                    }
 	            }
 	        }
 
