@@ -1,6 +1,8 @@
 #region
 
 using System;
+using System.Linq;
+using System.Threading;
 using NUnit.Framework;
 using ThingModel.Builders;
 
@@ -313,6 +315,39 @@ namespace ThingModel.Specs
             Assert.That(duck2.IsConnectedTo(pond), Is.True);
             Assert.That(duck2.ConnectedThings[0], Is.Not.Null);
             Assert.That(duck2.ConnectedThings[0], Is.EqualTo(pond));
+        }
+
+        [Test]
+        public void MultiThreadProperties()
+        {
+
+            Thing thing = BuildANewThing.WithoutType().IdentifiedBy("canard");
+
+            const int nbLoop = 100000;
+            var waitA = new AutoResetEvent(false);
+            var waitB = new AutoResetEvent(false);
+
+            new Thread(() =>
+            {
+                for (var i = 0; i < nbLoop; ++i)
+                {
+                    thing.Boolean("a" + i, i % 2 == 0);
+                }
+	            waitA.Set();
+	        }).Start();
+            new Thread(() =>
+            {
+                for (var i = 0; i < nbLoop; ++i)
+                {
+                    thing.Boolean("b" + i, i % 2 == 0);
+                }
+	            waitB.Set();
+	        }).Start();
+
+            waitA.WaitOne();
+            waitB.WaitOne();
+
+            Assert.That(thing.GetProperties().Count(), Is.EqualTo(nbLoop * 2));
         }
     }
 }

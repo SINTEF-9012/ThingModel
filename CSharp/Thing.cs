@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using ThingModel.Builders;
@@ -30,10 +30,22 @@ namespace ThingModel
         protected IDictionary<string, Property> Properties { get; private set; }
 
         /**
+         * The Properties dictionary is not thread-safe.
+         * The following object will be used as a lock.
+         */
+        private readonly object _PropertiesLock = new object();
+
+        /**
          * A thing can be connected to other things,
          * but never directly to itself.
          */
         protected IDictionary<string, Thing> Connections { get; private set; } 
+        
+        /**
+         * The Connections dictionary is not thread-safe.
+         * The following object will be used as a lock.
+         */
+        private readonly object _ConnectionsLock = new object();
 
         /**
          * Create a new thing. The id cannot be null and should
@@ -55,19 +67,28 @@ namespace ThingModel
 
         public void SetProperty(Property property)
         {
-            Properties[property.Key] = property;
+            lock (_PropertiesLock)
+            {
+                Properties[property.Key] = property;
+            }
         }
 
         public T GetProperty<T>(string key) where T : Property
         {
             Property value;
-            Properties.TryGetValue(key, out value);
+            lock (_PropertiesLock)
+            {
+                Properties.TryGetValue(key, out value);
+            }
             return value as T;
         }
 
         public bool HasProperty(string key)
         {
-            return Properties.ContainsKey(key);
+            lock (_PropertiesLock)
+            {
+                return Properties.ContainsKey(key);
+            }
         }
 
         public void Connect(Thing thing)
@@ -78,23 +99,39 @@ namespace ThingModel
             {
                 throw new Exception("Cannot connect a thing to itself");
             }
-            Connections.Add(thing._id, thing);
+
+            lock (_ConnectionsLock)
+            {
+                Connections.Add(thing._id, thing);
+            }
         }
 
         public bool Disconnect(Thing thing)
         {
-	        return thing != null && Connections.Remove(thing._id);
+            if (thing == null) return false;
+
+            lock (_ConnectionsLock)
+            {
+                return Connections.Remove(thing._id);
+            }
         }
 
 	    public bool IsConnectedTo(Thing thing)
         {
 	        if (thing == null) return false;
-            return Connections.ContainsKey(thing._id);
+
+	        lock (_ConnectionsLock)
+	        {
+	            return Connections.ContainsKey(thing._id);
+	        }
         }
 
         public void Detach()
         {
-            Connections.Clear();
+            lock (_ConnectionsLock)
+            {
+                Connections.Clear();
+            }
         }
 
         /**
@@ -104,12 +141,23 @@ namespace ThingModel
          */
         public IList<Thing> ConnectedThings
         {
-            get { return new List<Thing>(Connections.Values); }
+            get
+            {
+                lock (_ConnectionsLock)
+                {
+                    return new List<Thing>(Connections.Values);
+                }
+            }
         }
 
 	    public int ConnectedThingsCount
 	    {
-			get { return Connections.Count; }
+			get {
+			    lock (_ConnectionsLock)
+			    {
+			        return Connections.Count;
+			    }
+            }
 	    }
 
 
@@ -140,27 +188,33 @@ namespace ThingModel
                 return false;
             }
 
-            // Check if the connection list are the same
-            if (Connections.Count != other.Connections.Count ||
-                Connections.Keys.Any(key => !other.Connections.ContainsKey(key)))
+            lock (_ConnectionsLock)
             {
-                return false;
-            }
-
-            if (Properties.Count != other.Properties.Count)
-            {
-                return false;
-            }
-
-            // Check if the properties are the same
-            foreach (var property in Properties)
-            {
-                Property otherProp;
-                other.Properties.TryGetValue(property.Key, out otherProp);
-
-                if (otherProp == null || !property.Value.CompareValue(otherProp))
+                // Check if the connection list are the same
+                if (Connections.Count != other.Connections.Count ||
+                    Connections.Keys.Any(key => !other.Connections.ContainsKey(key)))
                 {
                     return false;
+                }
+            }
+
+            lock (_PropertiesLock)
+            {
+                if (Properties.Count != other.Properties.Count)
+                {
+                    return false;
+                }
+
+                // Check if the properties are the same
+                foreach (var property in Properties)
+                {
+                    Property otherProp;
+                    other.Properties.TryGetValue(property.Key, out otherProp);
+
+                    if (otherProp == null || !property.Value.CompareValue(otherProp))
+                    {
+                        return false;
+                    }
                 }
             }
 
@@ -193,14 +247,17 @@ namespace ThingModel
             // this instruction prevent infinite recursion
             workIds.Add(_id);
 
-            // And start the recursion for connected things
-            foreach (var connectedThing in Connections)
+            lock (other._ConnectionsLock)
             {
-                var otherThing = other.Connections[connectedThing.Key];
-
-                if (!connectedThing.Value.RecursiveCompare(otherThing, workIds))
+                // And start the recursion for connected things
+                foreach (var connectedThing in Connections)
                 {
-                    return false;
+                    var otherThing = other.Connections[connectedThing.Key];
+
+                    if (!connectedThing.Value.RecursiveCompare(otherThing, workIds))
+                    {
+                        return false;
+                    }
                 }
             }
 
@@ -212,7 +269,10 @@ namespace ThingModel
         {
             // Create a copy of this list, so the user can change the
             // things properties during a loop on this list without exceptions
-            return new List<Property>(Properties.Values);
+            lock (_PropertiesLock)
+            {
+                return new List<Property>(Properties.Values);
+            }
         }
 
 		// Create a semi-deep copy of the thing
@@ -221,24 +281,30 @@ namespace ThingModel
 	    public Thing Clone(bool attachConnections = false)
 	    {
 		    var copy = new Thing(_id, _type);
-		    foreach (var property in Properties)
-		    {
-			    copy.Properties[property.Key] = property.Value.Clone();
-		    }
+	        lock (_PropertiesLock)
+	        {
+                foreach (var property in Properties)
+                {
+                    copy.Properties[property.Key] = property.Value.Clone();
+                }
+	        }
 
-		    if (attachConnections)
-		    {
-				// Create a shallow copy
-				copy.Connections = new Dictionary<string, Thing>(Connections);
-		    }
-		    else
-		    {
-			    foreach (var connection in Connections)
-			    {
-					// Just copy the keys
-				    copy.Connections[connection.Key] = null;
-			    }
-		    }
+	        lock (_ConnectionsLock)
+	        {
+                if (attachConnections)
+                {
+                    // Create a shallow copy
+                    copy.Connections = new Dictionary<string, Thing>(Connections);
+                }
+                else
+                {
+                    foreach (var connection in Connections)
+                    {
+                        // Just copy the keys
+                        copy.Connections[connection.Key] = null;
+                    }
+                }
+	        }
 		    return copy;
 	    }
 
