@@ -198,16 +198,23 @@ namespace ThingModel.WebSockets
                                             {
                                                 var transaction = _thingModelObserver.GetTransaction(_toProtobuf,
                                                     SenderID, _reconnection);
-                                                byte[] output = _toProtobuf.Convert(transaction);
+                                                   
                                                 _thingModelObserver.Reset();
-
-                                                lock (_lockWsObject)
+                                                if (transaction.string_declarations.Count != 0 ||
+                                                    transaction.things_publish_list.Count != 0 ||
+                                                    transaction.things_remove_list.Count != 0 ||
+                                                    transaction.thingtypes_declaration_list.Count != 0)
                                                 {
-                                                    _reconnection = false;
+                                                    byte[] output = _toProtobuf.Convert(transaction);
+
+                                                    lock (_lockWsObject)
+                                                    {
+                                                        _reconnection = false;
+                                                    }
+                                                    Console.WriteLine("ThingModel: sending: " +
+                                                                      Convert.ToBase64String(output));
+                                                    _ws.Send(output);
                                                 }
-                                                Console.WriteLine("ThingModel: sending: " +
-                                                                  Convert.ToBase64String(output));
-                                                _ws.Send(output);
                                             }
                                             else
                                             {
